@@ -1,0 +1,62 @@
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
+        <a href="" class="navbar-brand p-0 d-flex align-items-center gap-2">
+            <img src="{{asset('logo3.png')}}" alt="Logo">
+            <h1 class="text-primary m-0">Desi Kitchen</h1>
+
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse {{session('user_id')?'':''}}" id="navbarCollapse">
+            <div class="navbar-nav ms-auto py-0 pe-4">
+                <a href="{{route('customer.dashboard')}}" class="nav-item nav-link active">Home</a>
+                <a href="{{route('customer.about')}}" class="nav-item nav-link">About</a>
+
+                <a href="{{route('customer.service')}}" class="nav-item nav-link">Service</a>
+                <a href="{{route('customer.menu')}}" class="nav-item nav-link">Menu</a>
+                <!-- <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <div class="dropdown-menu m-0">
+                        <a href="booking.html" class="dropdown-item">Booking</a>
+                        <a href="team.html" class="dropdown-item">Our Team</a>
+                        <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                    </div>
+                </div> -->
+                <a href="{{route('customer.contact')}}" class="nav-item nav-link">Contact</a>
+                @if(session('user_id'))
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <div class="dropdown-menu m-0">
+                        <a href="{{route('customer.subscription')}}" class="dropdown-item">Subscription</a>
+                        <a href="{{route('customer.order')}}" class="dropdown-item">Order</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">Profile</a>
+
+                    </div>
+                </div>
+                <a href="{{route('customer.logout')}}" class="nav-item nav-link">Logout</a>
+                @else
+                <div class="nav-item dropdown nav-auth" style="display: none;">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <div class="dropdown-menu m-0">
+                        <a href="{{route('customer.subscription')}}" class="dropdown-item">Subscription</a>
+                        <a href="{{route('customer.order')}}" class="dropdown-item">Order</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">Profile</a>
+                    </div>
+                </div>
+                <a href="{{route('customer.logout')}}" class="nav-item nav-link nav-auth" style="display: none;">Logout</a>
+                <a id="login-user" href="javascript:void(0)" class="nav-item nav-link">Sign In</a>
+                <!-- <button id="login-user" class="btn btn-primary ">Sign In</button> -->
+                @endif
+
+            </div>
+            <a href="{{route('customer.cart')}}" class="btn btn-primary py-2 px-4" id="cartBtn">
+                <i class="fa fa-shopping-cart"></i>
+                <span id="cartCount">0 items</span>
+                <span class="text-white fw-bold" id="cartTotal">$0.00</span>
+            </a>
+            <!-- <a href="" class="btn btn-primary py-2 px-4">Book A Table</a> -->
+
+
+
+        </div>
+    </nav>
