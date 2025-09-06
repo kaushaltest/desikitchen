@@ -40,13 +40,21 @@ Route::prefix('admin')
             Route::get('/get-daywise-menu', [Daywisemenu::class, 'getDaywiseMenuData'], function () {})->name("get-daywise-menu");
             Route::post('/delete-daywisemenu', [Daywisemenu::class, 'deleteDayWiseMenu'], function () {})->name("delete-daywisemenu");
             Route::post('/add-update-daywise-menu', [Daywisemenu::class, 'addUpdateMenu'])->name('add-update-daywise-menu');
+            Route::post('/menus/import', [Daywisemenu::class, 'import'])->name('menus.import');
+            Route::get('/menus/export', [Daywisemenu::class, 'export'])->name('menus.export');
+
 
             //alacarte menu routes
             Route::get('/alacarte-menu', [Alacartemenu::class, 'index'])->name('alacartemenu');
             Route::get('/get-alacarte-menu', [Alacartemenu::class, 'getAlacarteMenuData'], function () {})->name("get-alacarte-menu");
             Route::post('/delete-alacartemenu', [Alacartemenu::class, 'deleteAlacarteMenu'], function () {})->name("delete-alacartemenu");
             Route::post('/add-update-alacarte-menu', [Alacartemenu::class, 'addUpdateMenu'])->name('add-update-alacarte-menu');
+            Route::get('/get-category', [Alacartemenu::class, 'getCategory'])->name('get-category');
+            Route::post('/add-category', [Alacartemenu::class, 'addCategory'])->name('add-category');
+            Route::post('/import_alacarte', [Alacartemenu::class, 'import'])->name('import_alacarte');
 
+
+            
             //party menu routes
             Route::get('/party-menu', [Partymenu::class, 'index'])->name('partymenu');
             Route::get('/get-party-menu', [Partymenu::class, 'getPartyMenuData'], function () {})->name("get-party-menu");
@@ -62,7 +70,6 @@ Route::prefix('admin')
 
             Route::get('/get-order-list', [Order::class, 'getOrderListData'], function () {})->name("get-order-list");
             Route::post('/add-order', [Order::class, 'addOrder'])->name('add-order');
-
 
             Route::get('/checkmobileexist', [AdminLoginController::class, 'checkMobileExist'])->name('checkmobileexist');
             Route::post('/add-new-address', [Useraddress::class, 'addAddress'])->name('add-new-address');
@@ -84,8 +91,6 @@ Route::prefix('admin')
             Route::get('/get-all-adminusers', [Users::class, 'getAllAdminUser'], function () {})->name("get-all-adminusers");
             Route::post('/delete-admin-users', [Users::class, 'deleteAdminUser'], function () {})->name("delete-admin-users");
             Route::post('/add-update-admin-users', [Users::class, 'addUpdateAdminUser'])->name('add-update-admin-users');
-
-          
         });
         Route::get('/logout', [AdminLoginController::class, 'logout'])->name('logout');
         Route::get('/get-all-menulist', [Order::class, 'getAllMenuList'])->name('getallmenulist');
@@ -97,18 +102,16 @@ Route::prefix('admin')
         Route::post('/add-new-user', [Useraddress::class, 'addNewUser'])->name('add-new-user');
         Route::post('/add-order', [Order::class, 'addOrder'])->name('add-order');
         Route::post('/add-update-order', [Order::class, 'addUpdateOrder'])->name('add-update-order');
-          //table
-          Route::get('/tables', [Users::class, 'tables'])->name('tables');
-          Route::get('/get-all-table', [Users::class, 'getAllTables'], function () {})->name("get-all-table");
-          Route::post('/delete-admin-users', [Users::class, 'deleteTables'], function () {})->name("delete-admin-users");
-          Route::post('/add-update-table', [Users::class, 'addUpdateTables'])->name('add-update-table');
+        //table
+        Route::get('/tables', [Users::class, 'tables'])->name('tables');
+        Route::get('/get-all-table', [Users::class, 'getAllTables'], function () {})->name("get-all-table");
+        Route::post('/delete-admin-users', [Users::class, 'deleteTables'], function () {})->name("delete-admin-users");
+        Route::post('/add-update-table', [Users::class, 'addUpdateTables'])->name('add-update-table');
 
-          Route::get('/selecttable', [Tables::class, 'index'])->name('selecttable');
-          Route::get('/tableorder', [Tables::class, 'tableOrder'])->name('tableorder');
-          Route::post('/book-table', [Tables::class, 'bookTable'])->name('book-table');
-          Route::post('/add-table-order', [Order::class, 'addTableOrder'])->name('add-table-order');
-
-
+        Route::get('/selecttable', [Tables::class, 'index'])->name('selecttable');
+        Route::get('/tableorder', [Tables::class, 'tableOrder'])->name('tableorder');
+        Route::post('/book-table', [Tables::class, 'bookTable'])->name('book-table');
+        Route::post('/add-table-order', [Order::class, 'addTableOrder'])->name('add-table-order');
     });
 
 Route::name('customer.')
@@ -128,6 +131,9 @@ Route::name('customer.')
         Route::post('/update-user', [Auth::class, 'updateUser'])->name('update-user');
         Route::post('/guest-verify-otp', [Auth::class, 'verifyGuestOTP'])->name('guest-verify-otp');
         Route::post('/verify-user', [Auth::class, 'sessionExists'])->name('verify-user');
+        Route::get('/is-user-loggedin', [Auth::class, 'custSessionExists'])->name('is-user-loggedin');
+
+        
         Route::post('/get-user-address', [Auth::class, 'getUserAddress'])->name('get-user-address');
         Route::post('/add-order', [Customerorder::class, 'addOrder'])->name('add-order');
         Route::post('/add-new-address', [Customeruseraddress::class, 'addAddress'])->name('add-new-address');
@@ -143,6 +149,8 @@ Route::name('customer.')
         Route::post('/buy-subscription', [CustomerSubscription::class, 'buySubscription'])->name('buy-subscription');
 
         Route::get('/profile', [CustomerSubscription::class, 'profile'])->name('profile');
+        Route::get('/check-subscription', [CustomerSubscription::class, 'checkSubscription'])->name('check-subscription');
+
         // More customer routes here
         // Route::middleware('auth')->group(function () {
         //     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');

@@ -822,7 +822,7 @@
                                 showCheckout();
 
                             } else {
-                                toastFail((response.message) ? response.message : "Application cant register try again");
+                                toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                             }
                         },
                         error: function(xhr, status, error) {
@@ -1854,7 +1854,7 @@
                     }, 1000);
 
                 } else {
-                    toastFail((response.message) ? response.message : "Application cant register try again");
+                    toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                 }
             },
             error: function(xhr, status, error) {
@@ -1899,7 +1899,7 @@
                         checkWithDBMobileExist($('#mobileInput').val())
 
                     } else {
-                        toastFail((response.message) ? response.message : "Application cant register try again");
+                        toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                     }
                 },
                 error: function(xhr, status, error) {

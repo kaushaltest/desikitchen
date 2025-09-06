@@ -15,4 +15,8 @@ class Category_model extends Model
     {
         return $this->hasMany(Alacartemenu_model::class, 'category_id');
     }
+    
+    protected $fillable = [
+        'category'
+    ];
 }

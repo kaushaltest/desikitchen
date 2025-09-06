@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Customer Panel')</title>
     <link rel="stylesheet" href="{{ asset('customer-assets/css/style.css') }}">
     @include('layouts.customer.header')
@@ -632,6 +633,8 @@
     let searchTerm = '';
     let alacarteorder_date = '';
     let currentUser = '';
+    let mealRemaining = 0;
+    let ifDeductAnountFromPlan = true;
     const assetBase = "{{ asset('storage') }}";
     const defaultImage = "{{ asset('default.png') }}";
 
@@ -681,8 +684,8 @@
     function updateCartDisplay() {
         const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
         const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-        $('#cartCount').text(`${itemCount} items`);
-        $('#cartTotal').text(`$${total.toFixed(2)}`);
+        $('#cartCount').text(`${itemCount>0?itemCount+' items':'Cart'}`);
+        $('#cartTotal').text(`${(total!=0)?'$'+total.toFixed(2):''}`);
     }
 
     function removeFromCart(cartId) {
@@ -711,7 +714,7 @@
             const isToday = menu.menu_date === today;
             html += ` <div class="col-lg-12 border  p-3 mb-3" style="border-radius: 10px;">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 80px;" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
+                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 120px; height:80px" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
                                 <div class="w-100 d-flex flex-column text-start ps-4">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.title}
@@ -756,9 +759,9 @@
             html += `<h5 class="mb-3">${category.category}</h5><div class="row mb-3 border p-3" style="border-radius: 10px;">`;
             category?.alacartemenus?.forEach(menu => {
 
-                html += ` <div class="col-lg-12">
+                html += ` <div class="col-lg-12 mb-3">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 80px;" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
+                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 120px; height:80px" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
                                 <div class="w-100 d-flex flex-column text-start ps-4">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.name}</span>
@@ -778,6 +781,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <hr />
                         </div>`;
             })
             html += `</div>`;
@@ -1169,6 +1173,7 @@
         $("#login-user").click(function() {
             $('#step-mobile').show();
             $('#step-otp').hide();
+            $("#guest_login").show();
             $('#model_login').modal('toggle');
         })
         $('#checkoutBtn').click(function() {
@@ -1194,10 +1199,12 @@
                                 return;
                             }
                         }
+                        ifDeductAnountFromPlan = true;
                         showCheckout();
                     } else {
                         $('#step-mobile').show();
                         $('#step-otp').hide();
+                        $("#guest_login").show();
                         $('#model_login').modal('toggle');
                     }
                 },
@@ -1260,7 +1267,7 @@
                             $("#step-otp").show();
                             startResendCountdown();
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1314,9 +1321,11 @@
                             $("#step-otp").hide();
                             $('#model_login').modal('toggle');
                             toastSuccess(response.message);
-
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1405,7 +1414,7 @@
                             toastSuccess(response.message);
 
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1495,7 +1504,7 @@
                             $("#step-register-otp").show();
                             startResendCountdown();
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1553,7 +1562,7 @@
                             toastSuccess(response.message);
 
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1646,7 +1655,7 @@
                             $('#addAddressModal').modal('toggle');
                             showCheckout();
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1709,6 +1718,7 @@
             }
         }, 1000);
     }
+
     function guestStartResendCountdown() {
         countdown = 30;
         $('#guest-resend-action').addClass('text-muted').removeClass('text-primary').css('pointer-events', 'none');
@@ -1725,8 +1735,38 @@
         }, 1000);
     }
 
-    function showCheckout() {
+    async function isSubscriptionExist() {
+        return new Promise((resolve) => {
+            $.ajax({
+                url: "{{ route('customer.check-subscription') }}",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                method: 'get',
+                beforeSend: function() {
+                    $(".loader-wrapper").css("display", "flex");
+                },
+                success: function(response) {
+                    if (response.success) {
+                        mealRemaining = (response?.meal_remaining) ? response.meal_remaining : 0
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                },
+                error: function() {
+                    resolve(false);
+                },
+                complete: function() {
+                    $(".loader-wrapper").css("display", "none");
+                },
+            });
+        });
+    }
 
+
+    async function showCheckout() {
+        let is_subscription_exist = await isSubscriptionExist()
         $.ajax({
             url: "{{ route('customer.get-user-address') }}", // Change this to your server endpoint
             type: 'GET',
@@ -1789,7 +1829,7 @@
 
 
         // Order summary
-        const total = cart.reduce((sum, item) => {
+        let total = cart.reduce((sum, item) => {
             // Main item total
             let itemTotal = item.price * item.quantity;
             console.log(item)
@@ -1824,6 +1864,7 @@
             }
         };
         let summaryHtml = '';
+        let isDailyTiffinAvailable=false;
         const grouped = cart.reduce((acc, item) => {
             if (!acc[item.type]) acc[item.type] = [];
             acc[item.type].push(item);
@@ -1857,16 +1898,36 @@
 
 
             items.forEach(item => {
-                console.log(category.name)
                 summaryHtml += `
                     <div class="d-flex justify-content-between align-items-center mt-1">
                         <div class="d-flex">
                             <h6>${item.name} x ${item.quantity}</h6>`;
+                let quantityAfterPlan = item.quantity;
                 if (category.name == "Daywise") {
+                    isDailyTiffinAvailable=true;
+                    if (mealRemaining > 0) {
+                        if (ifDeductAnountFromPlan) {
+                            let total_meal = mealRemaining - item.quantity;
+                            if (total_meal < 0) {
+                                let finalQty =  Math.abs(total_meal);
+                                let caalculateQtyForTotal =finalQty -item.quantity;
+                                const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
+                                quantityAfterPlan = finalQty
+                                mealRemaining = 0;
+                                total = total - finalPrice;
+                            } else {
+                                quantityAfterPlan = 0
+                                mealRemaining -= item.quantity;
+                                const finalPrice = item.price * item.quantity;
+                                total = total - finalPrice
+                            }
+                        }
+
+                    }
                     summaryHtml += `<span class="badge bg-primary" style="height:22px">${item.order_date} (${item.day_name})</span>`;
                 }
                 summaryHtml += `</div>
-                        <small class="fw-medium">$${(item.price * item.quantity).toFixed(2)}</small>
+                        <small class="fw-medium">$${(item.price * quantityAfterPlan).toFixed(2)}</small>
                     </div>
                 `;
                 if (item?.additional_items?.length > 0) {
@@ -1885,8 +1946,19 @@
             });
             summaryHtml += ' <hr>';
         }
+        summaryHtml += `<hr>`;
+        console.log("is_subscription_exist " + is_subscription_exist)
+        if (is_subscription_exist && isDailyTiffinAvailable) {
+            summaryHtml += `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="deductPlanCheckbox" ${(ifDeductAnountFromPlan)?'checked':''}>
+                    <label class="form-check-label" id="chk_deductplantext" for="deductPlanCheckbox">
+                    Deduct amount from plan (Remaining meal : ${mealRemaining})
+                    </label>
+                </div>
+                `;
+        }
         summaryHtml += `
-                <hr>
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Total:</strong>
                     <strong class="text-success">$${total.toFixed(2)}</strong>
@@ -1897,6 +1969,18 @@
 
         $('#checkoutModal').modal('show');
     }
+    $(document).on("change", "#deductPlanCheckbox", async function() {
+        if ($(this).is(":checked")) {
+            ifDeductAnountFromPlan = true;
+            showCheckout()
+            // Do something when checked
+        } else {
+            ifDeductAnountFromPlan = false;
+            showCheckout()
+            $("#chk_deductplantext").text(`Deduct amount from plan (Remaining meal : ${mealRemaining})`);
+            // Do something when unchecked
+        }
+    });
 
     function selectAddress(addressId) {
         selectedAddress = currentUser.address.find(addr => addr.id === addressId);
@@ -1907,6 +1991,8 @@
     }
 
     function completeOrder() {
+        let isDeductChecked = $("#deductPlanCheckbox").is(":checked");
+
         const grouped = cart.reduce((acc, item) => {
             if (!acc[item.type]) acc[item.type] = [];
             acc[item.type].push(item);
@@ -1922,6 +2008,7 @@
                 cart: grouped,
                 address_id: selectedAddress.id,
                 alacarteorder_date: alacarteorder_date,
+                is_deduct_amount: isDeductChecked
             },
             beforeSend: function() {
                 $(".loader-wrapper").css("display", "flex")
@@ -1942,7 +2029,7 @@
                     }, 1000);
 
                 } else {
-                    toastFail((response.message) ? response.message : "Application cant register try again");
+                    toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                 }
             },
             error: function(xhr, status, error) {

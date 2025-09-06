@@ -34,8 +34,22 @@
                     <div class="card">
                         <!-- /.card-header -->
                         <div class="card-body table-responsive">
+
+                            <!-- <form action="{{ route('admin.menus.import') }}" method="POST" enctype="multipart/form-data" class="my-3">
+                                @csrf
+                                <div class="input-group">
+                                    <input type="file" name="file" class="form-control" required>
+                                    <button class="btn btn-primary" type="submit">Import</button>
+                                </div>
+                            </form>
+
+                            <a href="{{ route('admin.menus.export') }}" class="btn btn-success mb-3">Export Excel</a> -->
+
                             <div class="d-flex justify-content-end mb-3">
                                 <div class="">
+                                    <button class="btn btn-success text-right" onclick="exportExcel()"><i class="fa fa-download"></i> Export Excel</button>
+                                    <button class="btn btn-success text-right" id="btn_import"><i class="fa fa-upload"></i> Import Excel</button>
+
                                     <button class="btn btn-primary btn-add-menu text-right">Add Menu</button>
                                 </div>
                             </div>
@@ -104,12 +118,112 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="model_add_import_request" role="dialog" aria-labelledby="model_add_import_request">
+        <div class="modal-dialog modal-dialog-centered model_add_import_request" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title "><span class="model_add_edit_menu_title"></span> Import File</h5>
+                    <button class="btn-close py-0" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form_add_import_request" method="post" class="theme-form needs-validation" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="form-group">
+                            <label class="col-form-label" for="file_menu_image">Upload File</label>
+                            <input type="file" class="form-control" id="file_import_file" name="file_import_file">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!--end::App Content-->
 </main>
 <script src="{{asset('admin-assets/validation/daywisemenu.js')}}"></script>
-<script>
-    $(document).ready(function() {
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
+<script>
+    async function exportExcel() {
+        const ExcelJS = window.ExcelJS;
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet("Menu");
+
+        // Headers
+        sheet.addRow(["Id", "Title", "Price", "Date", "Items"]);
+        $.ajax({
+            url: "{{ route('admin.get-daywise-menu') }}", // Change this to your server endpoint
+            type: 'GET',
+            beforeSend: function() {
+                $(".loader-wrapper").css("display", "flex")
+            },
+            success: async function(response) {
+                // Handle success response
+                if (response?.data) {
+                    response?.data.forEach(ele => {
+                        sheet.addRow([ele.id, ele.title, ele.price, ele.menu_date, ele.items]);
+                    });
+
+                }
+                const buf = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buf]), "menu.xlsx");
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                // var errors = xhr.responseJSON.errors;
+                toastFail(error)
+            },
+            complete: function() {
+                $(".loader-wrapper").css("display", "none")
+            },
+        });
+
+
+        // Example Data
+        // const data = [{
+        //     title: "Kathiyavadi dish",
+        //     price: "100.00",
+        //     menu_date: "2025-08-09",
+        //     items: "2 roti, 2 sabji",
+        //     image_url: "https://picsum.photos/200/300" // sample
+        // }];
+
+        // for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+        //     let d = data[rowIndex];
+        //     sheet.addRow([d.title, d.price, d.menu_date, d.items, ""]);
+
+        //     // fetch image
+        //     // let response = await fetch(d.image_url);
+        //     // let blob = await response.blob();
+        //     // let buffer = await blob.arrayBuffer();
+
+        //     // const imageId = workbook.addImage({
+        //     //     buffer: buffer,
+        //     //     extension: "png",
+        //     // });
+
+        //     // sheet.addImage(imageId, {
+        //     //     tl: {
+        //     //         col: 4,
+        //     //         row: rowIndex + 1
+        //     //     }, // column index (0-based)
+        //     //     ext: {
+        //     //         width: 80,
+        //     //         height: 80
+        //     //     }
+        //     // });
+        // }
+
+
+    }
+    $(document).ready(function() {
+        const assetBase = "{{ asset('storage') }}";
+        const defaultImage = "{{ asset('default.png') }}";
         var table = $("#dt_daywisemenu").DataTable({
             ajax: {
                 url: '{{route("admin.get-daywise-menu")}}', // Replace with your server endpoint
@@ -127,9 +241,9 @@
                     data: 'id',
                 },
                 {
-                    data: 'image_url',
+                    data: 'image_path',
                     render: function(data) {
-                        return `<img src="${data}" width="80" onerror="this.onerror=null;this.src='{{ asset("default.png") }}'>`;
+                        return `<img src="${data ? `${assetBase}/${data}` : defaultImage}" width="80" >`;
                     }
                 },
                 {
@@ -164,7 +278,11 @@
             //     }
             // }]
         });
-
+        $("#btn_import").click(function() {
+            $("#file_import_file").val("");
+            $('#form_add_import_request').validate().resetForm();
+            $('#model_add_import_request').modal('toggle');
+        });
         $(".btn-add-menu").click(function() {
             $('#form_add_edit_menu').validate().resetForm();
             $('#form_add_edit_menu')[0].reset();
@@ -261,7 +379,7 @@
                             table.ajax.reload();
 
                         } else {
-                            toastFail((response.message) ? response.message : "Application cant register try again");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -273,6 +391,66 @@
                         $(".loader-wrapper").css("display", "none")
                     },
                 });
+
+            }
+        });
+        $('#form_add_import_request').validate({
+            rules: validationRules.importRequestForm.rules,
+            messages: validationRules.importRequestForm.messages,
+            submitHandler: async function(form, event) {
+                event.preventDefault();
+                const fileInput = form.querySelector('input[name="file_import_file"]');
+                const file = fileInput.files[0];
+                const ExcelJS = window.ExcelJS;
+                const workbook = new ExcelJS.Workbook();
+                await workbook.xlsx.load(await file.arrayBuffer());
+                const sheet = workbook.worksheets[0];
+                let rowsData = [];
+                sheet.eachRow((row, rowNumber) => {
+                    if (rowNumber === 1) return; // skip header
+
+                    rowsData.push({
+                        id: row.getCell(1).value,
+                        title: row.getCell(2).value,
+                        price: row.getCell(3).value,
+                        date: row.getCell(4).value,
+                        items: row.getCell(5).value,
+                        image: null // will be filled later
+                    });
+                });
+
+                // Read images & map them
+                sheet.getImages().forEach((imgObj, index) => {
+                    const img = workbook.getImage(imgObj.imageId);
+
+                    let base64 = btoa(
+                        new Uint8Array(img.buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+                    );
+
+                    rowsData[index].image = "data:image/png;base64," + base64;
+                });
+                fetch("{{ route('admin.menus.import') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            data: rowsData
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            toastSuccess(res.message);
+                            $('#model_add_import_request').modal('toggle');
+                            table.ajax.reload();
+
+                        } else {
+                            toastFail(res.message)
+                        }
+                    })
+                    .catch(err => toastFail(err.message));
 
             }
         });

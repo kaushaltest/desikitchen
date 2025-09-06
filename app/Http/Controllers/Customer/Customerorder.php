@@ -107,7 +107,11 @@ class Customerorder extends Controller
     public function addOrder(Request $request)
     {
         try {
+            echo $request->input('is_deduct_amount');
+            
             $items = $request->input('cart');
+            print_r($items['daywise']);
+            exit ;
             if (isset($items['daywise'])) {
                 $paymentStatus = 'Unpaid';
                 $subscription_plan = Usersubscription_model::where('user_id', session('user_id'))

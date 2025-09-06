@@ -16,6 +16,7 @@ class Alacartemenu_model extends Model
         return $this->belongsTo(Category_model::class, 'category_id');
     }
     protected $fillable = [
+        'category_id',
         'name',
         'description',
         'price',

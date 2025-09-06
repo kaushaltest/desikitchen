@@ -20,6 +20,10 @@ class Auth_model extends Authenticatable
         'phone',
         'is_active'
     ];
+    public function address()
+    {
+        return $this->hasMany(Useraddress_model::class, 'user_id');
+    }
     public function subscription()
     {
         return $this->hasMany(Usersubscription_model::class, 'user_id');

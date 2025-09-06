@@ -55,12 +55,12 @@
                                 <p>Alacarte</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="{{ route('admin.partymenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Party</p>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="{{ route('admin.additionalmenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-plus-square-fill"></i>
@@ -70,25 +70,25 @@
                     </ul>
                 </li>
                 <li class="nav-item ">
-                    <a href="{{ route('admin.order') }}" class="nav-link active">
+                    <a href="{{ route('admin.order') }}" class="nav-link">
                         <i class="nav-icon bi bi-list"></i>
                         <p>Order</p>
                     </a>
                 </li>
                 <li class="nav-item ">
-                    <a href="{{ route('admin.subscription') }}" class="nav-link active">
+                    <a href="{{ route('admin.subscription') }}" class="nav-link">
                         <i class="nav-icon bi bi-credit-card"></i>
                         <p>Subscription</p>
                     </a>
                 </li>
                 <li class="nav-item ">
-                    <a href="{{ route('admin.users') }}" class="nav-link active">
+                    <a href="{{ route('admin.users') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
                         <p>User</p>
                     </a>
                 </li>
                 <li class="nav-item ">
-                    <a href="{{ route('admin.admin-user') }}" class="nav-link active">
+                    <a href="{{ route('admin.admin-user') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
                         <p>Admin User</p>
                     </a>
@@ -96,7 +96,7 @@
                 @endif
                 @endauth
                 <li class="nav-item ">
-                    <a href="{{ route('admin.logout') }}" class="nav-link active">
+                    <a href="{{ route('admin.logout') }}" class="nav-link">
                         <i class="nav-icon bi bi-box-arrow-left"></i>
                         <p>Logout</p>
                     </a>

@@ -221,6 +221,6 @@ class Users extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Table deleted successfully']);
     }
 }

@@ -133,7 +133,7 @@ class Menu extends Controller
                 'order_date'    =>  Carbon::parse($order->order_date)->format('d-m-Y'),
                 'status'        => ucfirst($order->status),
                 'status_badge'  => $this->getStatusBadge($order->status),
-                'total_amount'  => '₹' . number_format($order->total_amount, 2),
+                'total_amount'  => '$' . number_format($order->total_amount, 2),
                 'created_at'    => Carbon::parse($order->created_at)->format('d-m-Y H:i'),
             ];
         });

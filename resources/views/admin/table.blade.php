@@ -249,7 +249,7 @@
                             $('#model_add_edit_tables').modal('toggle');
                             table.ajax.reload();
                         } else {
-                            toastFail(response.message || "Application can't register, try again");
+                            toastFail(response.message || "Something went wrong. Please try again later.");
                         }
                     },
                     error: function(xhr) {

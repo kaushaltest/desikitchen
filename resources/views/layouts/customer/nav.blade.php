@@ -23,27 +23,28 @@
                     </div>
                 </div> -->
                 <a href="{{route('customer.contact')}}" class="nav-item nav-link">Contact</a>
+                <a href="{{route('customer.subscription')}}" class="nav-item nav-link">Plans</a>
                 @if(session('user_id'))
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-user"></i></a>
                     <div class="dropdown-menu m-0">
-                        <a href="{{route('customer.subscription')}}" class="dropdown-item">Subscription</a>
-                        <a href="{{route('customer.order')}}" class="dropdown-item">Order</a>
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">Profile</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
+                        <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
+                        <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>
 
                     </div>
                 </div>
-                <a href="{{route('customer.logout')}}" class="nav-item nav-link">Logout</a>
                 @else
                 <div class="nav-item dropdown nav-auth" style="display: none;">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-user"></i></a>
                     <div class="dropdown-menu m-0">
-                        <a href="{{route('customer.subscription')}}" class="dropdown-item">Subscription</a>
-                        <a href="{{route('customer.order')}}" class="dropdown-item">Order</a>
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">Profile</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
+                        <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
+                        <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>
                     </div>
                 </div>
-                <a href="{{route('customer.logout')}}" class="nav-item nav-link nav-auth" style="display: none;">Logout</a>
                 <a id="login-user" href="javascript:void(0)" class="nav-item nav-link">Sign In</a>
                 <!-- <button id="login-user" class="btn btn-primary ">Sign In</button> -->
                 @endif
@@ -51,8 +52,8 @@
             </div>
             <a href="{{route('customer.cart')}}" class="btn btn-primary py-2 px-4" id="cartBtn">
                 <i class="fa fa-shopping-cart"></i>
-                <span id="cartCount">0 items</span>
-                <span class="text-white fw-bold" id="cartTotal">$0.00</span>
+                <span id="cartCount">Cart</span>
+                <span class="text-white fw-bold" id="cartTotal"></span>
             </a>
             <!-- <a href="" class="btn btn-primary py-2 px-4">Book A Table</a> -->
 

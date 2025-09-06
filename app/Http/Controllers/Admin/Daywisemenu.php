@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\MenuExport;
 use App\Http\Controllers\Controller;
+use App\Imports\MenuImport;
 use App\Models\Admin\Daywisemenu_model;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Daywisemenu extends Controller
 {
@@ -85,8 +89,8 @@ class Daywisemenu extends Controller
             return response()->json(['success' => false, 'message' => 'Menu not found']);
         }
         // Delete image if exists
-        if ($request->has('image_path') && File::exists(public_path('storage/'.$request->image_path))) {
-            File::delete(public_path('storage/'.$request->image_path));
+        if ($request->has('image_path') && File::exists(public_path('storage/' . $request->image_path))) {
+            File::delete(public_path('storage/' . $request->image_path));
         }
 
         // Or delete from storage if saved via Storage::put
@@ -96,5 +100,94 @@ class Daywisemenu extends Controller
         $menu->delete();
 
         return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $data = $request->input('data', []);
+            foreach ($data as $row) {
+                $imagePath = null;
+                // If image exists
+                if (!empty($row['image'])) {
+                    $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $row['image']));
+                    $imageName = uniqid() . '.png';
+                    Storage::disk('public')->put("uploads/$imageName", $imageData);
+                    $imagePath = "uploads/$imageName";
+                }
+                if (empty($row['title']) || empty($row['price'])) {
+                    continue;
+                }
+
+                if (!empty($row['id'])) {
+                    $menu = Daywisemenu_model::find($row['id']);
+                    
+                    if ($menu) {
+                        // Update existing record
+                        $menu->update([
+                            'title' => $row['title'],
+                            'price' => $row['price'],
+                            'menu_date'  => $this->normalizeDate($row['date']),
+                            'items' => $row['items'],
+                            'image' => $imagePath ?? $menu->image, // keep old image if not provided
+                        ]);
+                    } else {
+                        // ID given but not found → insert new
+                        Daywisemenu_model::create([
+                            'title' => $row['title'],
+                            'price' => $row['price'],
+                            'menu_date'  => $this->normalizeDate($row['date']),
+                            'items' => $row['items'],
+                            'image' => $imagePath ?? null,
+                        ]);
+                    }
+                } else {
+                    // No ID → always create new
+                    Daywisemenu_model::create([
+                        'title' => $row['title'],
+                        'price' => $row['price'],
+                        'menu_date'  => $this->normalizeDate($row['date']),
+                        'items' => $row['items'],
+                        'image' => $imagePath ?? null,
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Import file successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                'error' => $e->getMessage()
+            ], 200);
+        }
+    }
+    private function normalizeDate($dateValue)
+    {
+        if (empty($dateValue)) {
+            return null;
+        }
+    
+        try {
+            // Case 1: Already a Carbon/DateTime object
+            if ($dateValue instanceof \DateTime) {
+                return Carbon::instance($dateValue)->format('Y-m-d');
+            }
+    
+            // Case 2: Numeric Excel date serial
+            if (is_numeric($dateValue)) {
+                // Excel's base date is 1899-12-30
+                return Carbon::createFromDate(1899, 12, 30)->addDays($dateValue)->format('Y-m-d');
+            }
+    
+            // Case 3: ISO 8601 string or normal string
+            return Carbon::parse($dateValue)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null; // fallback if parsing fails
+        }
+    }
+    
+    public function export()
+    {
+        return Excel::download(new MenuExport, 'menus.xlsx');
     }
 }

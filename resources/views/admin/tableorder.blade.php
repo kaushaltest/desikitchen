@@ -1242,7 +1242,7 @@
                         }, 1000);
 
                     } else {
-                        toastFail((response.message) ? response.message : "Application cant register try again");
+                        toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
                     }
                 },
                 error: function(xhr, status, error) {

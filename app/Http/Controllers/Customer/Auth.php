@@ -143,6 +143,10 @@ class Auth extends Controller
     {
         return $request->session()->has('user_id');
     }
+    public function custSessionExists(Request $request): bool
+    {
+        return $request->session()->has('user_id');
+    }
 
     public function getUserAddress(Request $request)
     {

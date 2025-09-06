@@ -22,7 +22,7 @@
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h1 class="section-title ff-secondary text-center text-primary fw-normal">Our Master Chefs</h1>
+            <h1 class="section-title ff-secondary text-center text-primary fw-normal">Our Master Chef</h1>
             <!-- <h1 class="mb-5">Our Master Chefs</h1> -->
         </div>
         <!-- <div class="row g-4">
@@ -101,7 +101,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <h5 class="section-title ff-secondary text-start text-primary fw-normal">About Chefs</h5>
+                <h1 class="section-title ff-secondary text-start text-primary fw-normal">Chef</h1>
                 <div class="p-0 d-flex align-items-center mb-4">
                     <h1>Welcome to </h1>
                     <img src="{{asset('logo3.png')}}" width="50" alt="Logo">
@@ -147,8 +147,8 @@
                 <div class="service-item rounded pt-3">
                     <div class="p-4">
                         <i class="fa fa-3x fa-user-tie text-primary mb-4"></i>
-                        <h5>Master Chefs</h5>
-                        <p>Our chefs bring decades of culinary expertise to every plate, blending tradition with creativity.</p>
+                        <h5>Master Chef</h5>
+                        <p>Our chef bring decades of culinary expertise to every plate, blending tradition with creativity.</p>
 
                     </div>
                 </div>

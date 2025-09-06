@@ -15,7 +15,7 @@ class Usersubscription_model extends Authenticatable
     protected $fillable = [
         'user_id',
         'plan_id',
-        'meals_remaning',
+        'meals_remaining',
         'start_date',
         'end_date',
         'status',

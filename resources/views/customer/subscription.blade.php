@@ -123,11 +123,22 @@
                 },
                 success: function(response) {
                     // handle success
-                    toastSuccess(response.message);
+                    if (response.success) {
+                        toastSuccess(response.message);
+                    } else {
+                        if (!response.loggedin) {
+                            $('#step-mobile').show();
+                            $('#step-otp').hide();
+                            $("#guest_login").show();
+                            $('#model_login').modal('toggle');
+                        } else {
+                            toastFail(response.message);
+                        }
+                    }
                 },
                 error: function(xhr) {
                     // handle error
-                    toastError(xhr.responseText);
+                    toastFail(xhr.responseText);
                 }
             });
         });

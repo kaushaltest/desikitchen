@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Alacartemenu_model;
+use App\Models\Admin\Category_model;
 use App\Models\Admin\Daywisemenu_model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -18,8 +19,9 @@ class Alacartemenu extends Controller
     }
     public function getAlacarteMenuData()
     {
-        $data = Alacartemenu_model::all()->map(function ($item) {
+        $data = Alacartemenu_model::with(['category'])->get()->map(function ($item) {
             // Append full URL to image
+            $item->category_name = $item->category ? $item->category->category : null;
             $item->image_url = asset('storage/' . $item->image_path);
             return $item;
         });
@@ -33,8 +35,9 @@ class Alacartemenu extends Controller
         try {
             if (empty($request->input('hid_menuid'))) {
                 $added_data = [
+                    'category_id' => $request->input('drp_category'),
                     'name' => $request->input('txt_title'),
-                    'description' => $request->input('txt_description'),
+                    'description' => $request->input('text_description'),
                     'is_active' => $request->input('rbt_is_active'),
                     'price' => $request->input('txt_price'),
                 ];
@@ -51,8 +54,9 @@ class Alacartemenu extends Controller
                 ], 200);
             } else {
                 $updated_data = [
-                  'name' => $request->input('txt_title'),
-                    'description' => $request->input('txt_description'),
+                    'category_id' => $request->input('drp_category'),
+                    'name' => $request->input('txt_title'),
+                    'description' => $request->input('text_description'),
                     'is_active' => $request->input('rbt_is_active'),
                     'price' => $request->input('txt_price'),
                 ];
@@ -87,8 +91,8 @@ class Alacartemenu extends Controller
             return response()->json(['success' => false, 'message' => 'Menu not found']);
         }
         // Delete image if exists
-        if ($request->has('image_path') && File::exists(public_path('storage/'.$request->image_path))) {
-            File::delete(public_path('storage/'.$request->image_path));
+        if ($request->has('image_path') && File::exists(public_path('storage/' . $request->image_path))) {
+            File::delete(public_path('storage/' . $request->image_path));
         }
 
         // Or delete from storage if saved via Storage::put
@@ -98,5 +102,94 @@ class Alacartemenu extends Controller
         $menu->delete();
 
         return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+    }
+
+    public function getCategory()
+    {
+        $data = Category_model::select('id', 'category')->get();
+        return response()->json([
+            'data' => $data,
+        ], 200);
+    }
+
+    public function addCategory(Request $request)
+    {
+        try {
+            $categoryName = $request->input('txt_category');
+
+            $exists = Category_model::whereRaw('LOWER(category) = ?', [strtolower($categoryName)])->exists();
+
+            if ($exists) {
+                return response()->json([
+                    "success" => false,
+                    'message' => "This category already exists"
+                ], 200);
+            }
+            $added_data = [
+                'category' => $categoryName,
+            ];
+
+            Category_model::create($added_data);
+
+            return response()->json([
+                "success" => true,
+                'message' => "Category added successfully"
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                'error' => $e->getMessage()
+            ], 200);
+        }
+    }
+    public function import(Request $request)
+    {
+        try {
+            $data = $request->input('data', []);
+            foreach ($data as $row) {
+                $imagePath = null;
+              
+                if (empty($row['name']) || empty($row['price'])) {
+                    continue;
+                }
+
+                if (!empty($row['id'])) {
+                    $menu = Daywisemenu_model::find($row['id']);
+
+                    if ($menu) {
+                        // Update existing record
+                        $menu->update([
+                            'title' => $row['title'],
+                            'price' => $row['price'],
+                            'items' => $row['items'],
+                            'image' => $imagePath ?? $menu->image, // keep old image if not provided
+                        ]);
+                    } else {
+                        // ID given but not found → insert new
+                        Daywisemenu_model::create([
+                            'title' => $row['title'],
+                            'price' => $row['price'],
+                            'items' => $row['items'],
+                            'image' => $imagePath ?? null,
+                        ]);
+                    }
+                } else {
+                    // No ID → always create new
+                    Daywisemenu_model::create([
+                        'title' => $row['title'],
+                        'price' => $row['price'],
+                        'items' => $row['items'],
+                        'image' => $imagePath ?? null,
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Import file successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                'error' => $e->getMessage()
+            ], 200);
+        }
     }
 }
