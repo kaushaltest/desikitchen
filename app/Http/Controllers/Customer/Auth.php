@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Customer\Auth_model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class Auth extends Controller
 {
@@ -16,6 +17,43 @@ class Auth extends Controller
         return response()->json([
             "success" => true,
             "data" => $data
+        ]);
+    }
+
+    public function signIn(Request $request)
+    {
+        $email = $request->input('txt_login_email');
+        $password = $request->input('txt_login_password');
+
+        $user = Auth_model::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                "message" => "User not found with this email."
+            ], 404);
+        }
+
+        // 3. Verify password
+        if (!Hash::check($password, $user->password)) {
+            return response()->json([
+                "success" => false,
+                "message" => "Invalid password."
+            ], 401);
+        }
+        session([
+            'user_id' => $user->id,
+            'user_phone' => $user->phone,
+            'user_name' => $user->name,
+            'user_email' => $user->email,
+            // any other needed payload
+        ]);
+
+        // Regenerate for safety
+        session()->regenerate();
+        return response()->json([
+            "success" => true,
+            "message" => 'Login successfuly'
         ]);
     }
 
@@ -39,12 +77,12 @@ class Auth extends Controller
             session()->regenerate();
             return response()->json([
                 "success" => true,
-                "message" => 'OTP verified successfuly'
+                "message" => 'OTP verification completed successfully!'
             ]);
         } else {
             return response()->json([
                 "success" => false,
-                "message" => 'Invalid OTP. Please try again.'
+                "message" => 'The OTP entered is incorrect. Please try again.. Please try again.'
             ]);
         }
     }
@@ -62,6 +100,7 @@ class Auth extends Controller
                 $data = Auth_model::create([
                     'phone' => $mobile,
                     'name'  => 'Guest User', // you can make this dynamic if needed
+                    'role' => 'guest'
                 ]);
             }
 
@@ -77,25 +116,25 @@ class Auth extends Controller
             session()->regenerate();
             return response()->json([
                 "success" => true,
-                "message" => 'OTP verified successfuly'
+                "message" => 'OTP verification completed successfully!'
             ]);
         } else {
             return response()->json([
                 "success" => false,
-                "message" => 'Invalid OTP. Please try again.'
+                "message" => 'The OTP entered is incorrect. Please try again.. Please try again.'
             ]);
         }
     }
 
     public function checkRegisterMobileExist(Request $request)
     {
-        $mobile = $request->input('txt_new_mobile');
-        $data = Auth_model::where('phone', $mobile)
+        $email = $request->input('txt_new_email');
+        $data = Auth_model::where('email', $email)
             ->first();
         if ($data) {
             return response()->json([
                 "success" => false,
-                "message" => 'This mobile number is already exist'
+                "message" => 'This email is already exist'
             ]);
         }
         return response()->json([
@@ -109,32 +148,51 @@ class Auth extends Controller
         $name = $request->input('name');
         $email = $request->input('email');
         $mobile = $request->input('mobile');
+        $password = $request->input('password');
 
         if ($otp == '1234') {
-            $data = Auth_model::create([
-                'name'  => $name,
-                'email' => $email,
-                'phone' => $mobile,
-                // add any other default fields like password, etc.
-            ]);
+
+            $user = Auth_model::where('phone', $mobile)
+                ->where('role', 'guest')
+                ->first();
+
+
+            if ($user) {
+                // 2. Update existing guest record
+                $user->update([
+                    'name'     => $name,
+                    'email'    => $email,
+                    'password' => Hash::make($password),
+                    'role'     => 'user', // or whatever role you want after registration
+                ]);
+            } else {
+                // 3. Otherwise create new record
+                $user = Auth_model::create([
+                    'name'     => $name,
+                    'email'    => $email,
+                    'phone'    => $mobile,
+                    'password' => Hash::make($password),
+                    'role'     => 'user', // default role
+                ]);
+            }
+
             session([
-                'user_id' => $data->id,
-                'user_phone' => $mobile,
-                'user_name' => $name,
-                'user_email' => $email,
-                // any other needed payload
+                'user_id'    => $user->id,
+                'user_phone' => $user->phone,
+                'user_name'  => $user->name,
+                'user_email' => $user->email,
             ]);
 
             // Regenerate for safety
             session()->regenerate();
             return response()->json([
                 "success" => true,
-                "message" => 'OTP verified successfuly'
+                "message" => 'Register user successfuly'
             ]);
         } else {
             return response()->json([
                 "success" => false,
-                "message" => 'Invalid OTP. Please try again.'
+                "message" => 'The OTP entered is incorrect. Please try again.. Please try again.'
             ]);
         }
     }
@@ -192,7 +250,7 @@ class Auth extends Controller
 
         return response()->json([
             "success" => true,
-            "message" => "User updated successfully.",
+            "message" => "Your profile has been updated successfully..",
             "data"    => $user
         ]);
     }

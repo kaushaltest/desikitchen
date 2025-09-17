@@ -50,7 +50,7 @@ class Alacartemenu extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu added successfully"
+                    'message' => "New menu item added successfully"
                 ], 200);
             } else {
                 $updated_data = [
@@ -70,7 +70,7 @@ class Alacartemenu extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu updated successfully"
+                    'message' => "Menu item updated successfully"
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -101,7 +101,7 @@ class Alacartemenu extends Controller
         // Delete the menu record
         $menu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 
     public function getCategory()
@@ -122,7 +122,7 @@ class Alacartemenu extends Controller
             if ($exists) {
                 return response()->json([
                     "success" => false,
-                    'message' => "This category already exists"
+                    'message' => "This category name is already in use.eady exists"
                 ], 200);
             }
             $added_data = [
@@ -133,7 +133,7 @@ class Alacartemenu extends Controller
 
             return response()->json([
                 "success" => true,
-                'message' => "Category added successfully"
+                'message' => "New category created successfully!essfully"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -146,45 +146,52 @@ class Alacartemenu extends Controller
     {
         try {
             $data = $request->input('data', []);
+            
             foreach ($data as $row) {
                 $imagePath = null;
-              
-                if (empty($row['name']) || empty($row['price'])) {
+
+                if (empty($row['name']) || empty($row['category']) || empty($row['price'])) {
                     continue;
                 }
 
-                if (!empty($row['id'])) {
-                    $menu = Daywisemenu_model::find($row['id']);
+                if (!empty($row['category']) || empty($row['name'])) {
+                    $menu = Alacartemenu_model::where('category_id', $row['category'])->where('name', $row['name'])   // compares only the date part
+                        ->first();
 
                     if ($menu) {
                         // Update existing record
                         $menu->update([
-                            'title' => $row['title'],
+                            'category_id' => $row['category'],
+                            'name' => $row['name'],
+                            'description' => $row['description'],
                             'price' => $row['price'],
-                            'items' => $row['items'],
-                            'image' => $imagePath ?? $menu->image, // keep old image if not provided
+                            'is_active'  => $row['is_active'],
                         ]);
                     } else {
                         // ID given but not found → insert new
-                        Daywisemenu_model::create([
-                            'title' => $row['title'],
+                        Alacartemenu_model::create([
+                            'category_id' => $row['category'],
+                            'name' => $row['name'],
+                            'description' => $row['description'],
                             'price' => $row['price'],
-                            'items' => $row['items'],
                             'image' => $imagePath ?? null,
+                            'is_active'  => $row['is_active']
                         ]);
                     }
                 } else {
                     // No ID → always create new
-                    Daywisemenu_model::create([
-                        'title' => $row['title'],
+                    Alacartemenu_model::create([
+                        'category_id' => $row['category'],
+                        'name' => $row['name'],
+                        'description' => $row['description'],
                         'price' => $row['price'],
-                        'items' => $row['items'],
                         'image' => $imagePath ?? null,
+                        'is_active'  => $row['is_active']
                     ]);
                 }
             }
 
-            return response()->json(['success' => true, 'message' => 'Import file successfully']);
+            return response()->json(['success' => true, 'message' => 'File imported successfully!']);
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,

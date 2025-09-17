@@ -199,23 +199,23 @@
                                 <div class="col-md-4">
                                     <button class="btn btn-outline-warning w-100 d-flex align-items-center justify-content-center gap-2" id="cartBtn">
                                         <i class="fa fa-shopping-cart"></i>
-                                        <span id="cartCount">0 items</span>
-                                        <span class="text-dark fw-bold" id="cartTotal">$0.00</span>
+                                        <span id="cartCount">Cart</span>
+                                        <span class="text-dark fw-bold" id="cartTotal"></span>
                                     </button>
                                 </div>
                             </div>
                             <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
                                 <ul class="nav nav-pills nav-fill mb-4" id="menu_type_tab" role="tablist">
-                                    <li class="nav-item" role="presentation">
+                                    <!-- <li class="nav-item" role="presentation">
                                         <button class="nav-link active d-flex align-items-center justify-content-center gap-2"
                                             id="daywise-tab" data-tab="daywise">
                                             <i data-lucide="calendar"></i>
                                             <span class="d-none d-sm-inline">Day-wise</span>
                                             <span class="d-sm-none">Daily</span>
                                         </button>
-                                    </li>
+                                    </li> -->
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link d-flex align-items-center justify-content-center gap-2"
+                                        <button class="nav-link active d-flex align-items-center justify-content-center gap-2"
                                             id="alacarte-tab" data-tab="alacarte">
                                             <i data-lucide="utensils"></i>
                                             <span class="d-none d-sm-inline">Alacarte</span>
@@ -226,10 +226,10 @@
                                 </ul>
                                 <div id="menuContent">
                                     <!-- Day-wise Menu -->
-                                    <div id="daywise-content" class="tab-content active"></div>
+                                    <!-- <div id="daywise-content" class="tab-content active"></div> -->
 
                                     <!-- A-la-carte Menu -->
-                                    <div id="alacarte-content" class="tab-content" style="display: none;"></div>
+                                    <div id="alacarte-content" class="tab-content active" ></div>
 
                                     <!-- Party Menu -->
                                     <!-- <div id="party-content" class="tab-content" style="display: none;"></div> -->
@@ -326,7 +326,7 @@
 
     let currentUser = null;
     let selectedAddress = null;
-    let activeTab = 'daywise';
+    let activeTab = 'alacarte';
     let searchTerm = '';
     let map = null;
     let marker = null;
@@ -654,7 +654,7 @@
         localStorage.setItem(order_name, JSON.stringify(cart));
         updateCartDisplay();
         renderMenu();
-        showCart();
+        // showCart();
     }
 
     function removeItemCompletely(cartId) {
@@ -685,9 +685,14 @@
                 });
             }
         });
-
-        $('#cartCount').text(`${itemCount} items`);
-        $('#cartTotal').text(`$${total.toFixed(2)}`);
+        if(itemCount!=0){
+            $('#cartCount').text(`${itemCount} items`);
+            $('#cartTotal').text(`$${total.toFixed(2)}`);
+        }else{
+            $('#cartCount').text(`Cart`);
+            $('#cartTotal').text(``);
+        }
+       
     }
 
     function showCart() {

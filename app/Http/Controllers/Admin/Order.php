@@ -267,9 +267,11 @@ class Order extends Controller
                     : 'Table Order',
                 'items'         => $itemHtmlList,
                 'order_type'    => ucfirst($order->order_type),
+                'order_status'    => ucfirst($order->order_status),
                 'order_date'    =>  Carbon::parse($order->order_date)->format('d-m-Y'),
                 'status'        => ucfirst($order->status),
                 'next_status' => $nextStatus,
+                'status_cap' => $this->getStatusName($order->status),
                 'next_btn_status' => ($nextStatus) ? $this->getStatusButton($nextStatus) : '',
                 'status_badge'  => $this->getStatusBadge($order->status),
                 'total_amount'  => number_format($order->total_amount, 2),
@@ -290,9 +292,17 @@ class Order extends Controller
     }
     private function getStatusButton($status)
     {
+        $statusname = ['warning' => 'Warning', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
         $colors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
         $color = $colors[$status] ?? 'secondary';
-        return "<button  class='btn btn-{$color} btn-chanage-status p-1'>" . ucfirst($status) . "</button>";
+        return "<button  class='btn btn-{$color} btn-chanage-status p-1'>" . ucfirst($statusname[$status]) . "</button>";
+    }
+    private function getStatusName($status)
+    {
+        $statusname = ['warning' => 'Warning', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
+        $colors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
+        $color = $colors[$status] ?? 'secondary';
+        return "<span class='badge bg-{$color}'>" . ucfirst($statusname[$status]) . "</span>";
     }
 
 
@@ -314,7 +324,7 @@ class Order extends Controller
         // Delete the menu record
         $menu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 
     public function addUpdateOrder(Request $request)
@@ -330,7 +340,7 @@ class Order extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Order added successfully"
+                    'message' => "Your order has been successfully placed !"
                 ], 200);
             } else {
                 $updated_data = [
@@ -343,7 +353,7 @@ class Order extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Order updated successfully"
+                    'message' => "Your order details have been updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -371,6 +381,7 @@ class Order extends Controller
                         'order_date' => $item['order_date'],
                         'order_id' => $order_id,
                         'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
+                        'order_status' => 'Online'
                     ];
 
                     $orderinsertedid = Order_model::create($added_data);
@@ -418,7 +429,8 @@ class Order extends Controller
                     'order_type' => 'alacarte',
                     'order_date' => $request->input('alacarteorder_date'),
                     'order_id' => $order_id,
-                    'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null
+                    'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
+                    'order_status' => 'Online'
                 ];
 
                 $orderalacarteinsertedid = Order_model::create($added_data);
@@ -464,7 +476,7 @@ class Order extends Controller
 
             return response()->json([
                 "success" => true,
-                'message' => "Order added successfully"
+                'message' => "Your order has been successfully placed !"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -537,7 +549,7 @@ class Order extends Controller
                         'order_id' => $order_id,
                         'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
                         'status' => 'delivered',
-                        'payment_status' => 'Paid'
+                        'payment_status' => 'Paid',
                     ];
 
                     $orderinsertedid = Order_model::create($added_data);
@@ -587,7 +599,8 @@ class Order extends Controller
                     'order_id' => $order_id,
                     'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
                     'status' => 'delivered',
-                    'payment_status' => 'Paid'
+                    'payment_status' => 'Paid',
+                    'order_status' => 'Dining'
                 ];
 
                 $orderalacarteinsertedid = Order_model::create($added_data);
@@ -641,7 +654,7 @@ class Order extends Controller
             $table->save();
             return response()->json([
                 "success" => true,
-                'message' => "Order added successfully"
+                'message' => "Your order has been successfully placed !"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

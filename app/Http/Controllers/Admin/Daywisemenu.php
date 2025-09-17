@@ -49,7 +49,7 @@ class Daywisemenu extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu added successfully"
+                    'message' => "New menu item added successfully"
                 ], 200);
             } else {
                 $updated_data = [
@@ -68,7 +68,7 @@ class Daywisemenu extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu updated successfully"
+                    'message' => "Menu item updated successfully"
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -99,7 +99,7 @@ class Daywisemenu extends Controller
         // Delete the menu record
         $menu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 
     public function import(Request $request)
@@ -115,19 +115,20 @@ class Daywisemenu extends Controller
                     Storage::disk('public')->put("uploads/$imageName", $imageData);
                     $imagePath = "uploads/$imageName";
                 }
-                if (empty($row['title']) || empty($row['price'])) {
+                if (empty($row['title']) || empty($row['price'] || empty($row['date']))) {
                     continue;
                 }
-
-                if (!empty($row['id'])) {
-                    $menu = Daywisemenu_model::find($row['id']);
+                $menuDate = $this->normalizeDate($row['date']);
+                if (!empty($row['date'])) {
+                    $menu = Daywisemenu_model::whereDate('menu_date', $menuDate)   // compares only the date part
+                    ->first();
                     
                     if ($menu) {
                         // Update existing record
                         $menu->update([
                             'title' => $row['title'],
                             'price' => $row['price'],
-                            'menu_date'  => $this->normalizeDate($row['date']),
+                            'menu_date'  => $menuDate,
                             'items' => $row['items'],
                             'image' => $imagePath ?? $menu->image, // keep old image if not provided
                         ]);
@@ -136,7 +137,7 @@ class Daywisemenu extends Controller
                         Daywisemenu_model::create([
                             'title' => $row['title'],
                             'price' => $row['price'],
-                            'menu_date'  => $this->normalizeDate($row['date']),
+                            'menu_date'  => $menuDate,
                             'items' => $row['items'],
                             'image' => $imagePath ?? null,
                         ]);
@@ -146,14 +147,14 @@ class Daywisemenu extends Controller
                     Daywisemenu_model::create([
                         'title' => $row['title'],
                         'price' => $row['price'],
-                        'menu_date'  => $this->normalizeDate($row['date']),
+                        'menu_date'  =>$menuDate,
                         'items' => $row['items'],
                         'image' => $imagePath ?? null,
                     ]);
                 }
             }
 
-            return response()->json(['success' => true, 'message' => 'Import file successfully']);
+            return response()->json(['success' => true, 'message' => 'File imported successfully!']);
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,

@@ -46,7 +46,7 @@ class Useraddress extends Controller
                 "success" => true,
                 "user_id" => $user->id,
                 "address_id" => $address->id,
-                'message' => "User and address added successfully"
+                'message' => "Useer account and address added successfully!"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -75,7 +75,7 @@ class Useraddress extends Controller
 
             return response()->json([
                 "success" => true,
-                'message' => "Address added successfully"
+                'message' => "New address saved successfully"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

@@ -38,7 +38,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-menu-button"></i>
                         <p>
-                            Menus
+                            Menu Setup
                             <i class="nav-arrow bi bi-chevron-right"></i>
                         </p>
                     </a>
@@ -46,7 +46,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.daywisemenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-calendar-day"></i>
-                                <p>Day wise</p>
+                                <p>Tiffin</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -64,7 +64,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.additionalmenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-plus-square-fill"></i>
-                                <p>Additional</p>
+                                <p>Sides</p>
                             </a>
                         </li>
                     </ul>
@@ -72,7 +72,7 @@
                 <li class="nav-item ">
                     <a href="{{ route('admin.order') }}" class="nav-link">
                         <i class="nav-icon bi bi-list"></i>
-                        <p>Order</p>
+                        <p>Order History</p>
                     </a>
                 </li>
                 <li class="nav-item ">
@@ -84,13 +84,19 @@
                 <li class="nav-item ">
                     <a href="{{ route('admin.users') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
-                        <p>User</p>
+                        <p>Manage User</p>
                     </a>
                 </li>
                 <li class="nav-item ">
                     <a href="{{ route('admin.admin-user') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
                         <p>Admin User</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="{{ route('admin.tables') }}" class="nav-link">
+                        <i class="nav-icon bi bi-table"></i>
+                        <p>Manage Table</p>
                     </a>
                 </li>
                 @endif

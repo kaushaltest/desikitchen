@@ -38,7 +38,7 @@ class Customeruseraddress extends Controller
 
             return response()->json([
                 "success" => true,
-                'message' => "Address added successfully"
+                'message' => "New address saved successfully"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

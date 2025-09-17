@@ -155,7 +155,7 @@
         const sheet = workbook.addWorksheet("Menu");
 
         // Headers
-        sheet.addRow(["Id", "Title", "Price", "Date", "Items"]);
+        sheet.addRow(["Title", "Price", "Date", "Items"]);
         $.ajax({
             url: "{{ route('admin.get-daywise-menu') }}", // Change this to your server endpoint
             type: 'GET',
@@ -166,7 +166,7 @@
                 // Handle success response
                 if (response?.data) {
                     response?.data.forEach(ele => {
-                        sheet.addRow([ele.id, ele.title, ele.price, ele.menu_date, ele.items]);
+                        sheet.addRow([ele.title, ele.price, ele.menu_date, ele.items]);
                     });
 
                 }
@@ -410,11 +410,11 @@
                     if (rowNumber === 1) return; // skip header
 
                     rowsData.push({
-                        id: row.getCell(1).value,
-                        title: row.getCell(2).value,
-                        price: row.getCell(3).value,
-                        date: row.getCell(4).value,
-                        items: row.getCell(5).value,
+                        // id: row.getCell(1).value,
+                        title: row.getCell(1).value,
+                        price: row.getCell(2).value,
+                        date: row.getCell(3).value,
+                        items: row.getCell(4).value,
                         image: null // will be filled later
                     });
                 });

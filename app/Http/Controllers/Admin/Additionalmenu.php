@@ -46,7 +46,7 @@ class Additionalmenu extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu added successfully"
+                    'message' => "New menu item added successfully"
                 ], 200);
             } else {
                 $updated_data = [
@@ -65,7 +65,7 @@ class Additionalmenu extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Menu updated successfully"
+                    'message' => "Menu item updated successfully"
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -96,6 +96,6 @@ class Additionalmenu extends Controller
         // Delete the menu record
         $menu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 }

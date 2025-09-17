@@ -107,11 +107,130 @@ class Customerorder extends Controller
     public function addOrder(Request $request)
     {
         try {
-            echo $request->input('is_deduct_amount');
-            
             $items = $request->input('cart');
-            print_r($items['daywise']);
-            exit ;
+
+            if (isset($items['subscription']) && (!empty($items['subscription']) && empty($items['daywise']) && empty($items['alacarte']))) {
+                if ($request->session()->has('user_id')) {
+                    $userId = session('user_id');
+                    $planId = $items['subscription'][0]['db_id'];
+                    $meals =  $items['subscription'][0]['total_meals'];
+                    $days =  (int) $items['subscription'][0]['days'];
+                    $existing = Usersubscription_model::where('user_id', $userId)->first();
+                    $data = [];
+                    $startDate = Carbon::now('Asia/Kolkata');
+
+                    if ($existing) {
+                        $endDate = Carbon::now('Asia/Kolkata')->addDays($days);
+                        $data = [
+                            'user_id'        => $userId,
+                            'plan_id'         => $planId,
+                            'meals_remaining' => $meals,
+                            'start_date'     => $startDate,
+                            'end_date'       => ($days) ? $endDate : null,
+                            'status' => 'active',
+                        ];
+
+                        $today = Carbon::today();
+                        // check if plan is still active
+                        if ($endDate->gte($today)  && $existing->meals_remaining > 0) {
+                            return response()->json([
+                                'success' => false,
+                                'loggedin' => true,
+                                'message' => 'You already have an active plan. You cannot purchase another one right now.'
+                            ], 200);
+                        }
+                        $existing->update($data);
+                        $msg = "Subscription details updated successfully.!";
+                    } else {
+                        $endDate = Carbon::now('Asia/Kolkata')->addDays($days);
+                        $data = [
+                            'user_id'        => $userId,
+                            'plan_id'         => $planId,
+                            'meals_remaining' => $meals,
+                            'start_date'     => $startDate,
+                            'end_date'       => ($days) ? $endDate : null,
+                            'status' => 'active'
+                        ];
+                        Usersubscription_model::create($data);
+                        $msg = "Subscription created successfully!";
+                    }
+
+                    return response()->json([
+                        'success' => true,
+                        'loggedin' => true,
+                        'message' => $msg,
+                        'data'    => $data,
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'User logout can you please add '
+                    ]);
+                }
+            } else {
+                if (isset($items['daywise'])) {
+                    if ($request->session()->has('user_id')) {
+                        $userId = session('user_id');
+                        $existing = Usersubscription_model::where('user_id', $userId)->first();
+                        $data = [];
+                        $startDate = Carbon::now('Asia/Kolkata');
+
+                        if ($existing) {
+                            $planId = $items['subscription'][0]['db_id'];
+                            $meals =  $items['subscription'][0]['total_meals'];
+                            $days =  $items['subscription'][0]['days'];
+
+                            $endDate = Carbon::parse($existing->end_date);
+                            $data = [
+                                'user_id'        => $userId,
+                                'plan_id'         => $planId,
+                                'meals_remaining' => $meals,
+                                'start_date'     => $startDate,
+                                'end_date'       => ($days) ? $endDate : null,
+                                'status' => 'active'
+                            ];
+
+                            $today = Carbon::today();
+                            // check if plan is still active
+                            if ($endDate->gte($today)  && $existing->meals_remaining > 0) {
+                                return response()->json([
+                                    'success' => false,
+                                    'loggedin' => true,
+                                    'message' => 'You already have an active plan. You cannot purchase another one right now.'
+                                ], 200);
+                            }
+                            $existing->update($data);
+                            $msg = "Subscription details updated successfully.!";
+                        } else {
+                            if (isset($items['subscription'])) {
+                                $planId = $items['subscription'][0]['db_id'];
+                                $meals =  $items['subscription'][0]['total_meals'];
+                                $days = (int)  $items['subscription'][0]['days'];
+                                // Ensure Asia/Kolkata timezone
+                                $startDate = Carbon::now('Asia/Kolkata');
+                                if ($days) {
+                                    $endDate   = Carbon::now('Asia/Kolkata')->addDays($days);
+                                }
+                                $data = [
+                                    'user_id'        => $userId,
+                                    'plan_id'         => $planId,
+                                    'meals_remaining' => $meals,
+                                    'start_date'     => $startDate,
+                                    'end_date'       => ($days) ? $endDate : null,
+                                    'status' => 'active',
+                                ];
+                                Usersubscription_model::create($data);
+                                $msg = "Subscription created successfully!";
+                            }
+                        }
+                    } else {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'User logout can you please add '
+                        ]);
+                    }
+                }
+            }
             if (isset($items['daywise'])) {
                 $paymentStatus = 'Unpaid';
                 $subscription_plan = Usersubscription_model::where('user_id', session('user_id'))
@@ -150,7 +269,8 @@ class Customerorder extends Controller
                             'order_type' => 'daywise',
                             'order_date' => $item['order_date'],
                             'order_id' => $orderId,
-                            'payment_status' => $paymentStatus
+                            'payment_status' => $paymentStatus,
+                            'order_status' => 'Online'
                         ];
 
                         $orderinsertedid = Customerorder_model::create($added_data);
@@ -190,7 +310,7 @@ class Customerorder extends Controller
                     } else {
                         return response()->json([
                             "success" => false,
-                            'message' => "Order date must be greater than current date"
+                            'message' => "Please select a future date for your order. than current date"
                         ], 200);
                     }
                 }
@@ -203,7 +323,8 @@ class Customerorder extends Controller
                     'address_id' => $request->input('address_id'),
                     'order_type' => 'alacarte',
                     'order_date' => $items['alacarte'][0]['order_date'],
-                    'order_id' => $orderId
+                    'order_id' => $orderId,
+                    'order_status' => 'Online'
                 ];
 
                 $orderalacarteinsertedid = Customerorder_model::create($added_data);
@@ -248,7 +369,7 @@ class Customerorder extends Controller
             }
             return response()->json([
                 "success" => true,
-                'message' => "Order added successfully"
+                'message' => "Your order has been successfully placed !"
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

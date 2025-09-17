@@ -4,6 +4,15 @@
             <h1 class="text-primary m-0">Desi Kitchen</h1>
 
         </a>
+        <a href="{{ route('customer.cart') }}"
+            class="position-relative d-inline-flex align-items-center py-2 px-4 d-md-none"
+            id="cartBtn">
+            <i class="fa fa-shopping-cart fa-lg"></i>
+            <span id="cartCountMobile"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                0
+            </span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="fa fa-bars"></span>
         </button>
@@ -12,7 +21,7 @@
                 <a href="{{route('customer.dashboard')}}" class="nav-item nav-link active">Home</a>
                 <a href="{{route('customer.about')}}" class="nav-item nav-link">About</a>
 
-                <a href="{{route('customer.service')}}" class="nav-item nav-link">Service</a>
+                <!-- <a href="{{route('customer.service')}}" class="nav-item nav-link">Service</a> -->
                 <a href="{{route('customer.menu')}}" class="nav-item nav-link">Menu</a>
                 <!-- <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -30,7 +39,7 @@
                     <div class="dropdown-menu m-0">
                         <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
                         <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
+                        <!-- <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a> -->
                         <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>
 
                     </div>
@@ -41,7 +50,7 @@
                     <div class="dropdown-menu m-0">
                         <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
                         <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
+                        <!-- <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a> -->
                         <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>
                     </div>
                 </div>
@@ -50,7 +59,7 @@
                 @endif
 
             </div>
-            <a href="{{route('customer.cart')}}" class="btn btn-primary py-2 px-4" id="cartBtn">
+            <a href="{{route('customer.cart')}}"    class="btn btn-primary py-2 px-4 d-none d-sm-inline-block"            id="cartBtn">
                 <i class="fa fa-shopping-cart"></i>
                 <span id="cartCount">Cart</span>
                 <span class="text-white fw-bold" id="cartTotal"></span>

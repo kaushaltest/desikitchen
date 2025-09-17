@@ -127,6 +127,7 @@ Route::name('customer.')
 
         //login
         Route::post('/check-mobile-exist', [Auth::class, 'checkMobileExist'])->name('check-mobile-exist');
+        Route::post('/sign-in', [Auth::class, 'signIn'])->name('sign-in');
         Route::post('/verify-otp', [Auth::class, 'verifyOTP'])->name('verify-otp');
         Route::post('/update-user', [Auth::class, 'updateUser'])->name('update-user');
         Route::post('/guest-verify-otp', [Auth::class, 'verifyGuestOTP'])->name('guest-verify-otp');
@@ -141,7 +142,7 @@ Route::name('customer.')
         Route::get('/logout', [Customerorder::class, 'logout'])->name('logout');
 
         //register
-        Route::post('/check-register-mobile-exist', [Auth::class, 'checkRegisterMobileExist'])->name('check-register-mobile-exist');
+        Route::post('/register-user-mobile', [Auth::class, 'checkRegisterMobileExist'])->name('register-user-mobile');
         Route::post('/verify-register-otp', [Auth::class, 'verifyRegisterOTP'])->name('verify-register-otp');
 
         //subscription

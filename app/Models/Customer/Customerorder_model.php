@@ -38,6 +38,7 @@ class Customerorder_model extends Model
         'order_date',
         'order_id',
         'payment_status',
+        'order_status',
         'updated_at'
     ];
 }

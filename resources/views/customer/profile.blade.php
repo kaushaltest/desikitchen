@@ -38,13 +38,13 @@
 <div class="container-xxl py-5 bg-dark hero-header mb-5">
     <div class="container text-center my-5 pt-5 pb-4">
         <h1 class="display-3 text-white mb-3 animated slideInDown">Profile</h1>
-        <nav aria-label="breadcrumb">
+        <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb justify-content-center text-uppercase">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Pages</a></li>
                 <li class="breadcrumb-item text-white active" aria-current="page">Profile</li>
             </ol>
-        </nav>
+        </nav> -->
     </div>
 </div>
 
@@ -61,7 +61,7 @@
         <div class="container-xxl py-5">
             <div class="container">
                 <div class="row g-4">
-                    <div class="col-12 col-md-6 col-lg-6">
+                    <div class="col-12 col-md-12 col-lg-12">
                         <div class="plan-card h-100 d-flex flex-column border-2">
                             <div class="plan-header p-4">
                                 <div class="d-flex align-items-center justify-content-between">
@@ -110,7 +110,7 @@
 
                     <!-- Subscription Info -->
                     @foreach($profile['subscription'] as $sub)
-                    <div class="col-12 col-md-6 col-lg-6">
+                    <div class="col-12 col-md-12 col-lg-12">
                         <div class="plan-card h-100 d-flex flex-column border-2">
                             <div class="plan-header p-4">
                                 <div class="d-flex align-items-start justify-content-between">

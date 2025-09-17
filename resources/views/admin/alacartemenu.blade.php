@@ -182,6 +182,7 @@
 <script>
     getCategory();
     let categoryArr = [];
+    let categoryArrGetId = [];
 
     function getCategory() {
         $.ajax({
@@ -194,6 +195,7 @@
                 // Handle success response
                 let html = '<option value="">Select Category</option>';
                 if (response?.data) {
+                    categoryArrGetId=response?.data;
                     response?.data.forEach(ele => {
                         html += `<option value="${ele.id}">${ele.category}</option>`;
                         categoryArr.push(ele.category); // 👈 collect categories
@@ -219,17 +221,23 @@
         const sheet = workbook.addWorksheet("Menu");
 
         // Headers
-        sheet.addRow(["Id", "Category", "Title", "Price", "Date", "Items"]);
+        sheet.addRow(["Category", "Name", "Description", "Price", "Is Active"]);
 
         // Add dropdown validation for Category column (B column)
-        sheet.dataValidations.add('B2:B100', { // from B2 to B100 (adjust as per your need)
+        sheet.dataValidations.add('E2:E100', { // from B2 to B100 (adjust as per your need)
+            type: 'list',
+            allowBlank: true,
+            formulae: [`"Yes,No"`] // values for dropdown
+        });
+
+        sheet.dataValidations.add('A2:A100', { // from B2 to B100 (adjust as per your need)
             type: 'list',
             allowBlank: true,
             formulae: [`"${categoryArr.join(",")}"`] // values for dropdown
         });
 
         $.ajax({
-            url: "{{ route('admin.get-category') }}",
+            url: "{{ route('admin.get-alacarte-menu') }}",
             type: 'GET',
             beforeSend: function() {
                 $(".loader-wrapper").css("display", "flex")
@@ -238,12 +246,11 @@
                 if (response?.data) {
                     response?.data.forEach(ele => {
                         sheet.addRow([
-                            ele.id,
-                            "", // Category (dropdown will apply here)
-                            ele.title,
+                            ele.category_name, // Category (dropdown will apply here)
+                            ele.name,
+                            ele.description,
                             ele.price,
-                            ele.menu_date,
-                            ele.items
+                            ele.is_active ? "Yes" : "No",
                         ]);
                     });
                 }
@@ -258,12 +265,11 @@
                 $(".loader-wrapper").css("display", "none")
             },
         });
-        const buf = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), "alacarte_menu.xlsx");
     }
 
     $(document).ready(function() {
-
+        const assetBase = "{{ asset('storage') }}";
+        const defaultImage = "{{ asset('default.png') }}";
 
         var table = $("#dt_alacartemenu").DataTable({
             ajax: {
@@ -282,9 +288,9 @@
                     data: 'id',
                 },
                 {
-                    data: 'image_url',
+                    data: 'image_path',
                     render: function(data) {
-                        return '<img src="' + data + '" width="80">';
+                        return `<img src="${data ? `${assetBase}/${data}` : defaultImage}" width="80" >`;
                     }
                 },
                 {
@@ -543,27 +549,29 @@
                 let rowsData = [];
                 sheet.eachRow((row, rowNumber) => {
                     if (rowNumber === 1) return; // skip header
+                    const catId = categoryArrGetId.find(c => c.category === row.getCell(1).value)?.id || null;
 
                     rowsData.push({
-                        id: row.getCell(1).value,
-                        category: row.getCell(2).value,
-                        name: row.getCell(3).value,
-                        description: row.getCell(4).value,
-                        price: row.getCell(5).value,
-                        image: null // will be filled later
+                        // id: row.getCell(1).value,
+                        category: catId,
+                        name: row.getCell(2).value,
+                        description: row.getCell(3).value,
+                        price: row.getCell(4).value,
+                        is_active: (row.getCell(5).value == 'Yes') ? true : false,
+                        image: null
                     });
                 });
 
                 // Read images & map them
-                sheet.getImages().forEach((imgObj, index) => {
-                    const img = workbook.getImage(imgObj.imageId);
+                // sheet.getImages().forEach((imgObj, index) => {
+                //     const img = workbook.getImage(imgObj.imageId);
 
-                    let base64 = btoa(
-                        new Uint8Array(img.buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
-                    );
+                //     let base64 = btoa(
+                //         new Uint8Array(img.buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+                //     );
 
-                    rowsData[index].image = "data:image/png;base64," + base64;
-                });
+                //     rowsData[index].image = "data:image/png;base64," + base64;
+                // });
                 fetch("{{ route('admin.import_alacarte') }}", {
                         method: "POST",
                         headers: {

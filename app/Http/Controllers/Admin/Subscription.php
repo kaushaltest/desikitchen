@@ -42,7 +42,7 @@ class Subscription extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Subscription added successfully"
+                    'message' => "Subscription activated successfully! successfully"
                 ], 200);
             } else {
                 $updated_data = [
@@ -59,7 +59,7 @@ class Subscription extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Subscription updated successfully"
+                    'message' => "Subscription details updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -76,6 +76,6 @@ class Subscription extends Controller
     {
         $menu = Subscription_model::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'Subscription deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Subscription cancelled successfully.']);
     }
 }

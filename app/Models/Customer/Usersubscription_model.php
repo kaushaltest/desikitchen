@@ -19,7 +19,8 @@ class Usersubscription_model extends Authenticatable
         'start_date',
         'end_date',
         'status',
-        'created_at'
+        'created_at',
+        'payment_status'
     ];
     public function plan()
     {

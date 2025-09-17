@@ -6,13 +6,13 @@
 <div class="container-xxl py-5 bg-dark hero-header mb-5">
     <div class="container text-center my-5 pt-5 pb-4">
         <h1 class="display-3 text-white mb-3 animated slideInDown">Orders</h1>
-        <nav aria-label="breadcrumb">
+        <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb justify-content-center text-uppercase">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Pages</a></li>
                 <li class="breadcrumb-item text-white active" aria-current="page">Order</li>
             </ol>
-        </nav>
+        </nav> -->
     </div>
 </div>
 <style>
@@ -261,14 +261,14 @@
                         <h6 class="fw-semibold mb-3">Order Details</h6>
 
                         <!-- Restaurant Info -->
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <h6 class="fw-semibold text-dark">Desi Kitchen</h6>
                             <small class="text-muted">+1 (555) 987-6543</small>
-                        </div>
+                        </div> -->
 
                         <!-- Items Ordered -->
                         <div class="mb-4">
-                            <h6 class="fw-semibold mb-3">Items Ordered</h6>
+                            <!-- <h6 class="fw-semibold mb-3">Items Ordered</h6> -->
                             {!!$order['items']!!}
 
                             <div class="d-flex justify-content-between fw-semibold">
@@ -303,7 +303,7 @@
         @endforeach
         @else
         <div class="d-flex justify-content-center align-items-start">
-            <p>No Current orders found.</p>
+            <p>No active order currently exist.</p>
         </div>
         @endif
     </div>
@@ -414,14 +414,14 @@
                         <h6 class="fw-semibold mb-3">Order Details</h6>
 
                         <!-- Restaurant Info -->
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <h6 class="fw-semibold text-dark">Desi Kitchen</h6>
                             <small class="text-muted">+1 (555) 987-6543</small>
-                        </div>
+                        </div> -->
 
                         <!-- Items Ordered -->
                         <div class="mb-4">
-                            <h6 class="fw-semibold mb-3">Items Ordered</h6>
+                            <!-- <h6 class="fw-semibold mb-3">Items Ordered</h6> -->
                             {!!$order['items']!!}
 
                             <div class="d-flex justify-content-between fw-semibold">
@@ -456,7 +456,7 @@
     @endforeach
     @else
     <div class="d-flex justify-content-center align-items-start">
-        <p>No Previous orders found.</p>
+        <p>No past orders available at this time.</p>
     </div>
     @endif
 

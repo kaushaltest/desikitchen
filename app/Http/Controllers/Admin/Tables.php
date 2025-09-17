@@ -53,7 +53,7 @@ class Tables extends Controller
                 Table_model::create($added_data);
                 return response()->json([
                     "success" => true,
-                    'message' => "Table added successfully"
+                    'message' => "New table added successfully!"
                 ], 200);
             } else {
                 $updated_data = [
@@ -67,7 +67,7 @@ class Tables extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Table updated successfully"
+                    'message' => "Table details updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -83,7 +83,7 @@ class Tables extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'Table deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Table removed successfully.']);
     }
 
     public function tableOrder()
@@ -109,7 +109,7 @@ class Tables extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Table booked successfully.',
+                'message' => 'Table reserved successfully!.',
                 'table_id' => $table->id,
             ]);
         }
@@ -118,7 +118,7 @@ class Tables extends Controller
         if ($table->user_id == Auth::user()->id) {
             return response()->json([
                 'success' => true,
-                'message' => 'You already booked this table.',
+                'message' => 'This table is already reserved. this table.',
                 'table_id' => $table->id,
             ]);
         }
@@ -126,7 +126,7 @@ class Tables extends Controller
         // Case 3: Table booked by someone else → block
         return response()->json([
             'success' => false,
-            'message' => 'This table is already booked by another user.',
+            'message' => 'This table is already reserved by someone else. by another user.',
         ]);
     }
 }

@@ -78,7 +78,7 @@ class Subscription extends Controller
                         ], 200);
                     }
                     $existing->update($data);
-                    $msg = "Subscription updated successfully!";
+                    $msg = "Subscription details updated successfully.!";
                 } else {
                     Usersubscription_model::create($data);
                     $msg = "Subscription created successfully!";

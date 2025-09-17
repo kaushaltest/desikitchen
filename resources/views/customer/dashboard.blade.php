@@ -3,19 +3,36 @@
 @section('title', 'Customer Dashboard')
 
 @section('content')
+
+<style>
+    .hero-heasder {
+        height: 100vh !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)), url('../../../customer-assets/img/l3.png') no-repeat center center/cover  !important;
+        /* background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed; */
+
+        /* make it fill the container */
+        /* keep it centered when cropping */
+        /* avoid tiling */
+        /* optional: parallax effect */
+    }
+</style>
 <!-- Service Start -->
-<div class="container-xxl py-5 bg-dark hero-heasder mb-5">
-    <div class="container my-5 py-5">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 text-center text-lg-start">
-                <h1 class="display-3 text-white animated slideInLeft">Enjoy Our<br>Delicious Meal</h1>
-                <p class="text-white animated slideInLeft mb-4 pb-2"> From farm-fresh ingredients to time-honored recipes, every dish we serve is crafted with care and tradition. Join us for an experience that goes beyond flavor — it feels like home.
+<div class="container-xxl py-5 bg-dark hero-heasder mb-5 h-100">
+    <div class="container my-5 py-5 h-100">
+        <div class="row align-items-center justify-centent-center g-5 h-100">
+            <div class="col-lg-12 text-center text-lg-center">
+                <h1 class="display-3 text-white animated slideInLeft">The Test Of Home,<br>Delivered Fresh</h1>
+                <p class="text-white animated slideInLeft mb-4 pb-2">
+                    From fluffy rotis to wholesome sabzis, every meal at Desi Kitchen is made the way mom would — simple, nourishing, and full of flavor. No shortcuts, no preservatives, just real food that feels like home.
                 </p>
                 <a href="{{route('customer.menu')}}" class="btn btn-primary py-sm-3 px-sm-5 me-3 animated slideInLeft">Order Now</a>
             </div>
-            <div class="col-lg-6 text-center text-lg-end overflow-hidden">
-                <img class="img-fluid" src="{{asset('customer-assets/img/thali1.png')}}" alt="">
-            </div>
+            <!-- <div class="col-lg-6 text-center text-lg-end overflow-hidden">
+                <img class="img-fluid" src="{{asset('customer-assets/img/l3.png')}}" alt="">
+            </div> -->
         </div>
     </div>
 </div>
@@ -87,7 +104,7 @@
             <div class="col-lg-6">
                 <div class="row g-3">
                     <div class="col-12 text-start">
-                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/about-1.jpg')}}">
+                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/chef.jpeg')}}">
                     </div>
                     <!-- <div class="col-6 text-start">
                         <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.3s" src="{{asset('customer-assets/img/about-2.jpg')}}" style="margin-top: 25%;">
@@ -103,13 +120,20 @@
             <div class="col-lg-6">
                 <h1 class="section-title ff-secondary text-start text-primary fw-normal">Chef</h1>
                 <div class="p-0 d-flex align-items-center mb-4">
-                    <h1>Welcome to </h1>
+                    <!-- <h1>Welcome to </h1>
                     <img src="{{asset('logo3.png')}}" width="50" alt="Logo">
-                    <h1> Desi Kitchen</h1>
+                    <h1> Desi Kitchen</h1> -->
+                    <h1>Meet Chef Manish – Our Founder & Head Chef</h1>
                 </div>
 
-                <p class="mb-4">At Desi Kitchen, we bring the rich flavors of traditional Indian cuisine to your table with a modern twist. Whether you're craving spicy street food or slow-cooked curries, every dish is prepared with love, spice, and everything nice.</p>
-                <p class="mb-4"> We believe food is more than just a meal — it's a celebration of culture, community, and comfort. From our warm hospitality to our handpicked ingredients, Desi Kitchen is your home for authentic taste and heartfelt service.
+                <p class="mb-4">
+                    With over 15 years of culinary experience, including years at the prestigious Oberoi group, Chef Manish created Desi Kitchen with one mission: to bring the taste of ghar ka khana to the Cayman Islands.
+                </p>
+                <p class="mb-4">
+                    As both owner and chef, he personally curates every dish — from thalis and chaats to tandoori snacks — so that no one here has to miss the comfort of real Indian food.
+                </p>
+                <p class="mb-4">
+                    What makes Desi Kitchen special? It’s the only pure vegetarian Indian kitchen in Cayman — serving food that’s simple, soulful, and straight from the heart.
                 </p>
                 <div class="row g-4 mb-4">
                     <div class="col-sm-6">
@@ -121,7 +145,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <!-- <div class="col-sm-6">
                         <div class="d-flex align-items-center border-start border-5 border-primary px-3">
                             <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">50</h1>
                             <div class="ps-4">
@@ -129,14 +153,14 @@
                                 <h6 class="text-uppercase mb-0">Master Chefs</h6>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <!-- <a class="btn btn-primary py-3 px-5 mt-2" href="">Read More</a> -->
             </div>
         </div>
     </div>
 </div>
-<div class="container-xxl py-5">
+<div class="container-xxl py-5 d-none">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h5 class="section-title ff-secondary text-center text-primary fw-normal">What Makes Us Special</h5>
@@ -187,7 +211,7 @@
 
 
 <!-- About Start -->
-<div class="container-xxl py-5">
+<div class="container-xxl py-5 d-none">
     <div class="container">
         <div class="row g-5 align-items-center">
             <div class="col-lg-6">
@@ -227,7 +251,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <!-- <div class="col-sm-6">
                         <div class="d-flex align-items-center border-start border-5 border-primary px-3">
                             <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">50</h1>
                             <div class="ps-4">
@@ -235,9 +259,9 @@
                                 <h6 class="text-uppercase mb-0">Master Chefs</h6>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <a class="btn btn-primary py-3 px-5 mt-2" href="">Read More</a>
+                <a class="btn btn-primary py-3 px-5 mt-2" href="{{route('customer.about')}}">Read More</a>
             </div>
         </div>
     </div>
@@ -249,12 +273,12 @@
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h5 class="section-title ff-secondary text-center text-primary fw-normal">Food Menu</h5>
-            <h1 class="mb-5">Most Popular Items</h1>
+            <h2 class="section-title ff-secondary text-center text-primary fw-normal mb-5">Food Menu</h2>
+            <!-- <h1 class="mb-5">Most Popular Items</h1> -->
         </div>
         <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
-            <ul class="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
-                <li class="nav-item menu-items" data-tab="menu_daywise">
+            <ul class="nav nav-pills d-flex justify-content-center flex-column flex-md-row  border-bottom mb-5">
+                <li class="nav-item menu-items mb-3" data-tab="menu_daywise">
                     <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3 active" data-bs-toggle="pill" href="#menu_daywise">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
                             <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
@@ -265,19 +289,19 @@
                         </div>
                     </a>
                 </li>
-                <li class="nav-item menu-items" data-tab="menu_alacarte">
-                    <a class="d-flex align-items-center text-start mx-3 pb-3" data-bs-toggle="pill" href="#menu_alacarte">
+                <li class="nav-item menu-items mb-3" data-tab="menu_alacarte">
+                    <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3" data-bs-toggle="pill" href="#menu_alacarte">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-fork-knife" viewBox="0 0 16 16">
                             <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
                         </svg>
                         <div class="ps-3">
                             <!-- <small class="text-body">Special</small> -->
-                            <h5 class="mt-n1 mb-0">Alacarte</h5>
+                            <h5 class="mt-n1 mb-0">Catering Platters</h5>
                         </div>
                     </a>
                 </li>
-                <li class="nav-item menu-items" data-tab="menu_party">
-                    <a class="d-flex align-items-center text-start mx-3 me-0 pb-3" data-bs-toggle="pill" href="#menu_party">
+                <li class="nav-item menu-items mb-3" data-tab="menu_party">
+                    <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3" data-bs-toggle="pill" href="#menu_party">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-cake" viewBox="0 0 16 16">
                             <path d="m7.994.013-.595.79a.747.747 0 0 0 .101 1.01V4H5a2 2 0 0 0-2 2v3H2a2 2 0 0 0-2 2v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a2 2 0 0 0-2-2h-1V6a2 2 0 0 0-2-2H8.5V1.806A.747.747 0 0 0 8.592.802zM4 6a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v.414a.9.9 0 0 1-.646-.268 1.914 1.914 0 0 0-2.708 0 .914.914 0 0 1-1.292 0 1.914 1.914 0 0 0-2.708 0A.9.9 0 0 1 4 6.414zm0 1.414c.49 0 .98-.187 1.354-.56a.914.914 0 0 1 1.292 0c.748.747 1.96.747 2.708 0a.914.914 0 0 1 1.292 0c.374.373.864.56 1.354.56V9H4zM1 11a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.793l-.354.354a.914.914 0 0 1-1.293 0 1.914 1.914 0 0 0-2.707 0 .914.914 0 0 1-1.292 0 1.914 1.914 0 0 0-2.708 0 .914.914 0 0 1-1.292 0 1.914 1.914 0 0 0-2.708 0 .914.914 0 0 1-1.292 0L1 11.793zm11.646 1.854a1.915 1.915 0 0 0 2.354.279V15H1v-1.867c.737.452 1.715.36 2.354-.28a.914.914 0 0 1 1.292 0c.748.748 1.96.748 2.708 0a.914.914 0 0 1 1.292 0c.748.748 1.96.748 2.707 0a.914.914 0 0 1 1.293 0Z" />
                         </svg>
@@ -306,9 +330,9 @@
                                     <h5 class="card-title mb-2">Party Order Assistance</h5>
                                     <p class="card-text mb-2 text-muted">For bulk or party orders, kindly reach out to our representative:</p>
                                     <p class="mb-0">
-                                        <strong>Mr. Rajesh Kumar</strong><br>
-                                        <a href="tel:+919876543210" class="text-decoration-none text-primary fw-semibold">
-                                            +91 98765 43210
+                                        <!-- <strong>Mr. Rajesh Kumar</strong><br> -->
+                                        <a href="tel:+13455461580" class="text-decoration-none text-primary fw-semibold">
+                                            +1 345-546-1580 
                                         </a>
                                     </p>
                                 </div>

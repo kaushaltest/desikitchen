@@ -60,8 +60,9 @@
             <div class="card-header">
                 <a
                     href="../index2.html"
-                    class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
-                    <h1 class="mb-0"><b>DESI</b>KITCHEN</h1>
+                    class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover d-flex flex-row">
+                    <img src="{{asset('logo3.png')}}" width="55" alt="Logo">
+                    <h1 class="mb-0  mx-3"><b>DESI</b>KITCHEN</h1>
                 </a>
             </div>
             <div class="card-body login-card-body">

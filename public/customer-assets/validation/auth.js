@@ -10,16 +10,32 @@ $.validator.addMethod(
 const validationRules = {
     loginForm: {
         rules: {
-            txt_mobile: {
+            txt_login_email: {
                 required: true,
-                mobileIND: true, // uses the custom 10-digit rule
+                email: true,
             },
+            txt_login_password: {
+                required: true,
+                minlength: 8,
+            },
+            // txt_mobile: {
+            //     required: true,
+            //     mobileIND: true, // uses the custom 10-digit rule
+            // },
         },
         messages: {
-            txt_mobile: {
-                required: "Mobile number is required.",
-                mobileIND: "Enter a valid 10-digit mobile number.",
+            txt_login_email: {
+                required: "Email is required",
+                email: "Please enter valid email",
             },
+            txt_login_password: {
+                required: "Password is required",
+                minlength: "Password must be at least 8 characters long",
+            },
+            // txt_mobile: {
+            //     required: "Mobile number is required.",
+            //     mobileIND: "Enter a valid 10-digit mobile number.",
+            // },
         },
     },
 
@@ -47,6 +63,14 @@ const validationRules = {
                 required: true,
                 email: true,
             },
+            txt_new_password: {
+                required: true,
+                minlength: 8,
+            },
+            txt_new_confirm_password: {
+                required: true,
+                equalTo: "#txt_new_password", // id of the password field
+            },
             txt_new_mobile: {
                 required: true,
                 mobileIND: true, // uses the custom 10-digit rule
@@ -59,6 +83,14 @@ const validationRules = {
             txt_new_email: {
                 required: "Email is required",
                 email: "Please enter valid email",
+            },
+            txt_new_password: {
+                required: "Password is required",
+                minlength: "Password must be at least 8 characters long",
+            },
+            txt_new_confirm_password: {
+                required: "Please confirm your password",
+                equalTo: "Passwords do not match",
             },
             txt_new_mobile: {
                 required: "Mobile number is required.",

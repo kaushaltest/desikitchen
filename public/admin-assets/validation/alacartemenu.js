@@ -49,4 +49,18 @@ const validationRules = {
             },
         },
     },
+    importRequestForm: {
+        rules: {
+            file_import_file: {
+                required: true,
+                extension: "xls|xlsx",
+            },
+        },
+        messages: {
+            file_import_file: {
+                required: "Please select an Excel file.",
+                extension: "Only .xls or .xlsx files are allowed.",
+            },
+        },
+    },
 };

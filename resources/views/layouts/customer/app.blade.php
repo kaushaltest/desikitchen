@@ -10,6 +10,19 @@
 
 </head>
 <style>
+    .hero-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../customer-assets/img/l3.png') no-repeat center center/cover !important;
+        /* background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed; */
+
+        /* make it fill the container */
+        /* keep it centered when cropping */
+        /* avoid tiling */
+        /* optional: parallax effect */
+    }
+
     .modal {
         background-color: rgba(0, 0, 0, 0.8) !important;
         /* darker than default 0.5 */
@@ -18,6 +31,21 @@
     .toast.fade:not(.show) {
         display: none !important;
         pointer-events: none;
+    }
+
+    .menu-img {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        /* keeps aspect ratio, crops if needed */
+    }
+
+    /* phones < 768px */
+    @media (max-width: 767.98px) {
+        .menu-img {
+            width: 90px;
+            height: 60px;
+        }
     }
 </style>
 
@@ -156,18 +184,30 @@
                         <img src="{{asset('logo3.png')}}" width="100" alt="Logo" class="logo">
                     </div>
                     <div id="step-mobile">
-                        <h5 class="mb-3 text-center">Login with Mobile</h5>
+                        <!-- <h5 class="mb-3 text-center">Login</h5> -->
                         <div id="mobile-alert" class="alert d-none" role="alert"></div>
                         <form id="login_mobile_form" method="post">
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="mobile" class="form-label">Mobile Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+91</span>
                                     <input type="tel" class="form-control" id="txt_mobile" name="txt_mobile" placeholder="Enter 10-digit mobile">
                                 </div>
                                 <div class="form-text">We'll send a one-time password (OTP) to this number.</div>
+                            </div> -->
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="txt_login_email" name="txt_login_email" placeholder="Enter your email">
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100" id="send-otp-btn">Send OTP</button>
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="txt_login_password" name="txt_login_password" placeholder="Enter your password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" id="send-otp-btn">Sign In</button>
 
                             <div class="text-center mt-3">
                                 <a href="javascript:void(0)" class="register_new_user">Register a new user ?</a>
@@ -178,7 +218,7 @@
                         </form>
                     </div>
 
-                    <div id="step-otp" style="display: none;">
+                    <!-- <div id="step-otp" style="display: none;">
                         <h5 class="mb-3 text-center">Enter OTP</h5>
                         <div id="otp-alert" class="alert d-none" role="alert"></div>
                         <p class="small-muted text-center mb-2">OTP sent to <span id="display-mobile"></span></p>
@@ -203,7 +243,7 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -250,7 +290,7 @@
                                 <div class="small-muted">
                                     <span id="resend-label">Didn't get it?</span>
                                     <span id="resend-guest-action" class="text-primary cursor-pointer">Resend</span>
-                                    <span id="timer" class="ms-1"></span>
+                                    <span id="guest_timer" class="ms-1"></span>
                                 </div>
                                 <div>
                                     <button type="button" class="btn btn-link p-0" id="guest-change-number">Change Number</button>
@@ -286,6 +326,18 @@
                                 <label for="mobile" class="form-label">Email</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="txt_new_email" name="txt_new_email" placeholder="Enter your email">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="txt_new_password" name="txt_new_password" placeholder="Enter your password">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="txt_new_confirm_password" name="txt_new_confirm_password" placeholder="Enter your confirm password">
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -349,7 +401,7 @@
                                 </div>
                             </div>
 
-                            <h6 class="mt-4 mb-3">Delivery Address</h6>
+                            <h6 class="mt-4 mb-3" id="delivertAddress">Delivery Address</h6>
                             <div class="mb-3" id="addressList">
                                 <!-- Address list will be populated here -->
                             </div>
@@ -634,6 +686,7 @@
     let alacarteorder_date = '';
     let currentUser = '';
     let mealRemaining = 0;
+    let selectedAddress = null;
     let ifDeductAnountFromPlan = true;
     const assetBase = "{{ asset('storage') }}";
     const defaultImage = "{{ asset('default.png') }}";
@@ -649,25 +702,45 @@
     }
 
     function addToCart(item, type) {
-
+        console.log("addToCart")
         const cartId = `${type}-${item.id}`;
         const existing = cart.find(cartItem => cartItem.id === cartId);
         if (existing) {
-            existing.quantity += 1;
+            if (type != 'subscription') {
+                existing.quantity += 1;
+            }
         } else {
-            cart.push({
-                id: cartId,
-                db_id: item.id,
-                order_date: (item?.menu_date) ? item?.menu_date : "",
-                day_name: (item?.day_name) ? item?.day_name : "",
-                name: (item?.name) ? item?.name : item?.title,
-                description: (item?.items) ? item?.items : item?.description,
-                price: (item?.price) ? item?.price : (item?.price_per_kg) ? item?.price_per_kg : item?.price_per_qty,
-                price_type: (item?.price_per_kg) ? item?.price_per_kg : (item?.price_per_qty) ? item?.price_per_qty : "",
-                quantity: 1,
-                type: type,
-                image: item.image
-            });
+            if (type == 'subscription') {
+                cart = cart.filter(cartItem => cartItem.type !== "subscription");
+                cart.push({
+                    id: cartId,
+                    db_id: item.id,
+                    name: (item?.name) ? item?.name : '',
+                    days: (item?.days) ? item?.days : '',
+                    total_meals: (item?.total_meals) ? item?.total_meals : '',
+                    description: (item?.items) ? item?.items : item?.description,
+                    price: item?.price,
+                    quantity: 1,
+                    type: type,
+                    image: item.image
+                });
+            } else {
+                cart.push({
+                    id: cartId,
+                    db_id: item.id,
+                    order_date: (item?.menu_date) ? item?.menu_date : "",
+                    day_name: (item?.day_name) ? item?.day_name : "",
+                    name: (item?.name) ? item?.name : item?.title,
+                    description: (item?.items) ? item?.items : item?.description,
+                    price: (item?.price) ? item?.price : (item?.price_per_kg) ? item?.price_per_kg : item?.price_per_qty,
+                    price_type: (item?.price_per_kg) ? item?.price_per_kg : (item?.price_per_qty) ? item?.price_per_qty : "",
+                    quantity: 1,
+                    type: type,
+                    image: item.image
+                });
+            }
+            toastSuccess("Item added to cart")
+
         }
         localStorage.setItem('cart_items', JSON.stringify(cart));
         updateCartDisplay();
@@ -684,6 +757,7 @@
     function updateCartDisplay() {
         const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
         const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        $('#cartCountMobile').text(`${itemCount>0?itemCount+'':''}`)
         $('#cartCount').text(`${itemCount>0?itemCount+' items':'Cart'}`);
         $('#cartTotal').text(`${(total!=0)?'$'+total.toFixed(2):''}`);
     }
@@ -694,6 +768,7 @@
         if (existing && existing.quantity > 1) {
             existing.quantity = existing.quantity - 1;
         } else {
+            toastSuccess("Item removed from cart");
             cart = cart.filter(item => item.id !== cartId);
         }
         localStorage.setItem('cart_items', JSON.stringify(cart));
@@ -714,11 +789,11 @@
             const isToday = menu.menu_date === today;
             html += ` <div class="col-lg-12 border  p-3 mb-3" style="border-radius: 10px;">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 120px; height:80px" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
+                                <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
                                 <div class="w-100 d-flex flex-column text-start ps-4">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.title}
-                                        <span class="badge bg-primary fs-6">
+                                        <span class="badge bg-primary fs-6" style="text-wrap: auto;">
                                             ${menu.menu_date} - ${menu.day_name}
                                         </span>
                                         </span>
@@ -761,7 +836,7 @@
 
                 html += ` <div class="col-lg-12 mb-3">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt="" style="width: 120px; height:80px" onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
+                                <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
                                 <div class="w-100 d-flex flex-column text-start ps-4">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.name}</span>
@@ -843,6 +918,12 @@
                     icon: 'fas fa-birthday-cake',
                     color: 'warning',
                     bgColor: 'bg-warning-subtle'
+                },
+                'subscription': {
+                    name: 'Subscription',
+                    icon: 'fas fa-id-card',
+                    color: 'warning',
+                    bgColor: 'bg-warning-subtle'
                 }
             };
             // Render each group
@@ -896,7 +977,7 @@
                 // Handle Set Menu items differently (item-wise additional menu)
 
                 // Handle other categories (A La Carte, Party Menu) - category-wise additional items
-                html += `<div class="row p-2 ${(type === 'daywise')?'mt-3':''}">`;
+                html += `<div class="row p-2 ${(type === 'daywise' || type === 'subscription')?'mt-3':''}">`;
                 items.forEach((item, index) => {
                     html += `
                                 <div class="col-lg-12 pb-2">
@@ -917,11 +998,21 @@
                                                             <div className="flex-1">
                                                                 <p class="fw-semibold mb-0">${item.name} ${item.type === 'daywise' && item.order_date ? `<span class="badge bg-primary">${item.order_date} (${item.day_name || ''})</span>` : ''}
                                                                 </p>
-                                                                <small className="text-sm text-orange-700">$${item.price}</small>
+                                                                <small className="text-sm text-orange-700">${(type=="subscription")?item?.description:'$'+item.price}</small>
                                                             </div>
                                                         
-                                                        <div class="d-flex justify-content-between align-items-center gap-3">
-                                                        <div class="btn-group" role="group">
+                                                        <div class="d-flex justify-content-between align-items-center gap-3">`;
+                    if (type == "subscription") {
+                        html += `
+                                                             <div class="btn-group" role="group">
+                                                            <button class="btn btn-sm btn-primary" onclick="removeFromCart('${item.id}')">
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                            `;
+                    } else {
+                        html += `
+                                                              <div class="btn-group" role="group">
                                                             <button class="btn btn-sm btn-primary" onclick="removeFromCart('${item.id}')">
                                                                 <i class="fa fa-minus"></i>
                                                             </button>
@@ -930,8 +1021,11 @@
                                                                 <i class="fa fa-plus"></i>
                                                             </button>
                                                         </div>
-                                                        <span class="fw-bold text-primary">$${(item.price * item.quantity).toFixed(2)}</span>
-                                                    </div>
+                                                            `;
+                    }
+
+                    html += ` <span class="fw-bold text-primary">$${(item.price * item.quantity).toFixed(2)}</span>
+                                                   </div>
                                                     </div>                                        
                                                 </div>
                                             </div>
@@ -1195,7 +1289,7 @@
                         if ($('#order_date_alacarte').is(':visible')) {
                             const value = $('#order_date_alacarte').val();
                             if (!value) {
-                                toastFail("Alacarte Order Date is required!");
+                                toastFail("Please selct the order date");
                                 return;
                             }
                         }
@@ -1245,7 +1339,7 @@
                 console.log(data)
                 event.preventDefault();
                 $.ajax({
-                    url: "{{ route('customer.check-mobile-exist') }}", // Change this to your server endpoint
+                    url: "{{ route('customer.sign-in') }}", // Change this to your server endpoint
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -1255,19 +1349,22 @@
                     contentType: false,
                     beforeSend: function() {
                         $(".loader-wrapper").css("display", "flex")
-
                     },
                     success: function(response) {
-                        console.log(response)
                         // Handle success response
                         if (response.success) {
-                            toastSuccess("OPT send in your mobile number");
-                            $('#display-mobile').text('+91 ' + data.txt_mobile);
-                            $('#step-mobile').hide();
-                            $("#step-otp").show();
-                            startResendCountdown();
+                            $('#model_login').modal('toggle');
+                            toastSuccess(response.message);
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                            // toastSuccess("OTP sent to your mobile successfully! mobile number");
+                            // $('#display-mobile').text('+91 ' + data.txt_mobile);
+                            // $('#step-mobile').hide();
+                            // $("#step-otp").show();
+                            // startResendCountdown();
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1325,7 +1422,7 @@
                                 location.reload();
                             }, 1500);
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1365,7 +1462,7 @@
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
 
-                toastSuccess("OPT send in your mobile number");
+                toastSuccess("OTP sent to your mobile successfully! mobile number");
                 $('#display-guest-mobile').text('+91 ' + data.txt_guest_mobile);
                 $('#guest-step-mobile').hide();
                 $("#guest-step-otp").show();
@@ -1383,7 +1480,7 @@
                     otp += $(this).val();
                 });
                 if (otp.length !== 4 || !/^\d+$/.test(otp)) {
-                    toastFail('Enter 4 digit OTP.');
+                    toastFail('Please enter 4 digit OTP.');
                     return;
                 }
                 console.log(otp)
@@ -1414,7 +1511,7 @@
                             toastSuccess(response.message);
 
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1442,16 +1539,16 @@
             }
         });
 
-        $(document).on('input', '.otp-input', function() {
+        $(document).on('input', '.register-otp-input', function() {
             const $this = $(this);
             const val = $this.val();
             if (val.length === 1) {
-                $this.next('.otp-input').focus();
+                $this.next('.register-otp-input').focus();
             }
         });
-        $(document).on('keydown', '.otp-input', function(e) {
+        $(document).on('keydown', '.register-otp-input', function(e) {
             if (e.key === 'Backspace' && !$(this).val()) {
-                $(this).prev('.otp-input').focus();
+                $(this).prev('.register-otp-input').focus();
             }
         });
 
@@ -1482,7 +1579,7 @@
                 const data = Object.fromEntries(formData.entries());
                 event.preventDefault();
                 $.ajax({
-                    url: "{{ route('customer.check-register-mobile-exist') }}", // Change this to your server endpoint
+                    url: "{{ route('customer.register-user-mobile') }}", // Change this to your server endpoint
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -1498,13 +1595,13 @@
                         console.log(response)
                         // Handle success response
                         if (response.success) {
-                            toastSuccess("OPT send in your mobile number");
+                            toastSuccess("OTP sent to your mobile successfully! mobile number");
                             $('#display-register-mobile').text('+91 ' + data.txt_new_mobile);
                             $('#step-register-mobile').hide();
                             $("#step-register-otp").show();
                             startResendCountdown();
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1538,6 +1635,7 @@
                 formData.append('name', $("#txt_new_name").val())
                 formData.append('email', $("#txt_new_email").val())
                 formData.append('mobile', $("#txt_new_mobile").val())
+                formData.append('password', $("#txt_new_password").val())
 
                 $.ajax({
                     url: "{{ route('customer.verify-register-otp') }}", // Change this to your server endpoint
@@ -1562,7 +1660,7 @@
                             toastSuccess(response.message);
 
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1655,7 +1753,7 @@
                             $('#addAddressModal').modal('toggle');
                             showCheckout();
                         } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
                     },
                     error: function(xhr, status, error) {
@@ -1766,7 +1864,15 @@
 
 
     async function showCheckout() {
-        let is_subscription_exist = await isSubscriptionExist()
+        $("#addAddressBtn").hide();
+        $("#delivertAddress").hide();
+        const hasOnlySubscription = cart.length > 0 && cart.every(item => item.type == "subscription");
+        const onlySubscriptionData = cart.find(item => item.type === "subscription");
+        let freshSubscriptionMeal = 0;
+        if (onlySubscriptionData) {
+            freshSubscriptionMeal = Number(onlySubscriptionData?.total_meals)
+        }
+        let is_subscription_exist = await isSubscriptionExist();
         $.ajax({
             url: "{{ route('customer.get-user-address') }}", // Change this to your server endpoint
             type: 'GET',
@@ -1788,12 +1894,18 @@
             `);
                     // Address list
                     let addressHtml = '';
-                    response?.data?.address.forEach(addr => {
-                        const fullAddress = `${addr.address_line1}${addr.address_line2 ? ', ' + addr.address_line2 : ''} - ${addr.pincode}`;
-                        if (addr.is_default) {
-                            selectedAddress = addr
-                        }
-                        addressHtml += `
+                    if (hasOnlySubscription) {
+                        $("#addAddressBtn").hide();
+                        $("#delivertAddress").hide();
+                    } else {
+                        $("#addAddressBtn").show();
+                        $("#delivertAddress").show();
+                        response?.data?.address.forEach(addr => {
+                            const fullAddress = `${addr.address_line1}${addr.address_line2 ? ', ' + addr.address_line2 : ''} - ${addr.pincode}`;
+                            if (addr.is_default) {
+                                selectedAddress = addr
+                            }
+                            addressHtml += `
                     <div class="address-card card mb-2" onclick="selectAddress(${addr.id})">
                         <div class="card-body p-3">
                             <div class="d-flex align-items-start gap-3">
@@ -1809,7 +1921,9 @@
                         </div>
                     </div>
                 `;
-                    });
+                        });
+                    }
+
                     $('#addressList').html(addressHtml);
 
                 } else {
@@ -1864,7 +1978,7 @@
             }
         };
         let summaryHtml = '';
-        let isDailyTiffinAvailable=false;
+        let isDailyTiffinAvailable = false;
         const grouped = cart.reduce((acc, item) => {
             if (!acc[item.type]) acc[item.type] = [];
             acc[item.type].push(item);
@@ -1878,11 +1992,67 @@
                 bgColor: 'bg-secondary-subtle'
             };
             const category_wisetotal = items.reduce((sum, item) => {
-                const itemTotal = item.price * item.quantity;
-                const additionalTotal = Array.isArray(item.additional_items) ?
-                    item.additional_items.reduce((aSum, addItem) => aSum + (addItem.price * addItem.quantity), 0) :
-                    0;
-                return sum + itemTotal + additionalTotal;
+                if (category?.name == 'Daywise') {
+                    let sub_category_total = 0;
+                    if (is_subscription_exist) {
+                        if (mealRemaining > 0) {
+                            if (ifDeductAnountFromPlan) {
+                                let total_meal = mealRemaining - item.quantity;
+                                if (total_meal < 0) {
+                                    let finalQty = Math.abs(total_meal);
+                                    let caalculateQtyForTotal = finalQty - item.quantity;
+                                    const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
+                                    quantityAfterPlan = finalQty
+                                    mealRemaining = 0;
+                                    sub_category_total = sub_category_total - finalPrice;
+                                } else {
+                                    quantityAfterPlan = 0
+                                    mealRemaining -= item.quantity;
+                                    const finalPrice = item.price * item.quantity;
+                                    sub_category_total = sub_category_total - finalPrice
+                                }
+                            }
+
+                        }
+                    } else {
+                        if (onlySubscriptionData) {
+                            let total_meal = freshSubscriptionMeal - item.quantity;
+                            console.log("total_meal", total_meal)
+                            if (total_meal < 0) {
+                                console.log("call this total_meal")
+                                const usedFromPlan = freshSubscriptionMeal; // use all remaining plan meals
+                                const remainingQty = item.quantity - usedFromPlan; // qty not covered by plan
+                                const finalPrice = item.price * remainingQty; // charge only remaining
+                                quantityAfterPlan = remainingQty;
+                                freshSubscriptionMeal = 0; // plan exhausted
+                                sub_category_total = sub_category_total - finalPrice;
+                            } else {
+                                console.log("not call this total_meal")
+
+                                quantityAfterPlan = 0;
+                                freshSubscriptionMeal -= item.quantity; // reduce available meals
+                                const finalPrice = item.price * 0;
+                                sub_category_total = sub_category_total - finalPrice;
+                                console.log("freshSubscriptionMeal", freshSubscriptionMeal)
+
+                            }
+                        }
+                    }
+                    const itemTotal = sub_category_total;
+                    console.log("itemTotal", itemTotal)
+                    const additionalTotal = Array.isArray(item.additional_items) ?
+                        item.additional_items.reduce((aSum, addItem) => aSum + (addItem.price * addItem.quantity), 0) :
+                        0;
+                    return sum + itemTotal + additionalTotal;
+                } else {
+                    const itemTotal = item.price * item.quantity;
+
+                    const additionalTotal = Array.isArray(item.additional_items) ?
+                        item.additional_items.reduce((aSum, addItem) => aSum + (addItem.price * addItem.quantity), 0) :
+                        0;
+                    return sum + itemTotal + additionalTotal;
+                }
+
             }, 0);
             summaryHtml += `<div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex"><h6><b>${category.name}</b></h6>`;
@@ -1901,29 +2071,49 @@
                 summaryHtml += `
                     <div class="d-flex justify-content-between align-items-center mt-1">
                         <div class="d-flex">
-                            <h6>${item.name} x ${item.quantity}</h6>`;
+                            <h6>${item.name} ${(category.name == "Subscription")?'':'x' +item.quantity}</h6>`;
                 let quantityAfterPlan = item.quantity;
                 if (category.name == "Daywise") {
-                    isDailyTiffinAvailable=true;
-                    if (mealRemaining > 0) {
-                        if (ifDeductAnountFromPlan) {
-                            let total_meal = mealRemaining - item.quantity;
+                    isDailyTiffinAvailable = true;
+                    if (is_subscription_exist) {
+                        if (mealRemaining > 0) {
+                            if (ifDeductAnountFromPlan) {
+                                let total_meal = mealRemaining - item.quantity;
+                                if (total_meal < 0) {
+                                    let finalQty = Math.abs(total_meal);
+                                    let caalculateQtyForTotal = finalQty - item.quantity;
+                                    const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
+                                    quantityAfterPlan = finalQty
+                                    mealRemaining = 0;
+                                    total = total - finalPrice;
+                                } else {
+                                    quantityAfterPlan = 0
+                                    mealRemaining -= item.quantity;
+                                    const finalPrice = item.price * item.quantity;
+                                    total = total - finalPrice
+                                }
+                            }
+
+                        }
+                    } else {
+                        if (onlySubscriptionData) {
+                            let total_meal = freshSubscriptionMeal - item.quantity;
                             if (total_meal < 0) {
-                                let finalQty =  Math.abs(total_meal);
-                                let caalculateQtyForTotal =finalQty -item.quantity;
+                                let finalQty = Math.abs(total_meal);
+                                let caalculateQtyForTotal = finalQty - item.quantity;
                                 const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
                                 quantityAfterPlan = finalQty
-                                mealRemaining = 0;
+                                freshSubscriptionMeal = 0;
                                 total = total - finalPrice;
                             } else {
                                 quantityAfterPlan = 0
-                                mealRemaining -= item.quantity;
+                                freshSubscriptionMeal -= item.quantity;
                                 const finalPrice = item.price * item.quantity;
                                 total = total - finalPrice
                             }
                         }
-
                     }
+
                     summaryHtml += `<span class="badge bg-primary" style="height:22px">${item.order_date} (${item.day_name})</span>`;
                 }
                 summaryHtml += `</div>
@@ -1998,6 +2188,13 @@
             acc[item.type].push(item);
             return acc;
         }, {});
+        console.log(grouped.hasOwnProperty('subscription'))
+        if (!grouped.hasOwnProperty('subscription')) {
+            grouped.subscription = [];
+        }
+
+        console.log(grouped)
+
         $.ajax({
             url: "{{ route('customer.add-order') }}", // Change this to your server endpoint
             type: 'POST',
@@ -2006,7 +2203,7 @@
             },
             data: {
                 cart: grouped,
-                address_id: selectedAddress.id,
+                address_id: selectedAddress?.id || '',
                 alacarteorder_date: alacarteorder_date,
                 is_deduct_amount: isDeductChecked
             },
@@ -2029,7 +2226,7 @@
                     }, 1000);
 
                 } else {
-                    toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                    toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                 }
             },
             error: function(xhr, status, error) {

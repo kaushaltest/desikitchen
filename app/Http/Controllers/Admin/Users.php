@@ -35,7 +35,7 @@ class Users extends Controller
                 if ($existingUser) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'This mobile number is already registered.',
+                        'message' => 'This mobile number is already associated with an account.registered.',
                     ]);
                 }
                 $added_data = [
@@ -51,7 +51,7 @@ class Users extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "User added successfully"
+                    'message' => "New user account created successfully!"
                 ], 200);
             } else {
                 $userId = $request->input('hid_userid');
@@ -64,7 +64,7 @@ class Users extends Controller
                 if ($existingUser) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'This mobile number is already registered by another user.',
+                        'message' => 'This mobile number is already associated with an account.registered by another user.',
                     ]);
                 }
                 $updated_data = [
@@ -80,7 +80,7 @@ class Users extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "User updated successfully"
+                    'message' => "Your profile has been updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -97,7 +97,7 @@ class Users extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'User account has been successfully removed.successfully']);
     }
 
     public function adminUser()
@@ -129,7 +129,7 @@ class Users extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "User added successfully"
+                    'message' => "New user account created successfully!"
                 ], 200);
             } else {
                 $updated_data = [
@@ -146,7 +146,7 @@ class Users extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "User updated successfully"
+                    'message' => "Your profile has been updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -162,7 +162,7 @@ class Users extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'User account has been successfully removed.successfully']);
     }
 
     public function tables()
@@ -191,7 +191,7 @@ class Users extends Controller
                 Table_model::create($added_data);
                 return response()->json([
                     "success" => true,
-                    'message' => "Table added successfully"
+                    'message' => "New table added successfully!"
                 ], 200);
             } else {
                 $updated_data = [
@@ -205,7 +205,7 @@ class Users extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Table updated successfully"
+                    'message' => "Table details updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -221,6 +221,6 @@ class Users extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'Table deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Table removed successfully.']);
     }
 }

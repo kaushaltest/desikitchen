@@ -31,7 +31,7 @@ class AdminLoginController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Invalid credentials.',
+            'email' => 'Incorrect username or password. Please try again..',
         ]);
     }
     public function checkMobileExist(Request $request)

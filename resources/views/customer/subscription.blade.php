@@ -38,20 +38,20 @@
 <div class="container-xxl py-5 bg-dark hero-header mb-5">
     <div class="container text-center my-5 pt-5 pb-4">
         <h1 class="display-3 text-white mb-3 animated slideInDown">Subscription</h1>
-        <nav aria-label="breadcrumb">
+        <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb justify-content-center text-uppercase">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Pages</a></li>
                 <li class="breadcrumb-item text-white active" aria-current="page">Subscription</li>
             </ol>
-        </nav>
+        </nav> -->
     </div>
 </div>
 
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h1 class="section-title ff-secondary text-center text-primary fw-normal mb-5">Subscription</h1>
+            <h1 class="section-title ff-secondary text-center text-primary fw-normal mb-5">Subscription for tiffin service</h1>
         </div>
 
     </div>
@@ -90,9 +90,18 @@
                     </ul>
 
                     <!-- button pushed to bottom -->
-                    <button class="btn btn-primary w-100 mt-auto choose-plan-btn" data-plan="{{ $sub['id'] }}" data-meal="{{ $sub['total_meals'] }}" data-day="{{ $sub['days'] }}">
-                        Choose {{$sub['name']}}
+                    <button
+                        class="btn btn-primary w-100 mt-auto choose-plan-btn"
+                        data-menu='@json($sub)'
+                        data-id="{{ $sub['id'] }}"
+                        data-name="{{ $sub['name'] }}"
+                        data-price="{{ $sub['price'] }}"
+                        data-days="{{ $sub['days'] }}"
+                        data-total-meals="{{ $sub['total_meals'] }}"
+                        data-description="{{ $sub['description'] }}">
+                        Choose {{ $sub['name'] }}
                     </button>
+
                 </div>
             </div>
 
@@ -104,44 +113,57 @@
 <script>
     $(document).ready(function() {
         $(".choose-plan-btn").on("click", function() {
-            let planId = $(this).data("plan");
-            let meal = $(this).data("meal");
-            let days = $(this).data("day");
+            const item = {
+                id: $(this).attr("data-id"),
+                name: $(this).attr("data-name"),
+                price: $(this).attr("data-price"),
+                days : $(this).attr("data-days"),
+                total_meals : $(this).attr("data-total-meals"),
+                description: $(this).attr("data-description"),
+                image: ""
+            };
 
-            $.ajax({
-                url: "{{route('customer.buy-subscription')}}", // Laravel route
-                type: "POST",
-                data: {
-                    plan_id: planId,
-                    meal: meal,
-                    days: days,
-                    _token: "{{ csrf_token() }}"
-                },
-                beforeSend: function() {
-                    // optional: disable button / show loader
-                    console.log("Subscribing to plan " + planId + "...");
-                },
-                success: function(response) {
-                    // handle success
-                    if (response.success) {
-                        toastSuccess(response.message);
-                    } else {
-                        if (!response.loggedin) {
-                            $('#step-mobile').show();
-                            $('#step-otp').hide();
-                            $("#guest_login").show();
-                            $('#model_login').modal('toggle');
-                        } else {
-                            toastFail(response.message);
-                        }
-                    }
-                },
-                error: function(xhr) {
-                    // handle error
-                    toastFail(xhr.responseText);
-                }
-            });
-        });
+            addToCart(item, 'subscription');
+        })
+        // $(".choose-plan-btn").on("click", function() {
+        //     let planId = $(this).data("plan");
+        //     let meal = $(this).data("meal");
+        //     let days = $(this).data("day");
+
+        //     $.ajax({
+        //         url: "{{route('customer.buy-subscription')}}", // Laravel route
+        //         type: "POST",
+        //         data: {
+        //             plan_id: planId,
+        //             meal: meal,
+        //             days: days,
+        //             _token: "{{ csrf_token() }}"
+        //         },
+        //         beforeSend: function() {
+        //             // optional: disable button / show loader
+        //             console.log("Subscribing to plan " + planId + "...");
+        //         },
+        //         success: function(response) {
+        //             // handle success
+        //             if (response.success) {
+        //                 toastSuccess(response.message);
+        //             } else {
+        //                 if (!response.loggedin) {
+        //                     $('#step-mobile').show();
+        //                     $('#step-otp').hide();
+        //                     $("#guest_login").show();
+        //                     $('#model_login').modal('toggle');
+        //                 } else {
+        //                     toastFail(response.message);
+        //                 }
+        //             }
+        //         },
+        //         error: function(xhr) {
+        //             // handle error
+        //             toastFail(xhr.responseText);
+        //         }
+        //     });
+        // });
     });
 </script>
 

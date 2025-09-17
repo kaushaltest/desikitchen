@@ -131,7 +131,7 @@ class Neworder extends Controller
         // Delete the menu record
         $menu->delete();
 
-        return response()->json(['success' => true, 'message' => 'Menu deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 
     public function addUpdateOrder(Request $request)
@@ -147,7 +147,7 @@ class Neworder extends Controller
 
                 return response()->json([
                     "success" => true,
-                    'message' => "Order added successfully"
+                    'message' => "Your order has been successfully placed !"
                 ], 200);
             } else {
                 $updated_data = [
@@ -160,7 +160,7 @@ class Neworder extends Controller
                 );
                 return response()->json([
                     "success" => true,
-                    'message' => "Order updated successfully"
+                    'message' => "Your order details have been updated successfully."
                 ], 200);
             }
         } catch (\Exception $e) {

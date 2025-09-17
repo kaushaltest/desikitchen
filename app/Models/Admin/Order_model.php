@@ -34,6 +34,7 @@ class Order_model extends Model
         'order_date',
         'order_id',
         'created_by',
-        'payment_status'
+        'payment_status',
+        'order_status'
     ];
 }

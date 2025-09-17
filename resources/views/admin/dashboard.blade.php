@@ -78,7 +78,7 @@
                     <div class="small-box" style="background-color: #f4c430;">
                         <div class="inner">
                             <h3 id="todayRevenueCount">0</h3>
-                            <p>Today`s Revenue</p>
+                            <p>Today`s Revenue (Delivered)</p>
                         </div>
                         <svg class="small-box-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-currency-rupee" viewBox="0 0 16 16">
                             <path d="M8.5 1a.5.5 0 0 1 .5.5V2H10a.5.5 0 0 1 0 1H9v1h1a.5.5 0 0 1 0 1H9a3 3 0 0 1-2.98 2.65l3.546 4.129a.5.5 0 1 1-.752.658l-4.286-5A.5.5 0 0 1 5 7h1a2 2 0 0 0 0-4H5a.5.5 0 0 1 0-1h3V1.5a.5.5 0 0 1 .5-.5z" />
@@ -99,7 +99,7 @@
                     <div class="small-box text-bg-warning">
                         <div class="inner">
                             <h3 id="weekluRevenueCount">0</h3>
-                            <p>Weekly Revenue</p>
+                            <p>Weekly Revenue (Delivered)</p>
                         </div>
                         <svg class="small-box-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
                             <path d="M6.5 2a.5.5 0 0 0 0 1H7v1h2V3h.5a.5.5 0 0 0 0-1h-3zM1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm6-3a3 3 0 0 0-2.995 2.824A.5.5 0 0 0 4.5 14h5a.5.5 0 0 0 .495-.574A3 3 0 0 0 7 11z" />
@@ -129,52 +129,53 @@
                             <div class="card">
                                 <!-- /.card-header -->
                                 <div class="card-body table-responsive">
-                                    <div class="d-flex justify-content-end mb-3">
+                                    <div class="d-flex justify-content-end ">
                                         <div class="">
-                                            <a href="{{ route('admin.selecttable') }}" class="btn btn-primary btn-add-menu text-right">Add New Table Order</a>
-                                            <a href="{{ route('admin.neworder') }}" class="btn btn-primary btn-add-menu text-right">Add New Order</a>
+                                            <a href="{{ route('admin.selecttable') }}" class="btn btn-primary btn-add-menu text-right mb-3">Add New Table Order</a>
+                                            <a href="{{ route('admin.neworder') }}" class="btn btn-primary btn-add-menu text-right mb-3">Add New Order</a>
                                         </div>
                                     </div>
-                                    <div class="row align-items-end mb-3">
+                                    <div class="row my-3">
                                         <!-- Filter Type -->
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-bold">Select Filter</label>
-                                            <select id="filterType" class="form-select">
-                                                <option value="today" selected>Today</option>
-                                                <option value="week">This Week</option>
-                                                <option value="month">This Month</option>
-                                                <option value="custom">Custom Range</option>
-                                            </select>
-                                        </div>
+                                        <div class="row align-items-end justify-content-end ">
+                                            <div class="col-md-3">
+                                                <select id="filterType" class="form-select">
+                                                    <option value="today" selected>Today</option>
+                                                    <option value="week">This Week</option>
+                                                    <option value="month">This Month</option>
+                                                    <option value="custom">Custom Range</option>
+                                                </select>
+                                            </div>
 
-                                        <!-- From Date -->
-                                        <div class="col-md-3 custom-range d-none">
-                                            <label class="form-label fw-bold">From Date</label>
-                                            <input type="date" id="fromDate" class="form-control">
-                                        </div>
+                                            <!-- From Date -->
+                                            <div class="col-md-3 custom-range d-none">
+                                                <label class="form-label fw-bold">From Date</label>
+                                                <input type="date" id="fromDate" class="form-control">
+                                            </div>
 
-                                        <!-- To Date -->
-                                        <div class="col-md-3 custom-range d-none">
-                                            <label class="form-label fw-bold">To Date</label>
-                                            <input type="date" id="toDate" class="form-control">
-                                        </div>
+                                            <!-- To Date -->
+                                            <div class="col-md-3 custom-range d-none">
+                                                <label class="form-label fw-bold">To Date</label>
+                                                <input type="date" id="toDate" class="form-control">
+                                            </div>
 
-                                        <!-- Apply Button -->
-                                        <div class="col-md-2 d-flex align-items-end">
-                                            <button id="applyFilter" class="btn btn-primary w-100">
-                                                Apply
-                                            </button>
+                                            <!-- Apply Button -->
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button id="applyFilter" class="btn btn-primary w-100">
+                                                    Apply
+                                                </button>
+                                            </div>
                                         </div>
-
                                     </div>
-                                    <table id="dt_orderdata" class="table table-striped text-nowrap">
+                                    <table id="dt_orderdata" class="table table-striped text-nowrap my-3">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Ordered On</th>
                                                 <th>Customer</th>
-                                                <th>Address</th>
-                                                <th>Menu Type</th>
+                                                <!-- <th>Address</th> -->
+                                                <th>Order Type</th>
+                                                <!-- <th>Menu Type</th> -->
                                                 <th>Item Name</th>
                                                 <th>Total price</th>
                                                 <th>Status</th>
@@ -358,16 +359,20 @@
                         return `
                         <div>${data?.customer?.name}</div>
                         <strong>Mo.${data?.customer?.phone}</strong>
+                        <p>${data?.address}</p>
                         `;
                     },
                 },
 
+                // {
+                //     data: 'address',
+                // },
                 {
-                    data: 'address',
+                    data: 'order_status',
                 },
-                {
-                    data: 'order_type',
-                },
+                // {
+                //     data: 'order_type',
+                // },
                 {
                     data: 'items',
                 },
@@ -380,7 +385,7 @@
                     },
                 },
                 {
-                    data: 'status_badge',
+                    data: 'status_cap',
                 },
                 {
                     data: 'created_at',
