@@ -7,7 +7,7 @@
 <style>
     .hero-heasder {
         height: 100vh !important;
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)), url('../../../customer-assets/img/l3.png') no-repeat center center/cover  !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../../../logo3.png') no-repeat center center/cover !important;
         /* background-size: cover;
         background-position: center;
         background-repeat: no-repeat !important;
@@ -24,10 +24,16 @@
     <div class="container my-5 py-5 h-100">
         <div class="row align-items-center justify-centent-center g-5 h-100">
             <div class="col-lg-12 text-center text-lg-center">
-                <h1 class="display-3 text-white animated slideInLeft">The Test Of Home,<br>Delivered Fresh</h1>
-                <p class="text-white animated slideInLeft mb-4 pb-2">
-                    From fluffy rotis to wholesome sabzis, every meal at Desi Kitchen is made the way mom would — simple, nourishing, and full of flavor. No shortcuts, no preservatives, just real food that feels like home.
-                </p>
+                <h1 class="display-3 text-white animated slideInLeft">The Taste Of Home,<br>Delivered Fresh</h1>
+                <div class="px-md-5 mx-md-5">
+                    <div class="px-md-5 mx-md-5">
+
+                        <p class="text-white animated slideInLeft mb-4 pb-2 px-md-5 mx-md-5">
+                            From fluffy rotis to wholesome sabzis, every meal at Desi Kitchen is made the way mom would — simple, nourishing, and full of flavor. No shortcuts, no preservatives, just real food that feels like home.
+                        </p>
+                    </div>
+                </div>
+
                 <a href="{{route('customer.menu')}}" class="btn btn-primary py-sm-3 px-sm-5 me-3 animated slideInLeft">Order Now</a>
             </div>
             <!-- <div class="col-lg-6 text-center text-lg-end overflow-hidden">
@@ -104,7 +110,7 @@
             <div class="col-lg-6">
                 <div class="row g-3">
                     <div class="col-12 text-start">
-                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/chef.jpeg')}}">
+                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/chef1.jpeg')}}">
                     </div>
                     <!-- <div class="col-6 text-start">
                         <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.3s" src="{{asset('customer-assets/img/about-2.jpg')}}" style="margin-top: 25%;">
@@ -300,6 +306,29 @@
                         </div>
                     </a>
                 </li>
+                <li class="nav-item menu-items mb-3" data-tab="menu_dining">
+                    <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3" data-bs-toggle="pill" href="#menu_dining">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dining-table" viewBox="0 0 16 16">
+                            <!-- tabletop -->
+                            <rect x="1" y="2" width="14" height="2" rx="0.3" />
+                            <!-- table apron / skirt -->
+                            <rect x="1" y="5.2" width="14" height="1" rx="0.2" />
+                            <!-- left leg -->
+                            <rect x="2" y="7" width="1.5" height="6" rx="0.2" />
+                            <!-- right leg -->
+                            <rect x="12.5" y="7" width="1.5" height="6" rx="0.2" />
+                            <!-- left chair (back) -->
+                            <rect x="0.5" y="3.5" width="1.2" height="3" rx="0.2" />
+                            <!-- right chair (back) -->
+                            <rect x="14.3" y="3.5" width="1.2" height="3" rx="0.2" />
+                        </svg>
+
+                        <div class="ps-3">
+                            <!-- <small class="text-body">Lovely</small> -->
+                            <h5 class="mt-n1 mb-0">Dining</h5>
+                        </div>
+                    </a>
+                </li>
                 <li class="nav-item menu-items mb-3" data-tab="menu_party">
                     <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3" data-bs-toggle="pill" href="#menu_party">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-cake" viewBox="0 0 16 16">
@@ -319,6 +348,9 @@
                 <div id="menu_alacarte" class="tab-pane fade show p-0 menu_alacarte">
 
                 </div>
+                <div id="menu_dining" class="tab-pane fade show p-0 menu_dining">
+
+                </div>
                 <div id="menu_party" class="tab-pane fade show p-0">
                     <div class="container mt-5">
                         <div class="card border-0 shadow-sm" style="max-width: 600px; margin: auto;">
@@ -332,7 +364,7 @@
                                     <p class="mb-0">
                                         <!-- <strong>Mr. Rajesh Kumar</strong><br> -->
                                         <a href="tel:+13455461580" class="text-decoration-none text-primary fw-semibold">
-                                            +1 345-546-1580 
+                                            +1 345-546-1580
                                         </a>
                                     </p>
                                 </div>

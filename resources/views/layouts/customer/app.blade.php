@@ -11,7 +11,7 @@
 </head>
 <style>
     .hero-header {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../customer-assets/img/l3.png') no-repeat center center/cover !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../../../logo3.png') no-repeat center center/cover !important;
         /* background-size: cover;
         background-position: center;
         background-repeat: no-repeat !important;
@@ -38,6 +38,21 @@
         height: 80px;
         object-fit: cover;
         /* keeps aspect ratio, crops if needed */
+    }
+
+    .custom-map-control-button {
+        background-color: #fff;
+        border: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .3);
+        cursor: pointer;
+        margin: 10px;
+        padding: 0 12px;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        line-height: 38px;
+        text-align: center;
     }
 
     /* phones < 768px */
@@ -178,7 +193,12 @@
     <div class="modal fade" id="model_login" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
+
                 <div class="modal-body">
+                    <div class="w-100 text-right d-flex justify-content-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
                     <div class="text-center mb-3">
                         <!-- Replace src with your logo -->
                         <img src="{{asset('logo3.png')}}" width="100" alt="Logo" class="logo">
@@ -204,8 +224,11 @@
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="txt_login_password" name="txt_login_password" placeholder="Enter your password">
+                                    <input type="password" class="form-control" id="txt_login_password" name="txt_login_password" placeholder="Enter your password">
                                 </div>
+                            </div>
+                            <div style="text-align: right;" class="text-right mt-1 mb-3">
+                                <a href="javascript:void(0)" class="forgot_user_password">Forgot your password ?</a>
                             </div>
                             <button type="submit" class="btn btn-primary w-100" id="send-otp-btn">Sign In</button>
 
@@ -249,10 +272,45 @@
         </div>
     </div>
 
+    <div class="modal fade" id="model_forgotpassword" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="w-100 text-right d-flex justify-content-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <!-- Replace src with your logo -->
+                        <img src="{{asset('logo3.png')}}" width="100" alt="Logo" class="logo">
+                    </div>
+                    <div id="step-mobile">
+                        <h5 class="mb-3 text-center">Forgot your password</h5>
+                        <div id="mobile-alert" class="alert d-none" role="alert"></div>
+                        <form id="form_forgot_password" method="post">
+                            <div class="mb-3">
+                                <label for="mobile" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="txt_forgot_email" name="txt_forgot_email" placeholder="Enter your email">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="model_guest_login" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="w-100 text-right d-flex justify-content-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="text-center mb-3">
                         <!-- Replace src with your logo -->
                         <img src="{{asset('logo3.png')}}" width="100" alt="Logo" class="logo">
@@ -264,7 +322,7 @@
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Mobile Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">+91</span>
+                                    <span class="input-group-text">+1</span>
                                     <input type="tel" class="form-control" id="txt_guest_mobile" name="txt_guest_mobile" placeholder="Enter 10-digit mobile">
                                 </div>
                                 <div class="form-text">We'll send a one-time password (OTP) to this number.</div>
@@ -278,6 +336,8 @@
                         <p class="small-muted text-center mb-2">OTP sent to <span id="display-guest-mobile"></span></p>
                         <form id="guest_login_otp_form" method="post">
                             <div class="d-flex justify-content-center mb-3 gap-2" id="otp-inputs">
+                                <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control guest-otp-input" autocomplete="one-time-code" />
+                                <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control guest-otp-input" autocomplete="one-time-code" />
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control guest-otp-input" autocomplete="one-time-code" />
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control guest-otp-input" autocomplete="one-time-code" />
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control guest-otp-input" autocomplete="one-time-code" />
@@ -308,6 +368,9 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="w-100 text-right d-flex justify-content-end">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="text-center mb-3">
                         <!-- Replace src with your logo -->
                         <img src="{{asset('logo3.png')}}" width="100" alt="Logo" class="logo">
@@ -331,19 +394,19 @@
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="txt_new_password" name="txt_new_password" placeholder="Enter your password">
+                                    <input type="password" class="form-control" id="txt_new_password" name="txt_new_password" placeholder="Enter your password">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Confirm Password</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="txt_new_confirm_password" name="txt_new_confirm_password" placeholder="Enter your confirm password">
+                                    <input type="password" class="form-control" id="txt_new_confirm_password" name="txt_new_confirm_password" placeholder="Enter your confirm password">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Mobile Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">+91</span>
+                                    <span class="input-group-text">+1</span>
                                     <input type="tel" class="form-control" id="txt_new_mobile" name="txt_new_mobile" placeholder="Enter 10-digit mobile">
                                 </div>
                                 <div class="form-text">We'll send a one-time password (OTP) to this number.</div>
@@ -362,6 +425,9 @@
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control register-otp-input" autocomplete="one-time-code" />
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control register-otp-input" autocomplete="one-time-code" />
                                 <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control register-otp-input" autocomplete="one-time-code" />
+                                <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control register-otp-input" autocomplete="one-time-code" />
+                                <input type="text" style="width: 35px;" inputmode="numeric" maxlength="1" class="form-control register-otp-input" autocomplete="one-time-code" />
+
                             </div>
                             <div class="mb-2 text-center">
                                 <button type="submit" class="btn btn-success w-100" id="verify-otp-btn">Verify OTP</button>
@@ -384,7 +450,7 @@
     </div>
 
 
-    <div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal fade overflow-y-auto" id="checkoutModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -443,9 +509,9 @@
                             <div class="col-md-6">
                                 <div class="position-relative">
                                     <div class="map-search-box">
-                                        <input type="text" class="form-control" id="mapSearchInput" placeholder="Search for a location...">
+                                        <input type="text" class="form-control" id="mapSearchInput" style="width:100%;max-width:400px" placeholder="Search for a location...">
                                     </div>
-                                    <div id="map"></div>
+                                    <div id="map" class="w-100" style="height:400px;"></div>
                                 </div>
                                 <div class="mt-3">
                                     <div class="alert alert-info">
@@ -556,77 +622,142 @@
     <script src="{{ asset('customer-assets/customtoast.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="{{asset('customer-assets/validation/auth.js')}}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4sigxLQ9_i9Nfb4ZWLgl8sU2imWO89qM&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places"></script>
 
 </body>
 <script>
     let map, marker, geocoder, autocomplete;
 
     function initGoogleMap() {
-        const mapEl = document.getElementById("map");
-
-        // Initialize Map
-        map = new google.maps.Map(mapEl, {
-            center: {
-                lat: 20,
-                lng: 0
-            }, // default
-            zoom: 2
-        });
-
-        geocoder = new google.maps.Geocoder();
-        marker = new google.maps.Marker({
-            map: map,
-            draggable: true,
-        });
-
-        // Autocomplete setup
-        const input = document.getElementById("mapSearchInput");
-        autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo("bounds", map);
-
-        autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-            if (!place.geometry || !place.geometry.location) return;
-
-            // Center map
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
-
-            // Place marker
-            marker.setPosition(place.geometry.location);
-
-            // Fill form
-            fillAddressFromPlace(place);
-        });
-
-        // Click on map → set marker & reverse geocode
-        map.addListener("click", (e) => {
-            marker.setPosition(e.latLng);
-            reverseGeocode(e.latLng);
-        });
-
-        // Marker drag → reverse geocode
-        marker.addListener("dragend", () => {
-            reverseGeocode(marker.getPosition());
-        });
-
-        // Try current location
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const latLng = {
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude
-                };
-                map.setCenter(latLng);
-                map.setZoom(15);
-                marker.setPosition(latLng);
-                reverseGeocode(latLng);
+        try {
+            const mapEl = document.getElementById("map");
+            map = new google.maps.Map(mapEl, {
+                center: {
+                    lat: 20,
+                    lng: 0
+                },
+                zoom: 2
             });
+            geocoder = new google.maps.Geocoder();
+            marker = new google.maps.Marker({
+                map,
+                draggable: true
+            });
+
+            // ---- Autocomplete ----
+            const input = document.getElementById("mapSearchInput");
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                fields: ["address_components", "geometry", "name", "formatted_address"],
+                types: ["geocode"], // or leave out to allow all types
+            });
+
+            // Keep the search biased to the current map bounds (optional)
+            autocomplete.bindTo("bounds", map);
+
+            // Stop Enter from submitting a form
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") e.preventDefault();
+            });
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry && place.geometry.location) {
+                    const newLocation = results[0].geometry.location;
+                    const pos = {
+                        lat: newLocation.lat(),
+                        lng: newLocation.lng(),
+                    };
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(15);
+                    marker.setPosition(place.geometry.location);
+                    fillAddressFields(place);
+                    reverseGeocode(pos)
+                } else {
+                    // Case 2: The place is a general area with no geometry.
+                    // Use geocoder to find its coordinates by name.
+                    if (place.name) {
+                        geocoder.geocode({
+                            'address': place.name
+                        }, (results, status) => {
+                            if (status === 'OK' && results[0] && results[0].geometry) {
+                                const newLocation = results[0].geometry.location;
+                                const pos = {
+                                    lat: newLocation.lat(),
+                                    lng: newLocation.lng(),
+                                };
+                                map.setCenter(newLocation);
+                                map.setZoom(15);
+                                marker.setPosition(newLocation);
+
+                                // You might want to call a different function to fill fields
+                                // as results[0] may have different components.
+                                fillAddressFields(results[0]);
+                                reverseGeocode(pos)
+                            } else {
+                                console.log('Geocode was not successful for the following reason: ' + status);
+                                alert("Could not find a location for this place.");
+                            }
+                        });
+                    }
+                }
+            });
+
+            // --- 3. Add Current Location Button ---
+            const locationButton = document.createElement("button");
+            locationButton.textContent = "My Location";
+            locationButton.classList.add("custom-map-control-button");
+            locationButton.type = "button";
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+
+            locationButton.addEventListener("click", () => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                            };
+                            map.setCenter(pos);
+                            map.setZoom(15);
+                            marker.setPosition(pos);
+                            reverseGeocode(pos);
+                        },
+                        () => {
+                            alert("Error: The Geolocation service failed.");
+                        }
+                    );
+                } else {
+                    alert("Error: Your browser doesn't support geolocation.");
+                }
+            });
+
+            // Click on map → set marker & reverse geocode
+            map.addListener("click", e => {
+                marker.setPosition(e.latLng);
+                reverseGeocode(e.latLng);
+            });
+
+            // Marker drag → reverse geocode
+            marker.addListener("dragend", () => reverseGeocode(marker.getPosition()));
+
+            // Try current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const latLng = {
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude
+                    };
+                    map.setCenter(latLng);
+                    map.setZoom(15);
+                    marker.setPosition(latLng);
+                    reverseGeocode(latLng);
+                });
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
-    // Reverse geocode to fill form fields
     function reverseGeocode(latLng) {
         geocoder.geocode({
             location: latLng
@@ -639,43 +770,80 @@
         });
     }
 
-    // Fill form from Autocomplete place object
     function fillAddressFromPlace(place) {
         document.getElementById("selectedLocationInfo").style.display = "block";
         document.getElementById("selectedLocationText").textContent = place.formatted_address || "";
-
         fillAddressFields(place);
     }
 
-    // Extract components into fields
     function fillAddressFields(place) {
-        let components = {};
-
+        const c = {};
         (place.address_components || []).forEach(comp => {
-            const type = comp.types[0];
-            components[type] = comp.long_name;
+            comp.types.forEach(t => c[t] = comp.long_name);
         });
 
-        document.getElementById("newAddress1").value = components.street_number ? `${components.street_number} ${components.route || ''}` : (components.route || '');
-        document.getElementById("newAddress2").value = components.sublocality || '';
-        document.getElementById("newCity").value = components.locality || '';
-        document.getElementById("newState").value = components.administrative_area_level_1 || '';
-        document.getElementById("newCountry").value = components.country || '';
-        document.getElementById("newPincode").value = components.postal_code || '';
+        // Line 1: street number + street name (route) + premise/subpremise if present
+        const line1Parts = [];
+        if (c.street_number) line1Parts.push(c.street_number);
+        if (c.route) line1Parts.push(c.route);
+        if (c.premise) line1Parts.push(c.premise);
+        if (c.subpremise) line1Parts.push(c.subpremise);
+
+        // Line 2: neighborhood / area / locality details
+        const line2Parts = [];
+        if (c.sublocality) line2Parts.push(c.sublocality);
+        if (c.administrative_area_level_2) line2Parts.push(c.administrative_area_level_2);
+        if (c.locality && !line2Parts.includes(c.locality)) line2Parts.push(c.locality);
+
+        document.getElementById("newAddress1").value = line1Parts.join(" ");
+        document.getElementById("newAddress2").value = line2Parts.join(" ");
+        document.getElementById("newPincode").value = c.postal_code || "";
     }
 
-    // Bootstrap modal event → init map
+    function addCurrentLocationButton(map) {
+        const locationButton = document.createElement("button");
+        locationButton.textContent = "Pan to Current Location";
+        locationButton.classList.add("custom-map-control-button");
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(locationButton);
+
+        locationButton.addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        marker.setPosition(pos);
+                        reverseGeocode(pos);
+                    },
+                    () => {
+                        // Handle errors if geolocation fails
+                        alert("Error: The Geolocation service failed.");
+                    }
+                );
+            } else {
+                // Browser doesn't support Geolocation
+                alert("Error: Your browser doesn't support geolocation.");
+            }
+        });
+    }
+    // Initialize map only when modal is fully visible
     document.addEventListener("DOMContentLoaded", () => {
         const modal = document.getElementById("addAddressModal");
-        // console.log("map")
-        // modal.addEventListener("shown.bs.modal", () => {
-
-        if (!map) {
-            initGoogleMap();
-        } else {
-            google.maps.event.trigger(map, "resize");
-        }
-        // });
+        modal.addEventListener("shown.bs.modal", () => {
+            if (!map) {
+                initGoogleMap();
+            } else {
+                google.maps.event.trigger(map, "resize");
+                map.setCenter(marker.getPosition() || {
+                    lat: 20,
+                    lng: 0
+                });
+            }
+        });
     });
 </script>
 <script>
@@ -698,11 +866,13 @@
             renderAlaCarteMenu();
         } else if (activeTab === 'menu_party') {
             renderPartyMenu();
+        } else if (activeTab === 'menu_dining') {
+            renderDiningMenu();
         }
     }
 
     function addToCart(item, type) {
-        console.log("addToCart")
+
         const cartId = `${type}-${item.id}`;
         const existing = cart.find(cartItem => cartItem.id === cartId);
         if (existing) {
@@ -725,6 +895,34 @@
                     image: item.image
                 });
             } else {
+                // Suppose item.menu_date = "2025-09-23"
+                const menuDateStr = item?.menu_date; // e.g. "2025-09-23"
+
+                // 1. Create a Date object for the menu date (ignore time, use local midnight)
+                const menuDate = new Date(menuDateStr + "T00:00:00");
+
+                // 2. Get today's date and tomorrow's date (also at midnight for comparison)
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+
+                // 3. Check if menuDate is tomorrow
+                const isTomorrow = menuDate.getTime() === tomorrow.getTime();
+
+                // 4. If it’s tomorrow, check if current time is after 9 PM
+                if (isTomorrow) {
+                    const currentHour = now.getHours(); // 0–23
+                    const currentMinute = now.getMinutes(); // optional if you need minute precision
+
+                    if (currentHour >= 21) {
+                        // After 9 PM
+                        toastFail("You cannot buy meal after 9 PM for tomorrow.");
+                        return;
+                    }
+                }
+
+
                 cart.push({
                     id: cartId,
                     db_id: item.id,
@@ -736,6 +934,7 @@
                     price_type: (item?.price_per_kg) ? item?.price_per_kg : (item?.price_per_qty) ? item?.price_per_qty : "",
                     quantity: 1,
                     type: type,
+                    is_deductamount: (type == 'daywise') ? true : false,
                     image: item.image
                 });
             }
@@ -745,6 +944,18 @@
         localStorage.setItem('cart_items', JSON.stringify(cart));
         updateCartDisplay();
         renderMenu();
+    }
+
+    function isDeductAmountFromPlan(type, itemId, ischecked) {
+        const cartId = `${itemId}`;
+        console.log("cartId", cartId)
+        const existing = cart.find(cartItem => cartItem.id === cartId);
+        console.log("existing", existing)
+        if (existing) {
+            existing.is_deductamount = ischecked;
+        }
+        localStorage.setItem('cart_items', JSON.stringify(cart));
+
     }
 
     function getCartQuantity(cartId) {
@@ -787,14 +998,18 @@
         filteredMenu.forEach(menu => {
             menu.type = "daywise";
             const isToday = menu.menu_date === today;
+            const date = new Date(menu.menu_date);
+            const formatted = date.toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "short"
+            });
             html += ` <div class="col-lg-12 border  p-3 mb-3" style="border-radius: 10px;">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
-                                <div class="w-100 d-flex flex-column text-start ps-4">
+                                <div class="w-100 d-flex flex-column text-start ">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.title}
                                         <span class="badge bg-primary fs-6" style="text-wrap: auto;">
-                                            ${menu.menu_date} - ${menu.day_name}
+                                            ${formatted} - ${menu.day_name}
                                         </span>
                                         </span>
                                         
@@ -833,11 +1048,12 @@
         filteredMenu.forEach(category => {
             html += `<h5 class="mb-3">${category.category}</h5><div class="row mb-3 border p-3" style="border-radius: 10px;">`;
             category?.alacartemenus?.forEach(menu => {
+                //alacarte menu image
+                // <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
 
                 html += ` <div class="col-lg-12 mb-3">
                             <div class="d-flex align-items-center">
-                                <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
-                                <div class="w-100 d-flex flex-column text-start ps-4">
+                                <div class="w-100 d-flex flex-column text-start ">
                                     <h5 class="d-flex justify-content-between border-bottom pb-2">
                                         <span>${menu.name}</span>
                                         <span class="text-primary">$${menu.price}</span>
@@ -862,6 +1078,46 @@
             html += `</div>`;
         });
         $('.menu_alacarte').html(html);
+        updateCartDisplay();
+
+    }
+
+    function renderDiningMenu() {
+
+        const filteredMenu = allMenuList?.dining.map(category => ({
+            ...category,
+            items: category.diningmenus.filter(item =>
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.description.toLowerCase().includes(searchTerm)
+            )
+        })).filter(category => category.items.length > 0);
+        console.log(filteredMenu)
+        let html = '';
+        filteredMenu.forEach(category => {
+            html += `<h5 class="mb-3">${category.category}</h5><div class="row mb-3 border p-3" style="border-radius: 10px;">`;
+            category?.diningmenus?.forEach(menu => {
+                //alacarte menu image
+                // <img class="flex-shrink-0 img-fluid rounded menu-img" src="${menu.image_path ? `${assetBase}/${menu.image_path}` : defaultImage}" alt=""  onerror="this.onerror=null;this.src='{{ asset("default.png") }}">
+
+                html += ` <div class="col-lg-12 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="w-100 d-flex flex-column text-start ">
+                                    <h5 class="d-flex justify-content-between border-bottom pb-2">
+                                        <span>${menu.name}</span>
+                                        <span class="text-primary">$${menu.price}</span>
+                                    </h5>
+                                    <div class="d-flex justify-content-between  pb-2">
+                                            <small class="fst-italic">${menu.description}</small>
+                                          
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                        </div>`;
+            })
+            html += `</div>`;
+        });
+        $('.menu_dining').html(html);
         updateCartDisplay();
 
     }
@@ -976,32 +1232,40 @@
 
                 // Handle Set Menu items differently (item-wise additional menu)
 
+                //daatwise menu image
+                // <div class="me-3">
+                //                                     <img 
+                //                                         src="${item.image_path ?? '{{asset("default.png")}}'}"
+                //                                         alt="${item.name}"
+                //                                         class="rounded"
+                //                                         style="width: 50px; height: 50px; object-fit: cover;"
+                //                                         onerror="this.onerror=null;this.src='{{asset("default.png")}}';"
+                //                                     >
+                //                                 </div>
+
                 // Handle other categories (A La Carte, Party Menu) - category-wise additional items
                 html += `<div class="row p-2 ${(type === 'daywise' || type === 'subscription')?'mt-3':''}">`;
                 items.forEach((item, index) => {
+                    const formatted = new Date(item?.order_date).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short"
+                    });
+
                     html += `
                                 <div class="col-lg-12 pb-2">
                                     <div class="card shadow-sm ${(type === 'daywise')?'mb-3':''}">
                                         <div class="card-body p-2">
                                             <div class="d-flex">
-                                                <div class="me-3">
-                                                    <img 
-                                                        src="${item.image_path ?? '{{asset("default.png")}}'}"
-                                                        alt="${item.name}"
-                                                        class="rounded"
-                                                        style="width: 50px; height: 50px; object-fit: cover;"
-                                                        onerror="this.onerror=null;this.src='{{asset("default.png")}}';"
-                                                    >
-                                                </div>
+                                               
                                                 <div class="flex-grow-1">
                                                     <div class="d-flex justify-content-between">
                                                             <div className="flex-1">
-                                                                <p class="fw-semibold mb-0">${item.name} ${item.type === 'daywise' && item.order_date ? `<span class="badge bg-primary">${item.order_date} (${item.day_name || ''})</span>` : ''}
+                                                                <p class="fw-semibold mb-0">${item.name} ${item.type === 'daywise' && formatted ? `<span class="badge bg-primary">${formatted} (${item.day_name || ''})</span>` : ''}
                                                                 </p>
                                                                 <small className="text-sm text-orange-700">${(type=="subscription")?item?.description:'$'+item.price}</small>
                                                             </div>
                                                         
-                                                        <div class="d-flex justify-content-between align-items-center gap-3">`;
+                                                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">`;
                     if (type == "subscription") {
                         html += `
                                                              <div class="btn-group" role="group">
@@ -1048,27 +1312,29 @@
 
                                 const quantity = matchedAdditionalItem?.quantity || 0;
                                 const totalPrice = (additem.price * quantity).toFixed(2);
+                                // additional menu image 
+                                // <div class="me-3">
+                                //                                 <img 
+                                //                                     src="${additem.image_path ?? '{{asset("default.png")}}'}"
+                                //                                     alt="${additem.name}"
+                                //                                     class="rounded"
+                                //                                     style="width: 40px; height: 40px; object-fit: cover;"
+                                //                                     onerror="this.onerror=null;this.src='{{asset("default.png")}}';"
+                                //                                 >
+                                //                             </div>
                                 html += `
                                             <div class="col-lg-12">
                                                 <div class="card bg-warning-subtle border-warning shadow-sm mb-3">
                                                     <div class="card-body p-2">
                                                         <div class="d-flex">
-                                                        <div class="me-3">
-                                                                <img 
-                                                                    src="${additem.image_path ?? '{{asset("default.png")}}'}"
-                                                                    alt="${additem.name}"
-                                                                    class="rounded"
-                                                                    style="width: 40px; height: 40px; object-fit: cover;"
-                                                                    onerror="this.onerror=null;this.src='{{asset("default.png")}}';"
-                                                                >
-                                                            </div>
+                                                       
                                                             <div class="flex-grow-1">
                                                                 <div class="d-flex justify-content-between">
                                                                     <div className="flex-1">
                                                                         <p class="fw-semibold mb-0">${additem.name}</p>
                                                                         <small className="text-sm text-orange-700">$${additem.price}</small>
                                                                     </div>
-                                                                    <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                                                                     <div class="btn-group" role="group">
                                                                         <button class="btn btn-sm btn-outline-warning" onclick="removeFromCartAdditionalItem('${item.id}','${additem.id}')">
                                                                             <i class="fa fa-minus"></i>
@@ -1118,22 +1384,13 @@
                                                 <div class="card bg-warning-subtle border-warning shadow-sm mb-3">
                                                     <div class="card-body p-2">
                                                         <div class="d-flex">
-                                                        <div class="me-3">
-                                                                <img 
-                                                                    src="${additem.image_path ?? '{{asset("default.png")}}'}"
-                                                                    alt="${additem.name}"
-                                                                    class="rounded"
-                                                                    style="width: 40px; height: 40px; object-fit: cover;"
-                                                                    onerror="this.onerror=null;this.src='{{asset("default.png")}}';"
-                                                                >
-                                                            </div>
                                                             <div class="flex-grow-1">
                                                                 <div class="d-flex justify-content-between">
                                                                     <div className="flex-1">
                                                                         <p class="fw-semibold mb-0">${additem.name}</p>
                                                                         <small className="text-sm text-orange-700">$${additem.price}</small>
                                                                     </div>
-                                                                    <div class="d-flex justify-content-between align-items-center gap-3">
+                                                                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                                                                     <div class="btn-group" role="group">
                                                                         <button class="btn btn-sm btn-outline-warning" onclick="removeFromCartAdditionalItem('${item.id}','${additem.id}')">
                                                                             <i class="fa fa-minus"></i>
@@ -1174,8 +1431,10 @@
         const existing = cart.find(item => item.id === cartId);
         if (existing) {
             existing.quantity += 1;
+            localStorage.setItem('cart_items', JSON.stringify(cart));
             updateCartDisplay();
             showCart();
+
         }
     }
 
@@ -1289,7 +1548,7 @@
                         if ($('#order_date_alacarte').is(':visible')) {
                             const value = $('#order_date_alacarte').val();
                             if (!value) {
-                                toastFail("Please selct the order date");
+                                toastFail("Please select the order date");
                                 return;
                             }
                         }
@@ -1438,6 +1697,62 @@
             }
         });
 
+        //forgot password
+        $('#form_forgot_password').validate({
+            rules: validationRules.forgotForm.rules,
+            messages: validationRules.forgotForm.messages,
+            errorElement: "div",
+            errorClass: "invalid-feedback",
+            highlight: function(element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("is-invalid");
+            },
+            errorPlacement: function(error, element) {
+                const $group = element.closest(".input-group");
+                if ($group.length) {
+                    error.insertAfter($group);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            submitHandler: function(form, event) {
+                const formData = new FormData(form);
+                event.preventDefault();
+                $.ajax({
+                    url: "{{ route('customer.forgot-password') }}", // Change this to your server endpoint
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".loader-wrapper").css("display", "flex")
+
+                    },
+                    success: function(response) {
+                        // Handle success response
+                        if (response.success) {
+                            toastSuccess(response.message);
+                        } else {
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        var errors = xhr.responseJSON.errors;
+                        toastFail(errors)
+                    },
+                    complete: function() {
+                        $(".loader-wrapper").css("display", "none")
+                    },
+                });
+            }
+        });
+
         //guest_login
         $('#guest_login_mobile_form').validate({
             rules: validationRules.guestLoginForm.rules,
@@ -1462,11 +1777,43 @@
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
 
-                toastSuccess("OTP sent to your mobile successfully! mobile number");
-                $('#display-guest-mobile').text('+91 ' + data.txt_guest_mobile);
-                $('#guest-step-mobile').hide();
-                $("#guest-step-otp").show();
-                startResendCountdown();
+                formData.append('mobile', $("#txt_guest_mobile").val())
+                $.ajax({
+                    url: "{{ route('customer.guest-login-otp') }}", // Change this to your server endpoint
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".loader-wrapper").css("display", "flex")
+
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastSuccess("OTP sent to your mobile successfully! mobile number");
+                            $('#display-guest-mobile').text('+91 ' + data.txt_guest_mobile);
+                            $('#guest-step-mobile').hide();
+                            $("#guest-step-otp").show();
+                            startResendCountdown();
+
+                        } else {
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        var errors = xhr.responseJSON.errors;
+                        toastFail(errors)
+                    },
+                    complete: function() {
+                        $(".loader-wrapper").css("display", "none")
+                    },
+                });
+
+
             }
         });
 
@@ -1479,7 +1826,7 @@
                 $('.guest-otp-input').each(function() {
                     otp += $(this).val();
                 });
-                if (otp.length !== 4 || !/^\d+$/.test(otp)) {
+                if (otp.length !== 6 || !/^\d+$/.test(otp)) {
                     toastFail('Please enter 4 digit OTP.');
                     return;
                 }
@@ -1509,6 +1856,9 @@
                             $("#guest-step-otp").hide();
                             $('#model_guest_login').modal('toggle');
                             toastSuccess(response.message);
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000); // 1000 milliseconds = 1 second
 
                         } else {
                             toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
@@ -1626,8 +1976,8 @@
                 $('.register-otp-input').each(function() {
                     otp += $(this).val();
                 });
-                if (otp.length !== 4 || !/^\d+$/.test(otp)) {
-                    toastFail('Enter 4 digit OTP.');
+                if (otp.length !== 6 || !/^\d+$/.test(otp)) {
+                    toastFail('Enter 6 digit OTP.');
                     return;
                 }
                 const formData = new FormData();
@@ -1658,7 +2008,9 @@
                             $("#step-register-otp").hide();
                             $('#model_register').modal('toggle');
                             toastSuccess(response.message);
-
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000); // 1000 milliseconds = 1 second
                         } else {
                             toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
                         }
@@ -1846,8 +2198,12 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        mealRemaining = (response?.meal_remaining) ? response.meal_remaining : 0
-                        resolve(true);
+                        mealRemaining = (response?.meal_remaining) ? response.meal_remaining : 0;
+                        if (response?.is_subscription) {
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
                     } else {
                         resolve(false);
                     }
@@ -1866,13 +2222,23 @@
     async function showCheckout() {
         $("#addAddressBtn").hide();
         $("#delivertAddress").hide();
-        const hasOnlySubscription = cart.length > 0 && cart.every(item => item.type == "subscription");
+        let is_subscription_exist = await isSubscriptionExist();
+        const hasOnlySubscription = cart.length > 0 && cart.find(item => item.type == "subscription");
+        const cartOnlySubscriptionPlan = cart.length > 0 && cart.every(item => item.type == "subscription");
+
+        if (hasOnlySubscription) {
+            if (is_subscription_exist) {
+                toastFail("You already have an active subscription. Please remove the subscription from the cart to proceed further.");
+                return;
+            } else {
+                mealRemaining = hasOnlySubscription?.total_meals;
+            }
+        }
         const onlySubscriptionData = cart.find(item => item.type === "subscription");
         let freshSubscriptionMeal = 0;
         if (onlySubscriptionData) {
             freshSubscriptionMeal = Number(onlySubscriptionData?.total_meals)
         }
-        let is_subscription_exist = await isSubscriptionExist();
         $.ajax({
             url: "{{ route('customer.get-user-address') }}", // Change this to your server endpoint
             type: 'GET',
@@ -1894,7 +2260,7 @@
             `);
                     // Address list
                     let addressHtml = '';
-                    if (hasOnlySubscription) {
+                    if (cartOnlySubscriptionPlan) {
                         $("#addAddressBtn").hide();
                         $("#delivertAddress").hide();
                     } else {
@@ -1994,50 +2360,50 @@
             const category_wisetotal = items.reduce((sum, item) => {
                 if (category?.name == 'Daywise') {
                     let sub_category_total = 0;
-                    if (is_subscription_exist) {
-                        if (mealRemaining > 0) {
-                            if (ifDeductAnountFromPlan) {
-                                let total_meal = mealRemaining - item.quantity;
-                                if (total_meal < 0) {
-                                    let finalQty = Math.abs(total_meal);
-                                    let caalculateQtyForTotal = finalQty - item.quantity;
-                                    const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
-                                    quantityAfterPlan = finalQty
-                                    mealRemaining = 0;
-                                    sub_category_total = sub_category_total - finalPrice;
-                                } else {
-                                    quantityAfterPlan = 0
-                                    mealRemaining -= item.quantity;
-                                    const finalPrice = item.price * item.quantity;
-                                    sub_category_total = sub_category_total - finalPrice
-                                }
-                            }
+                    // if (is_subscription_exist) {
+                    //     if (mealRemaining > 0) {
+                    //         if (ifDeductAnountFromPlan) {
+                    //             let total_meal = mealRemaining - item.quantity;
+                    //             if (total_meal < 0) {
+                    //                 let finalQty = Math.abs(total_meal);
+                    //                 let caalculateQtyForTotal = finalQty - item.quantity;
+                    //                 const finalPrice = item.price * Math.abs(caalculateQtyForTotal);
+                    //                 quantityAfterPlan = finalQty
+                    //                 mealRemaining = 0;
+                    //                 sub_category_total = sub_category_total - finalPrice;
+                    //             } else {
+                    //                 quantityAfterPlan = 0
+                    //                 mealRemaining -= item.quantity;
+                    //                 const finalPrice = item.price * mealRemaining;
+                    //                 sub_category_total = sub_category_total - finalPrice
+                    //             }
+                    //         }
 
-                        }
-                    } else {
-                        if (onlySubscriptionData) {
-                            let total_meal = freshSubscriptionMeal - item.quantity;
-                            console.log("total_meal", total_meal)
-                            if (total_meal < 0) {
-                                console.log("call this total_meal")
-                                const usedFromPlan = freshSubscriptionMeal; // use all remaining plan meals
-                                const remainingQty = item.quantity - usedFromPlan; // qty not covered by plan
-                                const finalPrice = item.price * remainingQty; // charge only remaining
-                                quantityAfterPlan = remainingQty;
-                                freshSubscriptionMeal = 0; // plan exhausted
-                                sub_category_total = sub_category_total - finalPrice;
-                            } else {
-                                console.log("not call this total_meal")
+                    //     }
+                    // } else {
+                    //     if (onlySubscriptionData) {
+                    //         let total_meal = freshSubscriptionMeal - item.quantity;
+                    //         console.log("total_meal", total_meal)
+                    //         if (total_meal < 0) {
+                    //             console.log("call this total_meal")
+                    //             const usedFromPlan = freshSubscriptionMeal; // use all remaining plan meals
+                    //             const remainingQty = item.quantity - usedFromPlan; // qty not covered by plan
+                    //             const finalPrice = item.price * remainingQty; // charge only remaining
+                    //             quantityAfterPlan = remainingQty;
+                    //             freshSubscriptionMeal = 0; // plan exhausted
+                    //             sub_category_total = sub_category_total - finalPrice;
+                    //         } else {
+                    //             console.log("not call this total_meal")
 
-                                quantityAfterPlan = 0;
-                                freshSubscriptionMeal -= item.quantity; // reduce available meals
-                                const finalPrice = item.price * 0;
-                                sub_category_total = sub_category_total - finalPrice;
-                                console.log("freshSubscriptionMeal", freshSubscriptionMeal)
+                    //             quantityAfterPlan = 0;
+                    //             freshSubscriptionMeal -= item.quantity; // reduce available meals
+                    //             const finalPrice = item.price * 0;
+                    //             sub_category_total = sub_category_total - finalPrice;
+                    //             console.log("freshSubscriptionMeal", freshSubscriptionMeal)
 
-                            }
-                        }
-                    }
+                    //         }
+                    //     }
+                    // }
                     const itemTotal = sub_category_total;
                     console.log("itemTotal", itemTotal)
                     const additionalTotal = Array.isArray(item.additional_items) ?
@@ -2061,23 +2427,24 @@
             }
 
             summaryHtml += ` </div>
-                                    <div class="text-muted fw-medium" >$${category_wisetotal.toFixed(2)}</div>
                                     </div>
 
             `;
-
+            // <div class="text-muted fw-medium" >$${category_wisetotal.toFixed(2)}</div>
 
             items.forEach(item => {
                 summaryHtml += `
                     <div class="d-flex justify-content-between align-items-center mt-1">
                         <div class="d-flex">
                             <h6>${item.name} ${(category.name == "Subscription")?'':'x' +item.quantity}</h6>`;
+
                 let quantityAfterPlan = item.quantity;
                 if (category.name == "Daywise") {
                     isDailyTiffinAvailable = true;
                     if (is_subscription_exist) {
                         if (mealRemaining > 0) {
-                            if (ifDeductAnountFromPlan) {
+
+                            if (item.is_deductamount) {
                                 let total_meal = mealRemaining - item.quantity;
                                 if (total_meal < 0) {
                                     let finalQty = Math.abs(total_meal);
@@ -2113,13 +2480,24 @@
                             }
                         }
                     }
-
-                    summaryHtml += `<span class="badge bg-primary" style="height:22px">${item.order_date} (${item.day_name})</span>`;
+                    const date = new Date(item.order_date);
+                    const daywise_order_summary_date = date.toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short"
+                    });
+                    summaryHtml += `<span class="badge bg-primary" style="height:22px">${daywise_order_summary_date} (${item.day_name})</span>`;
                 }
                 summaryHtml += `</div>
                         <small class="fw-medium">$${(item.price * quantityAfterPlan).toFixed(2)}</small>
                     </div>
                 `;
+                if (category.name == 'Daywise' && is_subscription_exist) {
+                    summaryHtml += `<div class="form-check ml-2">
+                                    <input class="form-check-input chk_isdeductamount" data-id="${item.id}" data-type="${item.type}" type="checkbox" id="chk_ded_${item.id}" ${(item.is_deductamount)?'checked':''}>
+                                    <label class="form-check-label" id="lbl_ded_${item.id}" for="chk_ded_${item.id}">Deduct meal from plan
+                                    </label>
+                                </div>`;
+                }
                 if (item?.additional_items?.length > 0) {
                     summaryHtml += '<small style="margin-left:10px"><b>Additional Items:</b></small>'
                     item?.additional_items?.forEach(additem => {
@@ -2138,27 +2516,36 @@
         }
         summaryHtml += `<hr>`;
         console.log("is_subscription_exist " + is_subscription_exist)
-        if (is_subscription_exist && isDailyTiffinAvailable) {
-            summaryHtml += `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="deductPlanCheckbox" ${(ifDeductAnountFromPlan)?'checked':''}>
-                    <label class="form-check-label" id="chk_deductplantext" for="deductPlanCheckbox">
-                    Deduct amount from plan (Remaining meal : ${mealRemaining})
-                    </label>
-                </div>
-                `;
-        }
+        summaryHtml += `
+                <p>Remaining meal : ${mealRemaining}</p>`;
         summaryHtml += `
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Total:</strong>
-                    <strong class="text-success">$${total.toFixed(2)}</strong>
+                    <strong class="text-gray">$${total.toFixed(2)}</strong>
 
                 </div>
             `;
-        $('#orderSummary').html(summaryHtml);
+        summaryHtml += `
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <strong>USD 0.8</strong>
+                    <strong class="text-success">$${total.toFixed(2)*1.25}</strong>
 
+                </div>
+            `;
+
+        $('#orderSummary').html(summaryHtml);
         $('#checkoutModal').modal('show');
     }
+
+    $(document).on("change", ".chk_isdeductamount", async function() {
+        if ($(this).is(":checked")) {
+            isDeductAmountFromPlan($(this).attr('data-type'), $(this).attr('data-id'), true)
+        } else {
+            isDeductAmountFromPlan($(this).attr('data-type'), $(this).attr('data-id'), false)
+        }
+        showCheckout()
+    })
+
     $(document).on("change", "#deductPlanCheckbox", async function() {
         if ($(this).is(":checked")) {
             ifDeductAnountFromPlan = true;
@@ -2172,6 +2559,15 @@
         }
     });
 
+    //forgot user password
+    $(document).on("click", '.forgot_user_password', function() {
+        $("#model_login").modal('toggle');
+        $("#form_forgot_password").validate().resetForm()
+        $("#form_forgot_password")[0].reset();
+        $("#model_forgotpassword").modal('toggle');
+    });
+
+
     function selectAddress(addressId) {
         selectedAddress = currentUser.address.find(addr => addr.id === addressId);
         // Update visual selection
@@ -2181,8 +2577,11 @@
     }
 
     function completeOrder() {
-        let isDeductChecked = $("#deductPlanCheckbox").is(":checked");
 
+        if (!selectedAddress?.id) {
+            toastFail("Please select a delivery address");
+            return;
+        }
         const grouped = cart.reduce((acc, item) => {
             if (!acc[item.type]) acc[item.type] = [];
             acc[item.type].push(item);
@@ -2193,7 +2592,6 @@
             grouped.subscription = [];
         }
 
-        console.log(grouped)
 
         $.ajax({
             url: "{{ route('customer.add-order') }}", // Change this to your server endpoint
@@ -2205,7 +2603,6 @@
                 cart: grouped,
                 address_id: selectedAddress?.id || '',
                 alacarteorder_date: alacarteorder_date,
-                is_deduct_amount: isDeductChecked
             },
             beforeSend: function() {
                 $(".loader-wrapper").css("display", "flex")
@@ -2222,7 +2619,7 @@
                     updateCartDisplay();
                     $('#checkoutModal').modal('hide');
                     setTimeout(function() {
-                        window.location.href = "cart";
+                        window.location.href = "order";
                     }, 1000);
 
                 } else {
@@ -2238,6 +2635,9 @@
                 $(".loader-wrapper").css("display", "none")
             },
         });
+
+
+
 
 
     }

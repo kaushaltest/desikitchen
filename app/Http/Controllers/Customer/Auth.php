@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer\Auth_model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Password;
 
 class Auth extends Controller
 {
@@ -31,7 +33,7 @@ class Auth extends Controller
             return response()->json([
                 "success" => false,
                 "message" => "User not found with this email."
-            ], 404);
+            ], 200);
         }
 
         // 3. Verify password
@@ -39,7 +41,7 @@ class Auth extends Controller
             return response()->json([
                 "success" => false,
                 "message" => "Invalid password."
-            ], 401);
+            ], 200);
         }
         session([
             'user_id' => $user->id,
@@ -92,7 +94,22 @@ class Auth extends Controller
         $otp = $request->input('otp');
         $mobile = $request->input('mobile');
 
-        if ($otp == '1234') {
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/VerificationCheck", [
+                'To' => '+91' . $mobile,
+                'Code' => $otp
+            ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The OTP entered is incorrect. Please try again.',  // Full Twilio error details
+            ], 200);
+        }
+        $data = $response->json();
+
+        if (isset($data['status']) && $data['status'] === 'approved') {
             $data = Auth_model::where('phone', $mobile)
                 ->first();
             if (!$data) {
@@ -126,10 +143,46 @@ class Auth extends Controller
         }
     }
 
+    public function guestLoginOTP(Request $request)
+    {
+        $mobile = $request->input('mobile');
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/Verifications", [
+                'To' => '+91' . $mobile,
+                'Channel' => 'sms'
+            ]);
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Twilio API returned an error.',
+                'twilio_error' => $response->json(),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        // Check if OTP request was successful
+        if (isset($data['status']) && in_array($data['status'], ['pending', 'sent'])) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully!',
+                'twilio_response' => $data
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP.',
+                'twilio_response' => $data
+            ], 200);
+        }
+    }
+
     public function checkRegisterMobileExist(Request $request)
     {
         $email = $request->input('txt_new_email');
-        $data = Auth_model::where('email', $email)
+        $mobile = $request->input('txt_new_mobile');
+        $data = Auth_model::where('email', $email)->where('is_created_by_admin', false)
             ->first();
         if ($data) {
             return response()->json([
@@ -137,9 +190,37 @@ class Auth extends Controller
                 "message" => 'This email is already exist'
             ]);
         }
-        return response()->json([
-            "success" => true
-        ]);
+
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/Verifications", [
+                'To' => '+91' . $mobile,      // e.g. +919876543210
+                'Channel' => 'sms'
+            ]);
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Twilio API returned an error.',
+                'twilio_error' => $response->json(),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        // Check if OTP request was successful
+        if (isset($data['status']) && in_array($data['status'], ['pending', 'sent'])) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully!',
+                'twilio_response' => $data
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP.',
+                'twilio_response' => $data
+            ], 200);
+        }
     }
 
     public function verifyRegisterOTP(Request $request)
@@ -150,7 +231,23 @@ class Auth extends Controller
         $mobile = $request->input('mobile');
         $password = $request->input('password');
 
-        if ($otp == '1234') {
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/VerificationCheck", [
+                'To' => '+91' . $mobile,
+                'Code' => $otp
+            ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The OTP entered is incorrect. Please try again.. Please try again.',  // Full Twilio error details
+            ], 200);
+        }
+        $data = $response->json();
+
+        if (isset($data['status']) && $data['status'] === 'approved') {
+
 
             $user = Auth_model::where('phone', $mobile)
                 ->where('role', 'guest')
@@ -166,6 +263,19 @@ class Auth extends Controller
                     'role'     => 'user', // or whatever role you want after registration
                 ]);
             } else {
+
+                $isadmincreated = Auth_model::where('email', $email)->where('is_created_by_admin', true)
+                    ->first();
+
+                if ($isadmincreated) {
+                    $user->update([
+                        'name'     => $name,
+                        'email'    => $email,
+                        'password' => Hash::make($password),
+                        'role'     => 'user',
+                        'is_created_by_admin' => false
+                    ]);
+                }
                 // 3. Otherwise create new record
                 $user = Auth_model::create([
                     'name'     => $name,
@@ -182,12 +292,14 @@ class Auth extends Controller
                 'user_name'  => $user->name,
                 'user_email' => $user->email,
             ]);
+            // OTP is valid, do your registration/login logic here
 
-            // Regenerate for safety
+            // Regenerate session for safety
             session()->regenerate();
+
             return response()->json([
-                "success" => true,
-                "message" => 'Register user successfuly'
+                'success' => true,
+                'message' => 'User verified successfully!',
             ]);
         } else {
             return response()->json([
@@ -253,5 +365,95 @@ class Auth extends Controller
             "message" => "Your profile has been updated successfully..",
             "data"    => $user
         ]);
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/Verifications", [
+                'To' => '+91' . $request->phone,      // e.g. +919876543210
+                'Channel' => 'sms'
+            ]);
+
+        return $response->json();
+    }
+
+    public function verifySMPOtp(Request $request)
+    {
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/VerificationCheck", [
+                'To' => $request->phone,
+                'Code' => $request->otp
+            ]);
+
+        return $response->json();
+    }
+
+    public function sendCustomSms(Request $request)
+    {
+        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+            ->asForm()
+            ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                'To' => $request->phone,
+                'From' => env('TWILIO_PHONE'),
+                'Body' => $request->message
+            ]);
+
+        return $response->json();
+    }
+
+    public function forgotPassword()
+    {
+        return view('customer.forget-password');
+    }
+    public function create($token)
+    {
+        return view('customer.reset-password',['token' => $token]);
+    }
+
+    public function requestPassword(Request $request)
+    {
+      
+        $request->validate(['txt_forgot_email' => 'required|email']);
+
+        $status = Password::sendResetLink([
+            'email' => $request->input('txt_forgot_email')
+        ]);
+        
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'success' => true,
+                'message' => __($status)
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => __($status)
+            ], 200); // 422 = validation/processing error
+        }
+    }
+    public function store(Request $request)
+    {
+    
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+       
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('dashboard')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }

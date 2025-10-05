@@ -112,7 +112,13 @@
 </div>
 <script>
     $(document).ready(function() {
+        // $(".choose-plan-btn").on("click", function() {
+            
+        // })
         $(".choose-plan-btn").on("click", function() {
+            let planId =  $(this).attr("data-id");
+            let meal = $(this).attr("data-total-meals");
+            let days = $(this).attr("data-days");
             const item = {
                 id: $(this).attr("data-id"),
                 name: $(this).attr("data-name"),
@@ -123,47 +129,36 @@
                 image: ""
             };
 
-            addToCart(item, 'subscription');
-        })
-        // $(".choose-plan-btn").on("click", function() {
-        //     let planId = $(this).data("plan");
-        //     let meal = $(this).data("meal");
-        //     let days = $(this).data("day");
-
-        //     $.ajax({
-        //         url: "{{route('customer.buy-subscription')}}", // Laravel route
-        //         type: "POST",
-        //         data: {
-        //             plan_id: planId,
-        //             meal: meal,
-        //             days: days,
-        //             _token: "{{ csrf_token() }}"
-        //         },
-        //         beforeSend: function() {
-        //             // optional: disable button / show loader
-        //             console.log("Subscribing to plan " + planId + "...");
-        //         },
-        //         success: function(response) {
-        //             // handle success
-        //             if (response.success) {
-        //                 toastSuccess(response.message);
-        //             } else {
-        //                 if (!response.loggedin) {
-        //                     $('#step-mobile').show();
-        //                     $('#step-otp').hide();
-        //                     $("#guest_login").show();
-        //                     $('#model_login').modal('toggle');
-        //                 } else {
-        //                     toastFail(response.message);
-        //                 }
-        //             }
-        //         },
-        //         error: function(xhr) {
-        //             // handle error
-        //             toastFail(xhr.responseText);
-        //         }
-        //     });
-        // });
+            $.ajax({
+                url: "{{route('customer.buy-subscription')}}", // Laravel route
+                type: "POST",
+                data: {
+                    plan_id: planId,
+                    meal: meal,
+                    days: days,
+                    _token: "{{ csrf_token() }}"
+                },
+                beforeSend: function() {
+                    // optional: disable button / show loader
+                },
+                success: function(response) {
+                    // handle success
+                    if (response.success) {
+                        toastSuccess(response.message);
+                    } else {
+                        if (!response.loggedin) {
+                            addToCart(item, 'subscription');
+                        } else {
+                            toastFail(response.message);
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    // handle error
+                    toastFail(xhr.responseText);
+                }
+            });
+        });
     });
 </script>
 

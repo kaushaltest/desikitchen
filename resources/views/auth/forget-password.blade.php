@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Admin Login</title>
+    <title>Forgot password</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -66,9 +66,16 @@
                 </a>
             </div>
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
-                <form method="POST" action="{{ route('admin.login.submit') }}">
+                <p class="login-box-msg">Forgot Your password</p>
+                <form method="POST" action="{{ route('admin.forgot-password') }}">
                     @csrf
+                    @if(session('status'))
+                    <div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
+                        {{ session('status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
+
                     <div class="input-group mb-1">
                         <div class="form-floating">
                             <input id="loginEmail" type="email" name="email" class="form-control" value="" placeholder="" />
@@ -76,25 +83,18 @@
                         </div>
                         <div class="input-group-text"><span class="bi bi-envelope"></span></div>
                     </div>
-                    <div class="input-group mb-1">
-                        <div class="form-floating">
-                            <input id="loginPassword" type="password" name="password"  class="form-control" placeholder="" />
-                            <label for="loginPassword">Password</label>
-                        </div>
-                        <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
-                    </div>
                     <div class="row">
                         <!-- /.col -->
                         <div class="col-12 mt-2">
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Sign In</button>
+                                <button type="submit" class="btn btn-primary">Send Reset Link</button>
                             </div>
                         </div>
                         <!-- /.col -->
                     </div>
                 </form>
-                <!-- /.social-auth-links -->
-                <p class="mb-2 mt-2 text-center"><a href="{{route('admin.forgot-password')}}">I forgot my password</a></p>
+                <p class="mb-2 mt-2 text-center"><a href="{{route('admin.login')}}">Back to login</a></p>
+
             </div>
 
             <!-- /.login-card-body -->

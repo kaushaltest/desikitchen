@@ -20,7 +20,8 @@ class Useraddress_model extends Authenticatable
         'city',
         'state',
         'country',
-        'pincode'
+        'pincode',
+        'is_default'
     ];
    
     public function address()

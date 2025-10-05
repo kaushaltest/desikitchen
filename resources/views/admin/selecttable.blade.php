@@ -102,6 +102,45 @@
                 <!--end::Container-->
             </div>
 </main>
+<div class="modal fade" id="modal_add_table_user" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="form_addnewtablecustomer" method='post'>
+                <div class="modal-body">
+                    <input type="hidden" class="form-control" id="txt_tableid" name="txt_tableid">
+                    <label for="mobile" class="form-label">Name</label>
+
+                    <div class="input-group ">
+                        <input type="text" class="form-control" id="txt_name" name="txt_name" placeholder="Enter your name">
+                    </div>
+
+                    <label for="mobile" class="form-label mt-3">Mobile Number</label>
+
+                    <div class="input-group ">
+                        <span class="input-group-text">+1</span>
+                        <input type="tel" class="form-control" id="txt_phone" name="txt_phone" placeholder="Enter 10-digit mobile">
+                    </div>
+
+                    <label for="mobile" class="form-label mt-3">Email (Optional)</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="txt_email" name="txt_email" placeholder="Enter your email">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script src="{{asset('admin-assets/validation/users.js')}}"></script>
 <script>
     $(document).ready(function() {
@@ -127,47 +166,60 @@
                             if (!dt.user_id) {
                                 // Table is free
                                 buttonHtml = `
-                        <button class="btn btn-primary w-100 mt-auto btn-book-a-table" data-tableid='${dt.id}'>
-                            Book a table
-                        </button>`;
+                                    <button class="btn btn-primary w-100 mt-auto btn-book-a-table" data-tableid='${dt.id}'>
+                                        Book a table
+                                    </button>`;
                             } else if (dt.user_id == userId) {
                                 // Table booked by current user
-                                buttonHtml = `
-                        <button class="btn btn-warning w-100 mt-auto btn-book-a-table" data-tableid='${dt.id}'>
-                            Edit Order
-                        </button>`;
+                                buttonHtml += `
+                                    <button class="btn btn-warning w-100 mt-auto btn-edit-a-table" data-tableid='${dt.id}'>
+                                        Edit Order
+                                    </button>`;
+                                let order_name = 'tbl_order_' + (
+                                    dt.id ?
+                                    dt.id :
+                                    ''
+                                );
+                                let cart = (localStorage.getItem(order_name)) ? JSON.parse(localStorage.getItem(order_name)) : [];
+                                if (cart.length == 0) {
+                                    buttonHtml += `
+                                <button class="btn btn-primary w-100  btn-release-a-table mt-2" data-tableid='${dt.id}'>
+                                    Release Table
+                                </button>`;
+                                }
+
                             } else {
                                 // Booked by someone else
                                 buttonHtml = `
-                        <button class="btn btn-secondary w-100 mt-auto" disabled>
-                            Not Available
-                        </button>`;
+                                <button class="btn btn-secondary w-100 mt-auto" disabled>
+                                    Not Available
+                                </button>`;
                             }
 
                             html += `
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="plan-card h-100 d-flex flex-column border-2 border-primary">
-                <div class="p-4 d-flex flex-column flex-grow-1 plan-header">
-                    <div class="d-flex flex-column justify-content-center gap-2 mb-3 w-100">
-                        <div class="price text-center"><i class="fa fa-table"></i></div>
-                        <div class="text-secondary text-center">${dt.name}</div>
-                    </div>
-                    <ul class="list-unstyled mb-4">
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle me-2 text-primary"></i>
-                            <strong>Capacity:</strong> ${dt.capicity}
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle me-2 text-primary"></i>
-                            ${dt.user_id 
-                                ? '<span class="badge bg-danger">Booked</span>' 
-                                : '<span class="badge bg-success">Available</span>'}
-                        </li>
-                    </ul>
-                    ${buttonHtml}
-                </div>
-            </div>
-        </div>`;
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="plan-card h-100 d-flex flex-column border-2 border-primary">
+                                <div class="p-4 d-flex flex-column flex-grow-1 plan-header">
+                                    <div class="d-flex flex-column justify-content-center gap-2 mb-3 w-100">
+                                        <div class="price text-center"><i class="fa fa-table"></i></div>
+                                        <div class="text-secondary text-center">${dt.name}</div>
+                                    </div>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle me-2 text-primary"></i>
+                                            <strong>Capacity:</strong> ${dt.capicity}
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle me-2 text-primary"></i>
+                                            ${dt.user_id 
+                                                ? '<span class="badge bg-danger">Booked</span>' 
+                                                : '<span class="badge bg-success">Available</span>'}
+                                        </li>
+                                    </ul>
+                                    ${buttonHtml}
+                                </div>
+                            </div>
+                        </div>`;
                         });
                         $('#tbl_list').html(html);
                     }
@@ -183,10 +235,10 @@
             });
         }
 
-        $(document).on("click", '.btn-book-a-table', function() {
+        $(document).on("click", '.btn-release-a-table', function() {
             let tableId = $(this).attr('data-tableid');
             $.ajax({
-                url: "{{ route('admin.book-table') }}",
+                url: "{{ route('admin.release-table') }}",
                 type: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -199,8 +251,8 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        localStorage.setItem('table_id', tableId);
-                        window.location = './tableorder'
+                        localStorage.removeItem(`tbl_order_${tableId}`);
+                        toastSuccess(response.message || "Something went wrong. Please try again later.");
                     } else {
                         toastFail(response.message || "Something went wrong. Please try again later.");
                     }
@@ -214,36 +266,68 @@
                     $(".loader-wrapper").css("display", "none")
                 }
             });
+        });
 
+        $(document).on("click", '.btn-edit-a-table', function() {
+            window.location = './tableorder';
+        });
+
+        $(document).on("click", '.btn-book-a-table', function() {
+            let tableId = $(this).attr('data-tableid');
+            $("#txt_tableid").val(tableId);
+            $("#form_addnewtablecustomer")[0].reset();
+            $("#modal_add_table_user").modal('toggle');
         })
 
 
-        $('#form_add_edit_table').validate({
-            rules: validationRules.tableValidationForm.rules,
-            messages: validationRules.tableValidationForm.messages,
+        $('#form_addnewtablecustomer').validate({
+            rules: validationRules.tableUserValidationForm.rules,
+            messages: validationRules.tableUserValidationForm.messages,
+            errorElement: "div",
+            errorClass: "invalid-feedback",
+            highlight: function(element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("is-invalid");
+            },
+            errorPlacement: function(error, element) {
+                const $group = element.closest(".input-group");
+                if ($group.length) {
+                    error.insertAfter($group);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
             submitHandler: function(form, event) {
                 const formData = new FormData(form);
-
+                console.log(formData);
                 $.ajax({
-                    url: "{{ route('admin.add-update-table') }}",
+                    url: "{{ route('admin.book-table') }}",
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
                     },
-                    data: formData,
-                    processData: false,
-                    contentType: false,
+                    data: {
+                        table_id: $("#txt_tableid").val()
+                    },
                     beforeSend: function() {
                         $(".loader-wrapper").css("display", "flex")
                     },
                     success: function(response) {
                         if (response.success) {
-                            toastSuccess(response.message);
-                            $('#model_add_edit_tables').modal('toggle');
-                            table.ajax.reload();
+                            localStorage.setItem('table_id', $("#txt_tableid").val());
+                            let userData = {
+                                name: $("#txt_name").val(),
+                                phone: $("#txt_phone").val(),
+                                email: $("#txt_email").val(),
+                            }
+                            localStorage.setItem(`tbl_order_${$("#txt_tableid").val()}_user`, JSON.stringify(userData));
+                            window.location = './tableorder';
                         } else {
                             toastFail(response.message || "Something went wrong. Please try again later.");
                         }
+                        getAllTable();
                     },
                     error: function(xhr) {
                         var errors = xhr.responseJSON.errors;

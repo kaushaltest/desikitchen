@@ -129,4 +129,44 @@ class Tables extends Controller
             'message' => 'This table is already reserved by someone else. by another user.',
         ]);
     }
+
+    public function releaseTable(Request $res)
+    {
+        $table = Table_model::find($res->table_id);
+
+        if (!$table) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Table not found.'
+            ]);
+        }
+
+        // Case 1: Table is free → allow booking
+        if (is_null($table->user_id)) {
+            $table->user_id = Auth::user()->id;
+            $table->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Table reserved successfully!.',
+                'table_id' => $table->id,
+            ]);
+        }
+
+        // Case 2: Table already booked by this user → allow edit
+        if ($table->user_id == Auth::user()->id) {
+            $table->user_id = null;
+            $table->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'This table release successfully.',
+            ]);
+        }
+
+        // Case 3: Table booked by someone else → block
+        return response()->json([
+            'success' => false,
+            'message' => 'This table is already reserved by someone else. by another user.',
+        ]);
+    }
 }

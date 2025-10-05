@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('title', 'Menu - Alacarte')
+@section('title', 'Menu - Dining')
 
 @section('content')
 <main class="app-main">
@@ -11,12 +11,12 @@
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Alacarte Menu</h3>
+                    <h3 class="mb-0">Dining Menu</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Alacarte menu</li>
+                        <li class="breadcrumb-item active" aria-current="page">Dining menu</li>
                     </ol>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                                     <button class="btn btn-primary btn-add-menu text-right">Add Menu</button>
                                 </div>
                             </div>
-                            <table id="dt_alacartemenu" class="table table-hover text-nowrap">
+                            <table id="dt_diningemenu" class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -237,7 +237,7 @@
         });
 
         $.ajax({
-            url: "{{ route('admin.get-alacarte-menu') }}",
+            url: "{{ route('admin.get-dining-menu') }}",
             type: 'GET',
             beforeSend: function() {
                 $(".loader-wrapper").css("display", "flex")
@@ -256,7 +256,7 @@
                 }
 
                 const buf = await workbook.xlsx.writeBuffer();
-                saveAs(new Blob([buf]), "alacarte_menu.xlsx");
+                saveAs(new Blob([buf]), "dining_menu.xlsx");
             },
             error: function(xhr, status, error) {
                 toastFail(error)
@@ -271,9 +271,9 @@
         const assetBase = "{{ asset('storage') }}";
         const defaultImage = "{{ asset('default.png') }}";
 
-        var table = $("#dt_alacartemenu").DataTable({
+        var table = $("#dt_diningemenu").DataTable({
             ajax: {
-                url: '{{route("admin.get-alacarte-menu")}}', // Replace with your server endpoint
+                url: '{{route("admin.get-dining-menu")}}', // Replace with your server endpoint
                 type: 'GET', // or 'POST', depending on your server setup
                 dataSrc: function(json) {
                     // Ensure the data is returned in a way that DataTable understands
@@ -344,7 +344,7 @@
 
         })
 
-        $('#dt_alacartemenu').on('click', '.btn-menu-edit', function(e) {
+        $('#dt_diningemenu').on('click', '.btn-menu-edit', function(e) {
             e.preventDefault();
             $('#form_add_edit_menu').validate().resetForm();
             $('#form_add_edit_menu')[0].reset();
@@ -365,13 +365,13 @@
             // Show the modal
             $('#model_add_edit_menu').modal('toggle');
         });
-        $('#dt_alacartemenu').on('click', '.btn-menu-delete', function(e) {
+        $('#dt_diningemenu').on('click', '.btn-menu-delete', function(e) {
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
             let confirmation = confirm("Are you sure want to delete this menu ?");
             if (confirmation) {
                 $.ajax({
-                    url: "{{ route('admin.delete-alacartemenu') }}", // Change this to your server endpoint
+                    url: "{{ route('admin.delete-diningmenu') }}", // Change this to your server endpoint
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -429,7 +429,7 @@
 
                 // event.preventDefault();
                 $.ajax({
-                    url: "{{ route('admin.add-update-alacarte-menu') }}", // Change this to your server endpoint
+                    url: "{{ route('admin.add-update-dining-menu') }}", // Change this to your server endpoint
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -572,7 +572,7 @@
 
                 //     rowsData[index].image = "data:image/png;base64," + base64;
                 // });
-                fetch("{{ route('admin.import_alacarte') }}", {
+                fetch("{{ route('admin.import_dining') }}", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

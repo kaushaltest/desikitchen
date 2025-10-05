@@ -171,7 +171,7 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Ordered On</th>
+                                                <th>Delivery Date</th>
                                                 <th>Customer</th>
                                                 <!-- <th>Address</th> -->
                                                 <th>Order Type</th>
@@ -275,7 +275,7 @@
 
                         $('row', sheet).each(function(index) {
                             if (index === 0) return; // skip header
-                            let cell = $('c[r^="G"] v', this).text(); // 👈 Column G (adjust if needed)
+                            let cell = $('c[r^="F"] v', this).text(); // 👈 Column G (adjust if needed)
                             let value = parseFloat(cell) || 0;
                             total += value;
                         });
@@ -283,11 +283,11 @@
                         // Append a new row with TOTAL
                         let totalRow =
                             `<row r="${lastRow + 1}">
-                            <c t="inlineStr" r="F${lastRow + 1}">
+                            <c t="inlineStr" r="E${lastRow + 1}">
                                 <is><t style="font-weight:bold">TOTAL</t></is>
                             </c>
-                            <c t="n" r="G${lastRow + 1}">
-                                <v>${total.toFixed(2)}</v>
+                            <c t="n" r="F${lastRow + 1}">
+                                <v>$${total.toFixed(2)}</v>
                             </c>
                         </row>`;
 
@@ -313,7 +313,7 @@
                         let total = 0;
                         tableBody.forEach(function(row, index) {
                             if (index > 0) { // skip header
-                                let price = row[6].text || row[6]; // 👈 index of "total_amount"
+                                let price = row[5].text || row[5]; // 👈 index of "total_amount"
                                 price = parseFloat(String(price).replace(/[^\d.-]/g, '')) || 0;
                                 total += price;
                             }
@@ -325,13 +325,13 @@
                             if (i === 0) {
                                 footerRow.push({
                                     text: 'TOTAL',
-                                    colSpan: 6,
+                                    colSpan: 5,
                                     alignment: 'right',
                                     bold: true
                                 });
-                            } else if (i > 0 && i < 6) {
+                            } else if (i > 0 && i < 5) {
                                 footerRow.push({}); // empty cells for colSpan
-                            } else if (i === 6) {
+                            } else if (i === 5) {
                                 footerRow.push({
                                     text: total.toFixed(2), // show total under "Total price"
                                     bold: true
@@ -403,6 +403,7 @@
                     searchable: false
                 }
             ],
+            order: []
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,

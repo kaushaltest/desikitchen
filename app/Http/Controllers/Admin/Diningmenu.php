@@ -3,27 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\Alacartemenu_model;
+use App\Models\Admin\Diningmenu_model;
 use App\Models\Admin\Category_model;
-use App\Models\Admin\Daywisemenu_model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 
-class Alacartemenu extends Controller
+class Diningmenu extends Controller
 {
     public function index()
     {
-        return view('admin.alacartemenu'); // View: resources/views/admin/dashboard.blade.php
+        return view('admin.diningmenu'); // View: resources/views/admin/dashboard.blade.php
     }
-    public function category()
+    public function getDiningMenuData()
     {
-        return view('admin.category'); // View: resources/views/admin/dashboard.blade.php
-    }
-    public function getAlacarteMenuData()
-    {
-        $data = Alacartemenu_model::with(['category'])->get()->map(function ($item) {
+        $data = Diningmenu_model::with(['category'])->get()->map(function ($item) {
             // Append full URL to image
             $item->category_name = $item->category ? $item->category->category : null;
             $item->image_url = asset('storage/' . $item->image_path);
@@ -34,7 +29,7 @@ class Alacartemenu extends Controller
         ], 200);
     }
 
-    public function addUpdateMenu(Request $request)
+    public function addUpdateDiningMenu(Request $request)
     {
         try {
             if (empty($request->input('hid_menuid'))) {
@@ -50,7 +45,7 @@ class Alacartemenu extends Controller
                     $added_data['image_path'] = $imagePath;
                 }
 
-                Alacartemenu_model::create($added_data);
+                Diningmenu_model::create($added_data);
 
                 return response()->json([
                     "success" => true,
@@ -68,7 +63,7 @@ class Alacartemenu extends Controller
                     $imagePath = $request->file('file_menu_image')->store('uploads/alacartemenu_images', 'public');
                     $updated_data['image_path'] = $imagePath;
                 }
-                $addQuarantine_failed = Alacartemenu_model::updateOrCreate(
+                $addQuarantine_failed = Diningmenu_model::updateOrCreate(
                     ['id' => $request->input('hid_menuid')],
                     $updated_data
                 );
@@ -87,9 +82,9 @@ class Alacartemenu extends Controller
         return [];
     }
 
-    public function deleteAlacarteMenu(Request $request)
+    public function deleteDiningMenu(Request $request)
     {
-        $menu = Alacartemenu_model::find($request->user_uid); // Adjust model name
+        $menu = Diningmenu_model::find($request->user_uid); // Adjust model name
 
         if (!$menu) {
             return response()->json(['success' => false, 'message' => 'Menu not found']);
@@ -146,93 +141,11 @@ class Alacartemenu extends Controller
             ], 200);
         }
     }
-
-    public function addEditCategory(Request $request)
-    {
-        try {
-            $categoryName = $request->input('txt_category');
-
-            $exists = Category_model::whereRaw('LOWER(category) = ?', [strtolower($categoryName)])->exists();
-
-            if ($exists) {
-                return response()->json([
-                    "success" => false,
-                    'message' => "This category name is already in use & exists"
-                ], 200);
-            }
-            $added_data = [
-                'category' => $categoryName,
-            ];
-
-            if (!empty($request->input('hid_menuid'))) {
-                $category = Category_model::where('id', $request->input('hid_menuid'))->first();
-                if ($category) {
-                    $category->update($added_data);
-                    return response()->json([
-                        "success" => true,
-                        'message' => "Category updated successfully"
-                    ], 200);
-                } else {
-                    Category_model::create($added_data);
-                    return response()->json([
-                        "success" => true,
-                        'message' => "New category created successfully"
-                    ], 200);
-                }
-            } else {
-                Category_model::create($added_data);
-
-                return response()->json([
-                    "success" => true,
-                    'message' => "New category created successfully"
-                ], 200);
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                'error' => $e->getMessage()
-            ], 200);
-        }
-    }
-
-    public function deleteCategory(Request $request)
-    {
-        try {
-            $category = Category_model::find($request->category_id); // Adjust model name
-
-            if (!$category) {
-                return response()->json(['success' => false, 'message' => 'Category not found']);
-            }
-            $category->delete();
-
-            return response()->json(['success' => true, 'message' => 'Category removed successfully.']);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Check if it's a foreign key constraint error
-            if ($e->getCode() == "23000") {
-                return response()->json([
-                    "success" => false,
-                    "message" => "This category cannot be deleted because it is linked to one or more menus."
-                ], 200);
-            }
-
-            // Other DB errors
-            return response()->json([
-                "success" => false,
-                "message" => "Database error: " . $e->getMessage()
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                "success" => false,
-                'message' => $e->getMessage()
-            ], 200);
-        }
-    }
-
     public function import(Request $request)
     {
         try {
             $data = $request->input('data', []);
-
+            
             foreach ($data as $row) {
                 $imagePath = null;
 
@@ -241,7 +154,7 @@ class Alacartemenu extends Controller
                 }
 
                 if (!empty($row['category']) || empty($row['name'])) {
-                    $menu = Alacartemenu_model::where('category_id', $row['category'])->where('name', $row['name'])   // compares only the date part
+                    $menu = Diningmenu_model::where('category_id', $row['category'])->where('name', $row['name'])   // compares only the date part
                         ->first();
 
                     if ($menu) {
@@ -255,7 +168,7 @@ class Alacartemenu extends Controller
                         ]);
                     } else {
                         // ID given but not found → insert new
-                        Alacartemenu_model::create([
+                        Diningmenu_model::create([
                             'category_id' => $row['category'],
                             'name' => $row['name'],
                             'description' => $row['description'],
@@ -266,7 +179,7 @@ class Alacartemenu extends Controller
                     }
                 } else {
                     // No ID → always create new
-                    Alacartemenu_model::create([
+                    Diningmenu_model::create([
                         'category_id' => $row['category'],
                         'name' => $row['name'],
                         'description' => $row['description'],

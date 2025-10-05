@@ -1,6 +1,8 @@
-<?php 
+<?php
+
 namespace App\Models\Admin;
 
+use App\Notifications\CustomResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +20,8 @@ class KitUser extends Authenticatable
         'password',
         'role',
         'phone',
-        'is_active'
+        'is_active',
+        'is_created_by_admin'
     ];
     public function address()
     {
@@ -28,4 +31,13 @@ class KitUser extends Authenticatable
         'password',
         'remember_token',
     ];
+    public function sendPasswordResetNotification($token)
+    {
+        $isAdmin = request()->is('admin/*');
+
+        $url = $isAdmin
+        ? url('/admin/reset-password/' . $token . '?email=' . $this->email)
+        : url('/reset-password/' . $token . '?email=' . $this->email);
+        $this->notify(new CustomResetPassword($token, $url));
+    }
 }

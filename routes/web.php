@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Additionalmenu;
 use App\Http\Controllers\Admin\Alacartemenu;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Daywisemenu;
+use App\Http\Controllers\Admin\Diningmenu;
 use App\Http\Controllers\Admin\Neworder;
 use App\Http\Controllers\Admin\Order;
 use App\Http\Controllers\Admin\Partymenu;
@@ -12,13 +13,19 @@ use App\Http\Controllers\Admin\Tables;
 use App\Http\Controllers\Admin\Useraddress;
 use App\Http\Controllers\Admin\Users;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Customer\Auth;
 use App\Http\Controllers\Customer\Customerorder;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Customer\Customeruseraddress;
 use App\Http\Controllers\Customer\Menu;
 use App\Http\Controllers\Customer\Subscription as CustomerSubscription;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+
+
+
+
 
 Route::prefix('admin')
     // ->middleware(['web', \App\Http\Middleware\RedirectIfAuthenticatedAdmin::class])
@@ -26,6 +33,14 @@ Route::prefix('admin')
         Route::get('/', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
         Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
         Route::post('/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+        Route::get('/forgot-password', [AdminLoginController::class, 'forgotPassword'])->name('admin.forgot-password');
+        Route::post('/forgot-password', [AdminLoginController::class, 'requestPassword'])->name('admin.forgot-password');
+        Route::get('/reset-password/{token}', [AdminLoginController::class, 'create'])
+            ->middleware('guest')
+            ->name('admin.password.reset');
+
+        Route::post('/reset-password', [AdminLoginController::class, 'store'])
+            ->name('admin.password.update');
     });
 Route::prefix('admin')
     ->name('admin.')
@@ -49,12 +64,21 @@ Route::prefix('admin')
             Route::get('/get-alacarte-menu', [Alacartemenu::class, 'getAlacarteMenuData'], function () {})->name("get-alacarte-menu");
             Route::post('/delete-alacartemenu', [Alacartemenu::class, 'deleteAlacarteMenu'], function () {})->name("delete-alacartemenu");
             Route::post('/add-update-alacarte-menu', [Alacartemenu::class, 'addUpdateMenu'])->name('add-update-alacarte-menu');
+            Route::get('/category', [Alacartemenu::class, 'category'])->name('category');
             Route::get('/get-category', [Alacartemenu::class, 'getCategory'])->name('get-category');
             Route::post('/add-category', [Alacartemenu::class, 'addCategory'])->name('add-category');
+            Route::post('/add-edit-category', [Alacartemenu::class, 'addEditCategory'])->name('add-edit-category');
+            Route::post('/delete-category', [Alacartemenu::class, 'deleteCategory'], function () {})->name("delete-category");
             Route::post('/import_alacarte', [Alacartemenu::class, 'import'])->name('import_alacarte');
 
+            //dining menu routes
+            Route::get('/dining-menu', [Diningmenu::class, 'index'])->name('diningmenu');
+            Route::get('/get-dining-menu', [Diningmenu::class, 'getDiningMenuData'], function () {})->name("get-dining-menu");
+            Route::post('/delete-diningmenu', [Diningmenu::class, 'deleteDiningMenu'], function () {})->name("delete-diningmenu");
+            Route::post('/add-update-dining-menu', [Diningmenu::class, 'addUpdateDiningMenu'])->name('add-update-dining-menu');
+            Route::post('/import_dining', [Diningmenu::class, 'import'])->name('import_dining');
 
-            
+
             //party menu routes
             Route::get('/party-menu', [Partymenu::class, 'index'])->name('partymenu');
             Route::get('/get-party-menu', [Partymenu::class, 'getPartyMenuData'], function () {})->name("get-party-menu");
@@ -70,6 +94,7 @@ Route::prefix('admin')
 
             Route::get('/get-order-list', [Order::class, 'getOrderListData'], function () {})->name("get-order-list");
             Route::post('/add-order', [Order::class, 'addOrder'])->name('add-order');
+            Route::post('/address-selected', [Order::class, 'selectedAddress'])->name('address-selected');
 
             Route::get('/checkmobileexist', [AdminLoginController::class, 'checkMobileExist'])->name('checkmobileexist');
             Route::post('/add-new-address', [Useraddress::class, 'addAddress'])->name('add-new-address');
@@ -111,6 +136,7 @@ Route::prefix('admin')
         Route::get('/selecttable', [Tables::class, 'index'])->name('selecttable');
         Route::get('/tableorder', [Tables::class, 'tableOrder'])->name('tableorder');
         Route::post('/book-table', [Tables::class, 'bookTable'])->name('book-table');
+        Route::post('/release-table', [Tables::class, 'releaseTable'])->name('release-table');
         Route::post('/add-table-order', [Order::class, 'addTableOrder'])->name('add-table-order');
     });
 
@@ -133,17 +159,26 @@ Route::name('customer.')
         Route::post('/guest-verify-otp', [Auth::class, 'verifyGuestOTP'])->name('guest-verify-otp');
         Route::post('/verify-user', [Auth::class, 'sessionExists'])->name('verify-user');
         Route::get('/is-user-loggedin', [Auth::class, 'custSessionExists'])->name('is-user-loggedin');
+        Route::post('/send-otp', [Auth::class, 'sendOtp']);
+        Route::post('/verify-otps', [Auth::class, 'verifySMPOtp']);
+        Route::post('/send-sms', [Auth::class, 'sendCustomSms']);
 
-        
+
         Route::post('/get-user-address', [Auth::class, 'getUserAddress'])->name('get-user-address');
         Route::post('/add-order', [Customerorder::class, 'addOrder'])->name('add-order');
         Route::post('/add-new-address', [Customeruseraddress::class, 'addAddress'])->name('add-new-address');
         Route::get('/order', [Customerorder::class, 'index'])->name('order');
+        Route::get('/get-order', [Customerorder::class, 'getOrder'])->name('get-order');
+
+        Route::post('/cancel-order', [Customerorder::class, 'cancelOrder'])->name('cancel-order');
+
         Route::get('/logout', [Customerorder::class, 'logout'])->name('logout');
 
         //register
         Route::post('/register-user-mobile', [Auth::class, 'checkRegisterMobileExist'])->name('register-user-mobile');
         Route::post('/verify-register-otp', [Auth::class, 'verifyRegisterOTP'])->name('verify-register-otp');
+        Route::post('/guest-login-otp', [Auth::class, 'guestLoginOTP'])->name('guest-login-otp');
+
 
         //subscription
         Route::get('/subscription', [CustomerSubscription::class, 'index'])->name('subscription');
@@ -156,4 +191,21 @@ Route::name('customer.')
         // Route::middleware('auth')->group(function () {
         //     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
         // });
+        Route::post('/contact-mail', [ContactController::class, 'send'])->name('contact-mail');
+        Route::get('/send-mail', function () {
+
+            Mail::raw('This is a simple test email.', function ($message) {
+                $message->to('tretiya.kaushal@gmail.com')
+                    ->subject('Test Email');
+            });
+
+            return 'Mail sent!';
+        });
+        Route::get('/forgot-password', [Auth::class, 'forgotPassword'])->name('forgot-password');
+        Route::post('/forgot-password', [Auth::class, 'requestPassword'])->name('forgot-password');
     });
+Route::get('/reset-password/{token}', [Auth::class, 'create'])
+    ->middleware('guest')
+    ->name('password.reset');
+Route::post('/reset-password', [Auth::class, 'store'])
+    ->name('password.update');

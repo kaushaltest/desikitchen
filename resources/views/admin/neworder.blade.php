@@ -81,11 +81,22 @@
     }
 
     .map-search-box {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        z-index: 1000;
+        position: absolute !important;
+        top: 10px !important;
+        /* distance from top of the map */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        /* center horizontally */
+        width: 80% !important;
+        /* or any width you like */
+        max-width: 400px;
+        z-index: 5;
+        /* ensure it stays above the map tiles */
+
+        /* white background for readability */
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        padding: 6px 12px;
     }
 
     .address-form-section {
@@ -97,6 +108,21 @@
 
     #menu_type_tab {
         border-bottom: 1px solid #000;
+    }
+
+    .custom-map-control-button {
+        background-color: #fff;
+        border: 0;
+        border-radius: 2px;
+        box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .3);
+        cursor: pointer;
+        margin: 10px;
+        padding: 0 12px;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        line-height: 38px;
+        text-align: center;
     }
 </style>
 
@@ -230,11 +256,13 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="modal-body" id="mapSelectForm" style="display: none;">
+
                                                 <div class="position-relative">
                                                     <div class="map-search-box">
-                                                        <input type="text" class="form-control" id="mapSearchInput" placeholder="Search for a location...">
+                                                        <input type="text" class="form-control" id="searchBox2" placeholder="Search for a location...">
                                                     </div>
-                                                    <div id="map"></div>
+                                                    <div id="map2" class="w-100" style="height:400px;"></div>
+
                                                 </div>
                                                 <div class="mt-3">
                                                     <div class="alert alert-info">
@@ -313,10 +341,7 @@
                                                             <input type="text" class="form-control" name="pincodeInput" id="pincodeInput" placeholder="Pin Code">
                                                         </div>
                                                     </div>
-                                                    <button class="btn btn-outline-secondary" type="button" id="selectFromMapBtn">
-                                                        <i data-lucide="map-pin"></i>
-                                                        Select from Map
-                                                    </button>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -324,7 +349,7 @@
 
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn btn-primary" id="saveUserBtn" style="display: none;">Save & Continue</button>
+                                    <button class="btn btn-primary" type="submit" id="saveUserBtn" style="display: none;">Save & Continue</button>
                                     <button class="btn btn-primary" type="button" id="continueCheckoutBtn" style="display: none;">Continue to Checkout</button>
                                 </div>
                             </form>
@@ -333,41 +358,6 @@
                     </div>
                 </div>
 
-                <!-- Map Selection Modal -->
-                <div class="modal fade" id="mapModal" tabindex="-1">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title d-flex align-items-center gap-2">
-                                    <i data-lucide="map"></i>
-                                    Select Address from Map
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="position-relative">
-                                    <div class="map-search-box">
-                                        <input type="text" class="form-control" id="mapSearchInput" placeholder="Search for a location...">
-                                    </div>
-                                    <div id="map"></div>
-                                </div>
-                                <div class="mt-3">
-                                    <div class="alert alert-info">
-                                        <small><i data-lucide="info"></i> Click on the map to select your delivery location</small>
-                                    </div>
-                                    <div id="selectedLocationInfo" style="display: none;">
-                                        <h6>Selected Location:</h6>
-                                        <p id="selectedLocationText" class="text-muted"></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button class="btn btn-primary" id="confirmLocationBtn" disabled>Confirm Location</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Checkout Modal -->
                 <div class="modal fade" id="checkoutModal" tabindex="-1">
@@ -433,18 +423,18 @@
                                             <div class="col-md-6">
                                                 <div class="modal-body">
                                                     <div class="position-relative">
-                                                        <div class="map-search-box">
-                                                            <input type="text" class="form-control" id="mapSearchInput" placeholder="Search for a location...">
+                                                        <div class="">
+                                                            <input type="text" class="form-control" id="searchBox1" placeholder="Search for a location...">
                                                         </div>
-                                                        <div id="map"></div>
+                                                        <div id="map1" class="w-100" style="height:400px;"></div>
                                                     </div>
                                                     <div class="mt-3">
                                                         <div class="alert alert-info">
                                                             <small><i data-lucide="info"></i> Click on the map to select your delivery location</small>
                                                         </div>
-                                                        <div id="selectedLocationInfo" style="display: none;">
+                                                        <div id="selectedLocationInfo1" style="display: none;">
                                                             <h6>Selected Location:</h6>
-                                                            <p id="selectedLocationText" class="text-muted"></p>
+                                                            <p id="selectedLocationText1" class="text-muted"></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -515,7 +505,6 @@
     <!--end::App Content-->
 </main>
 <script src="{{asset('admin-assets/validation/neworder.js')}}"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"></script>
 <script>
     // Sample data with detailed addresses
 
@@ -555,62 +544,45 @@
 
     });
 
-    // Initialize Google Maps
-    function initMap() {
-        // Default location (New York City)
-        const defaultLocation = {
-            lat: 40.7128,
-            lng: -74.0060
-        };
-
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 13,
-            center: defaultLocation,
-            mapTypeControl: false,
-            streetViewControl: false,
-            fullscreenControl: false
+    function initLocationPicker(opts) {
+        const map = new google.maps.Map(document.getElementById(opts.mapId), {
+            center: {
+                lat: 20.5937,
+                lng: 78.9629
+            }, // India center; change as needed
+            zoom: 5,
+            mapTypeControl: false, // Removes Map/Satellite toggle
+            streetViewControl: false, // Removes Street View pegman
+            fullscreenControl: false, // Removes fullscreen button
+            zoomControl: true, // Optional: keeps zoom control
+            scaleControl: true, // Optional: keeps scale
+            rotateControl: false, // Optional: remove rotate control
+            clickableIcons: false
         });
 
-        geocoder = new google.maps.Geocoder();
-
-        // Create marker
-        marker = new google.maps.Marker({
-            position: defaultLocation,
-            map: map,
-            draggable: true,
-            title: 'Selected Location'
+        const geocoder = new google.maps.Geocoder();
+        const marker = new google.maps.Marker({
+            map,
+            draggable: true
         });
 
-        // Map click event
-        map.addListener('click', function(event) {
-            const location = event.latLng;
-            marker.setPosition(location);
-            selectedLocation = {
-                lat: location.lat(),
-                lng: location.lng()
-            };
-            reverseGeocode(location);
-            $('#confirmLocationBtn').prop('disabled', false);
-        });
+        const searchInput = document.getElementById(opts.searchBoxId);
+        const searchBox = new google.maps.places.SearchBox(searchInput);
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchInput);
+        if (searchInput) {
 
-        // Marker drag event
-        marker.addListener('dragend', function(event) {
-            const location = event.latLng;
-            selectedLocation = {
-                lat: location.lat(),
-                lng: location.lng()
-            };
-            reverseGeocode(location);
-            $('#confirmLocationBtn').prop('disabled', false);
-        });
-
-        // Search box
-        const searchBox = new google.maps.places.SearchBox(document.getElementById('mapSearchInput'));
-
-        searchBox.addListener('places_changed', function() {
+            searchInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault(); // Stop form submission
+                    // Optionally trigger the search manually
+                    google.maps.event.trigger(searchBox, 'places_changed');
+                }
+            });
+        }
+        // Search box listener
+        searchBox.addListener("places_changed", () => {
             const places = searchBox.getPlaces();
-            if (places.length === 0) return;
-
+            if (!places || !places.length) return;
             const place = places[0];
             if (!place.geometry || !place.geometry.location) return;
 
@@ -618,76 +590,97 @@
             map.setZoom(15);
             marker.setPosition(place.geometry.location);
 
-            selectedLocation = {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng()
-            };
-
-            displayLocationInfo(place);
-            $('#confirmLocationBtn').prop('disabled', false);
+            fillAddressFromPlace(place.geometry.location, opts);
         });
-    }
 
-    function reverseGeocode(location) {
-        geocoder.geocode({
-            location: location
-        }, function(results, status) {
-            if (status === 'OK' && results[0]) {
-                displayLocationInfo(results[0]);
-            }
+        // Marker drag event → reverse geocode
+        marker.addListener("dragend", () => {
+            const pos = marker.getPosition();
+            reverseGeocode(pos, geocoder, opts);
         });
-    }
 
-    function displayLocationInfo(place) {
-        $('#selectedLocationInfo').show();
-        $('#selectedLocationText').text(place.formatted_address || place.name);
-
-        // Parse address components
-        if (place.address_components) {
-            const addressComponents = parseAddressComponents(place.address_components);
-            selectedLocation.addressComponents = addressComponents;
-            selectedLocation.formattedAddress = place.formatted_address;
+        // helper functions
+        function reverseGeocode(latLng, geocoder, o) {
+            geocoder.geocode({
+                location: latLng
+            }, (results, status) => {
+                if (status === "OK" && results[0]) {
+                    document.getElementById(o.infoBoxId).style.display = "block";
+                    document.getElementById(o.textId).textContent = results[0].formatted_address;
+                    fillAddressFields(results[0], o);
+                }
+            });
         }
+
+        function fillAddressFromPlace(place, o) {
+            document.getElementById(o.infoBoxId).style.display = "block";
+            document.getElementById(o.textId).textContent = place.formatted_address || "";
+            fillAddressFields(place, o);
+        }
+
+        function fillAddressFields(place, opts) {
+            const geocoder = new google.maps.Geocoder();
+            const location = place.geometry ? place.geometry.location : place;
+
+            geocoder.geocode({
+                location: location
+            }, (results, status) => {
+                if (status === "OK" && results[0]) {
+                    const c = {};
+                    (results[0].address_components || []).forEach(comp => {
+                        comp.types.forEach(t => {
+                            c[t] = comp.long_name;
+                        });
+                    });
+
+                    document.getElementById(opts.addrLine1Id).value = [c.premise, c.street_number, c.route, c.subpremise].filter(Boolean).join(" ");
+                    document.getElementById(opts.addrLine2Id).value = [c.sublocality, c.administrative_area_level_2, c.locality].filter(Boolean).join(" ");
+                    document.getElementById(opts.pinId).value = c.postal_code || "";
+                    document.getElementById(opts.infoBoxId).style.display = "block";
+                    document.getElementById(opts.textId).textContent = results[0].formatted_address;
+                }
+            });
+        }
+
+
+        return map;
     }
 
-    function parseAddressComponents(components) {
-        const addressData = {
-            address1: '',
-            address2: '',
-            city: '',
-            state: '',
-            country: '',
-            pincode: ''
-        };
+    // ---------- initialize multiple maps ----------
+    document.addEventListener("DOMContentLoaded", () => {
+        const maps = {};
 
-        components.forEach(component => {
-            const types = component.types;
-
-            if (types.includes('street_number')) {
-                addressData.address1 = component.long_name + ' ';
-            }
-            if (types.includes('route')) {
-                addressData.address1 += component.long_name;
-            }
-            if (types.includes('sublocality') || types.includes('neighborhood')) {
-                addressData.address2 = component.long_name;
-            }
-            if (types.includes('locality') || types.includes('administrative_area_level_2')) {
-                addressData.city = component.long_name;
-            }
-            if (types.includes('administrative_area_level_1')) {
-                addressData.state = component.short_name;
-            }
-            if (types.includes('country')) {
-                addressData.country = component.long_name;
-            }
-            if (types.includes('postal_code')) {
-                addressData.pincode = component.long_name;
-            }
+        maps.map1 = initLocationPicker({
+            mapId: "map1",
+            searchBoxId: "searchBox1",
+            infoBoxId: "selectedLocationInfo1",
+            textId: "selectedLocationText1",
+            addrLine1Id: "newAddress1",
+            addrLine2Id: "newAddress2",
+            pinId: "newPincode"
         });
 
-        return addressData;
-    }
+        maps.map2 = initLocationPicker({
+            mapId: "map2",
+            searchBoxId: "searchBox2",
+            infoBoxId: "selectedLocationInfo",
+            textId: "selectedLocationText",
+            addrLine1Id: "address1Input",
+            addrLine2Id: "address2Input",
+            pinId: "pincodeInput"
+        });
+
+        // Re-center maps when modals show
+        $('#addAddressModal').on('shown.bs.modal', () => {
+            google.maps.event.trigger(maps.map1, 'resize');
+            maps.map1.setCenter(maps.map1.getCenter());
+        });
+
+        $('#userModal').on('shown.bs.modal', () => {
+            google.maps.event.trigger(maps.map2, 'resize');
+            maps.map2.setCenter(maps.map2.getCenter());
+        });
+    });
 
     function bindEvents() {
         // Tab switching
@@ -738,7 +731,9 @@
                 $('#userModal').modal('show');
             } else {
                 $('#cartModal').modal('hide');
+
                 showCheckout();
+                $("#form_addnewuser")[0].reset();
             }
         });
 
@@ -747,10 +742,6 @@
             checkMobileNumber();
         });
 
-        // Save user
-        $('#saveUserBtn').click(function() {
-            addNewUser();
-        });
 
         // Continue to checkout
         $('#continueCheckoutBtn').click(function() {
@@ -771,6 +762,7 @@
         });
         let clickedBtn = null;
         $('#form_addnewuser button[type="submit"]').on('click', function() {
+            console.log("clickedBtn")
             clickedBtn = $(this); // remember which was clicked
         });
         // Save address
@@ -835,6 +827,7 @@
                         },
                     });
                 }
+                console.log('form_addnewuser')
             }
         });
 
@@ -1583,7 +1576,7 @@
                                     Add New Address
                                 </button>
                         `;
-
+                        console.log(addressList)
                         addressList.forEach((addr, index) => {
                             if (addr?.is_default == 1) {
                                 selectedAddress = addr;
@@ -1591,11 +1584,11 @@
                             const isChecked = addr?.is_default == 1 || (addr?.is_default == 0 && index === 0);
                             const addressText = `
                                 ${addr.label ? `<strong>${addr.label}:</strong> ` : ''}
-                                ${addr.address_line1}, ${addr.address_line2}, ${addr.city} - ${addr.pincode}
+                                ${addr.address_line1}, ${addr.address_line2} - ${addr.pincode}
                             `;
                             html += `
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="selectedAddress" 
+                                <input class="form-check-input rbt_address_selected" data-userid="${addr.user_id}" type="radio" name="selectedAddress" 
                                     id="address_${addr.id}" value="${addr.id}" 
                                     ${isChecked ? 'checked' : ''}>
                                 <label class="form-check-label" for="address_${addr.id}">
@@ -1635,7 +1628,43 @@
             }
         });
     }
+    //address selected
+    $(document).on('change', '.rbt_address_selected', function() {
+        let selectedValue = $(this).val(); // id of the checked address
+        let userId = $(this).attr('data-userid');
+        $.ajax({
+            url: "{{ route('admin.address-selected') }}", // Change this to your server endpoint
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            data: {
+                user_id: userId,
+                address_id: selectedValue,
+            },
+            beforeSend: function() {
+                $(".loader-wrapper").css("display", "flex")
 
+            },
+            success: function(response) {
+                // Handle success response
+                if (response.success) {
+                    checkMobileNumber();
+                } else {
+                    toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                var errors = xhr.responseJSON.errors;
+                toastFail(errors)
+            },
+            complete: function() {
+                $(".loader-wrapper").css("display", "none")
+            },
+        });
+
+    });
 
 
     function showCheckout() {
@@ -1764,6 +1793,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Total:</strong>
                     <strong class="text-success">$${total.toFixed(2)}</strong>
+
+                </div>
+                 <div class="d-flex justify-content-between align-items-center mt-2">
+                    <strong>USD 0.8</strong>
+                    <strong class="text-success">$${total.toFixed(2)*1.25}</strong>
 
                 </div>
             `;
@@ -1915,5 +1949,6 @@
         }
     });
 </script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places&callback=initMap" async defer></script>
 
 @endsection

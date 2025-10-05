@@ -77,7 +77,7 @@
             <div class="col-lg-6">
                 <div class="row g-3">
                     <div class="col-12 text-start">
-                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/chef.jpeg')}}">
+                        <img class="img-fluid rounded w-100 wow zoomIn" data-wow-delay="0.1s" src="{{asset('customer-assets/img/chef1.jpeg')}}">
                     </div>
                     <!-- <div class="col-6 text-start">
                         <img class="img-fluid rounded w-75 wow zoomIn" data-wow-delay="0.3s" src="{{asset('customer-assets/img/about-2.jpg')}}" style="margin-top: 25%;">

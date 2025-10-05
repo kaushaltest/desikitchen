@@ -36,20 +36,20 @@ class DashboardController extends Controller
         // $data['total_user'] = KitUser::where(function ($query) {
         //     $query->where('role', 'user')->orWhere('role', 'guest');
         // })->count();
-        $data['today_order'] = Order_model::where('order_date', '=', $today)->when(Auth::user()->role === 'admin', function ($query) {
+        $data['today_order'] = Order_model::whereDate('created_at', '=', $today)->when(Auth::user()->role === 'admin', function ($query) {
             // If role = admin, add condition
             return $query->where('created_by', Auth::id());
         })
             ->count();
         $data['today_revenue'] = Order_model::where('status', 'delivered')
-            ->whereDate('order_date', Carbon::today())
+            ->whereDate('created_at', Carbon::today())
             ->when(Auth::user()->role === 'admin', function ($query) {
                 // If role = admin, add condition
                 return $query->where('created_by', Auth::id());
             })
             ->sum('total_amount');
         $data['weekly_revenue'] = Order_model::where('status', 'delivered')
-            ->whereBetween('order_date', [$startOfWeek, $endOfWeek])
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
             ->when(Auth::user()->role === 'admin', function ($query) {
                 // If role = admin, add condition
                 return $query->where('created_by', Auth::id());

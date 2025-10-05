@@ -25,6 +25,7 @@ class Useraddress extends Controller
                 'phone' => $request->input('mobileInput'),
                 'name' => $request->input('userNameInput'),
                 'email' => $request->input('userEmailInput'),
+                'is_created_by_admin'=>true
             ]);
 
             // Now use the ID from the inserted user

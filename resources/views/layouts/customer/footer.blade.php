@@ -4,22 +4,26 @@
             <div class="row g-5">
                 <div class="col-lg-4 col-md-4 offset-lg-2 offset-md-2">
                     <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Contact</h4>
-                    <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>144 N Church St, George Town, Cayman Islands</p>
-                    <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p>
-                    <p class="mb-2"><i class="fa fa-envelope me-3"></i>info@example.com</p>
+                    <div class="d-flex">
+                        <i class="fa fa-map-marker-alt me-3"></i>
+                        <p class="mb-2">144 N Church St, George Town, Cayman Islands</p>
+                    </div>
+
+                    <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+1 345-546-1580</p>
+                    <p class="mb-2"><i class="fa fa-envelope me-3"></i>info@desikitchen-ky.com</p>
                     <div class="d-flex pt-2">
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
                         <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-instagram"></i></a>
                         <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 ">
                     <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Opening</h4>
                     <h5 class="text-light fw-normal">Monday - Saturday</h5>
-                    <p>08AM - 12AM</p>
+                    <p>08AM to 12PM</p>
+                    <p>05PM to 10PM</p>
                     <h5 class="text-light fw-normal">Sunday</h5>
-                    <p>05PM - 10PM</p>
+                    <p>Closed</p>
                 </div>
                 <div class="offset-lg-2 offset-md-2"></div>
             </div>

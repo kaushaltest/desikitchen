@@ -39,6 +39,21 @@ const validationRules = {
         },
     },
 
+    forgotForm: {
+        rules: {
+            txt_forgot_email: {
+                required: true,
+                email: true,
+            },
+        },
+        messages: {
+            txt_forgot_email: {
+                required: "Email is required",
+                email: "Please enter valid email",
+            },
+        },
+    },
+
     guestLoginForm: {
         rules: {
             txt_guest_mobile: {

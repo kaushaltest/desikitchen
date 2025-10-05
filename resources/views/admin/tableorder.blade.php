@@ -218,7 +218,7 @@
                                         <button class="nav-link active d-flex align-items-center justify-content-center gap-2"
                                             id="alacarte-tab" data-tab="alacarte">
                                             <i data-lucide="utensils"></i>
-                                            <span class="d-none d-sm-inline">Alacarte</span>
+                                            <span class="d-none d-sm-inline">Dining</span>
                                             <span class="d-sm-none">Menu</span>
                                         </button>
                                     </li>
@@ -229,7 +229,7 @@
                                     <!-- <div id="daywise-content" class="tab-content active"></div> -->
 
                                     <!-- A-la-carte Menu -->
-                                    <div id="alacarte-content" class="tab-content active" ></div>
+                                    <div id="dining-content" class="tab-content active"></div>
 
                                     <!-- Party Menu -->
                                     <!-- <div id="party-content" class="tab-content" style="display: none;"></div> -->
@@ -316,8 +316,6 @@
 
     // Global variables
     let order_name = 'tbl_order_' + (
-        localStorage.getItem('user_id') ?
-        localStorage.getItem('user_id') :
         localStorage.getItem('table_id') ?
         localStorage.getItem('table_id') :
         ''
@@ -407,66 +405,11 @@
         }
     }
 
-    function renderDayWiseMenu() {
-        const filteredMenu = allMenuList?.daywise.filter(menu =>
-            menu.title?.toLowerCase().includes(searchTerm) ||
-            menu.items?.toLowerCase().includes(searchTerm)
-        );
-        console.log("filteredMenu", filteredMenu)
-        const today = new Date().toISOString().split("T")[0];
-        let html = ' <div class="row g-3">';
-        filteredMenu.forEach(menu => {
-            menu.type = "daywise";
-            const isToday = menu.menu_date === today;
-            html += `
-
-               
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body d-flex gap-3">
-                                  <img 
-                        src="${menu.image_path ?? '{{asset("default.png")}}'}" 
-                        alt="${menu.title}" 
-                        class="rounded menu-item-image"
-                        onerror="this.onerror=null;this.src='{{asset('default.png')}}';"
-                    >
-                                <div class="">
-                                    <h6 class="card-title mb-1">${menu.title}
-                                    ${isToday ? '<span class="badge bg-warning text-dark ms-2">Today</span>' : ''}
-                                    </h6>
-                                                                    <p class="card-text small text-muted mb-1"><i class="fa fa-calendar"></i> ${menu.menu_date}</p>
-
-                                    <p class="card-text small text-muted mb-2">${menu.items}</p>
-                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold text-success"><i class="fa fa-usd"></i>${menu.price}</span>
-                              </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="removeFromCart('daywise-${menu.id}')" ${getCartQuantity('daywise-' + menu.id) === 0 ? 'disabled' : ''}>
-                                            <i class="fa fa-minus"></i>
-                                          </button>
-                                        <span class="fw-medium quantity-control">${getCartQuantity('daywise-' + menu.id)}</span>
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="addToCart(${JSON.stringify(menu).replace(/"/g, '&quot;')}, 'daywise')">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
-
-    `;
-        });
-        html += '</div>';
-        updateCartDisplay()
-        $('#daywise-content').html(html);
-
-    }
 
     function renderAlaCarteMenu() {
-        const filteredMenu = allMenuList?.alacarte.map(category => ({
+        const filteredMenu = allMenuList?.dining.map(category => ({
             ...category,
-            items: category.alacartemenus.filter(item =>
+            items: category.diningmenus.filter(item =>
                 item.name.toLowerCase().includes(searchTerm) ||
                 item.description.toLowerCase().includes(searchTerm)
             )
@@ -498,11 +441,11 @@
                                                     </div>
                                                     <p class="card-text small text-muted mb-3">${item.description}</p>
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="removeFromCart('alacarte-${item.id}')" ${getCartQuantity('alacarte-' + item.id) === 0 ? 'disabled' : ''}>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="removeFromCart('dining-${item.id}')" ${getCartQuantity('dining-' + item.id) === 0 ? 'disabled' : ''}>
                                                             <i class="fa fa-minus"></i>
                                                         </button>
-                                                        <span class="fw-medium quantity-control">${getCartQuantity('alacarte-' + item.id)}</span>
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')}, 'alacarte')">
+                                                        <span class="fw-medium quantity-control">${getCartQuantity('dining-' + item.id)}</span>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')}, 'dining')">
                                                             <i class="fa fa-plus"></i>
                                                         </button>
                                                     </div>
@@ -517,7 +460,7 @@
                 `;
         });
         updateCartDisplay()
-        $('#alacarte-content').html(html);
+        $('#dining-content').html(html);
     }
 
     function renderPartyMenu() {
@@ -641,7 +584,7 @@
         renderMenu();
     }
 
-    function removeFromCart(cartId) {
+    function removeFromCart(cartId, isRemoveFromCart = false) {
 
         const existing = cart.find(item => item.id === cartId);
         console.log("existing", existing)
@@ -654,7 +597,9 @@
         localStorage.setItem(order_name, JSON.stringify(cart));
         updateCartDisplay();
         renderMenu();
-        // showCart();
+        if (isRemoveFromCart) {
+            showCart();
+        }
     }
 
     function removeItemCompletely(cartId) {
@@ -685,14 +630,14 @@
                 });
             }
         });
-        if(itemCount!=0){
+        if (itemCount != 0) {
             $('#cartCount').text(`${itemCount} items`);
             $('#cartTotal').text(`$${total.toFixed(2)}`);
-        }else{
+        } else {
             $('#cartCount').text(`Cart`);
             $('#cartTotal').text(``);
         }
-       
+
     }
 
     function showCart() {
@@ -769,7 +714,6 @@
                     }
                     return sum;
                 }, 0);
-                console.log("additionalItemTotal", additionalItemTotal)
                 html += `
                 <div class="cart-section mb-4">
                     <!-- Category Header -->
@@ -820,7 +764,7 @@
                                                 
                                                   <div class="d-flex justify-content-between align-items-center gap-3">
                                                 <div class="btn-group" role="group">
-                                                    <button class="btn btn-sm btn-outline-secondary" onclick="removeFromCart('${item.id}')">
+                                                    <button class="btn btn-sm btn-outline-secondary" onclick="removeFromCart('${item.id}',true)">
                                                         <i class="fa fa-minus"></i>
                                                     </button>
                                                     <span class="btn btn-sm btn-light disabled">${item.quantity}</span>
@@ -900,7 +844,7 @@
                             html += `</div>`;
                         }
                     }
-                    if ((index === items.length - 1) && (type === 'alacarte' || type === 'party')) {
+                    if ((index === items.length - 1) && (type === 'alacarte' || type === 'dining' || type === 'party')) {
                         if (allMenuList?.additional_menu.length > 0) {
                             html += `
                                 <div style="margin-left:22px;">
@@ -1057,29 +1001,13 @@
 
 
     function showCheckout() {
-
+        let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${localStorage.getItem('table_id')}_user`));
+        console.log(userDetails?.name)
         // Address list
         let customerHtml = `
-        <div class="mb-3">
-                                <label for="mobile" class="form-label">Name</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="txt_name" name="txt_name" placeholder="Enter your name">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="mobile" class="form-label">Mobile Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">+91</span>
-                                    <input type="tel" class="form-control" id="txt_phone" name="txt_phone" placeholder="Enter 10-digit mobile">
-                                </div>
-                            </div>
-                             <div class="mb-3">
-                                <label for="mobile" class="form-label">Email (Optional)</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="txt_email" name="txt_email" placeholder="Enter your email">
-                                </div>
-                            </div>
-                            
+       <p class="mb-1"><strong>Name: </strong>${userDetails?.name || "-"}</p>
+                <p class="mb-1"><strong>Mobile: </strong>${userDetails?.phone || "-"}</p>
+                <p class="mb-0"><strong>Email: </strong>${userDetails?.email || "-"}</p>
         `;
 
         $('#customerDetails').html(customerHtml);
@@ -1112,6 +1040,12 @@
                 color: 'success',
                 bgColor: 'bg-success-subtle'
             },
+            'dining': {
+                name: 'Dining',
+                icon: 'fas fa-plate-wheat',
+                color: 'success',
+                bgColor: 'bg-success-subtle'
+            },
             'party': {
                 name: 'Party Menu',
                 icon: 'fas fa-birthday-cake',
@@ -1132,6 +1066,7 @@
                 color: 'secondary',
                 bgColor: 'bg-secondary-subtle'
             };
+            console.log("category", category)
             const category_wisetotal = items.reduce((sum, item) => {
                 const itemTotal = item.price * item.quantity;
                 const additionalTotal = Array.isArray(item.additional_items) ?
@@ -1177,7 +1112,12 @@
                 <hr>
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Total:</strong>
-                    <strong class="text-success">$${total.toFixed(2)}</strong>
+                    <strong class="text-dark">$${total.toFixed(2)}</strong>
+
+                </div>
+                 <div class="d-flex justify-content-between align-items-center mt-2">
+                    <strong>USD 0.8:</strong>
+                    <strong class="text-success">$${total.toFixed(2)*1.25}</strong>
 
                 </div>
             `;
@@ -1188,8 +1128,8 @@
 
     //complete order
     $('#form_addnewtablecustomer').validate({
-        rules: validationRules.tableUserValidationForm.rules,
-        messages: validationRules.tableUserValidationForm.messages,
+        rules: {},
+        messages: {},
         errorElement: "div",
         errorClass: "invalid-feedback",
         highlight: function(element) {
@@ -1213,6 +1153,8 @@
                 acc[item.type].push(item);
                 return acc;
             }, {});
+            let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${localStorage.getItem('table_id')}_user`));
+
             formData.append('cart', grouped);
             formData.append('table_id', localStorage.getItem('table_id'))
             event.preventDefault();
@@ -1223,11 +1165,11 @@
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
                 data: {
-                    cart:grouped,
-                    table_id:localStorage.getItem('table_id'),
-                    txt_name:$("#txt_name").val(),
-                    txt_email:$("#txt_email").val(),
-                    txt_phone:$("#txt_phone").val()
+                    cart: grouped,
+                    table_id: localStorage.getItem('table_id'),
+                    txt_name: userDetails?.name,
+                    txt_email: userDetails?.email,
+                    txt_phone: userDetails?.phone
                 },
                 beforeSend: function() {
                     $(".loader-wrapper").css("display", "flex")
@@ -1238,6 +1180,8 @@
                     if (response.success) {
                         toastSuccess(response.message);
                         localStorage.removeItem(order_name);
+                        localStorage.removeItem('table_id')
+                        localStorage.removeItem(`tbl_order_${localStorage.getItem('table_id')}_user`)
                         cart = [];
                         updateCartDisplay();
                         $('#checkoutModal').modal('hide');

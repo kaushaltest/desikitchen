@@ -70,15 +70,15 @@ const validationRules = {
             address2Input: {
                 required: true,
             },
-            cityInput: {
-                required: true,
-            },
-            stateInput: {
-                required: true,
-            },
-            countryInput: {
-                required: true,
-            },
+            // cityInput: {
+            //     required: true,
+            // },
+            // stateInput: {
+            //     required: true,
+            // },
+            // countryInput: {
+            //     required: true,
+            // },
             pincodeInput: {
                 required: true,
             },
@@ -103,15 +103,15 @@ const validationRules = {
             address2Input: {
                 required: "Address2 is required",
             },
-            cityInput: {
-                required: "City is required",
-            },
-            stateInput: {
-                required: "State is required",
-            },
-            countryInput: {
-                required: "Country is required",
-            },
+            // cityInput: {
+            //     required: "City is required",
+            // },
+            // stateInput: {
+            //     required: "State is required",
+            // },
+            // countryInput: {
+            //     required: "Country is required",
+            // },
             pincodeInput: {
                 required: "Pincode is required",
             },

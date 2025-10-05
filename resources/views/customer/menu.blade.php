@@ -41,7 +41,30 @@
                         </svg>
                         <div class="ps-3">
                             <!-- <small class="text-body">Special</small> -->
-                            <h5 class="mt-n1 mb-0">Platters</h5>
+                            <h5 class="mt-n1 mb-0">Catering Platters</h5>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item menu-items mb-3" data-tab="menu_dining">
+                    <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3" data-bs-toggle="pill" href="#menu_dining">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dining-table" viewBox="0 0 16 16">
+                            <!-- tabletop -->
+                            <rect x="1" y="2" width="14" height="2" rx="0.3" />
+                            <!-- table apron / skirt -->
+                            <rect x="1" y="5.2" width="14" height="1" rx="0.2" />
+                            <!-- left leg -->
+                            <rect x="2" y="7" width="1.5" height="6" rx="0.2" />
+                            <!-- right leg -->
+                            <rect x="12.5" y="7" width="1.5" height="6" rx="0.2" />
+                            <!-- left chair (back) -->
+                            <rect x="0.5" y="3.5" width="1.2" height="3" rx="0.2" />
+                            <!-- right chair (back) -->
+                            <rect x="14.3" y="3.5" width="1.2" height="3" rx="0.2" />
+                        </svg>
+
+                        <div class="ps-3">
+                            <!-- <small class="text-body">Lovely</small> -->
+                            <h5 class="mt-n1 mb-0">Dining</h5>
                         </div>
                     </a>
                 </li>
@@ -64,6 +87,9 @@
                 <div id="menu_alacarte" class="tab-pane fade show p-0 menu_alacarte">
 
                 </div>
+                <div id="menu_dining" class="tab-pane fade show p-0 menu_dining">
+
+                </div>
                 <div id="menu_party" class="tab-pane fade show p-0">
                     <div class="container mt-5">
                         <div class="card border-0 shadow-sm" style="max-width: 600px; margin: auto;">
@@ -75,9 +101,9 @@
                                     <h5 class="card-title mb-2">Party Order Assistance</h5>
                                     <p class="card-text mb-2 text-muted">For bulk or party orders, kindly reach out to our representative:</p>
                                     <p class="mb-0">
-                                        <strong>Mr. Rajesh Kumar</strong><br>
-                                        <a href="tel:+919876543210" class="text-decoration-none text-primary fw-semibold">
-                                            +91 98765 43210
+                                        <!-- <strong>Mr. Rajesh Kumar</strong><br> -->
+                                        <a href="tel:+13455461580" class="text-decoration-none text-primary fw-semibold">
+                                            +1 345-546-1580
                                         </a>
                                     </p>
                                 </div>

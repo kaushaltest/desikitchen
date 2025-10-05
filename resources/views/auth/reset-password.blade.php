@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Admin Login</title>
+    <title>Reset password</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -65,36 +65,60 @@
                     <h1 class="mb-0  mx-3"><b>DESI</b>KITCHEN</h1>
                 </a>
             </div>
+            @if (session('status'))
+            <div class="mb-4 text-green-600 font-medium">
+                {{ session('status') }}
+            </div>
+            @endif
+
+            <!-- Validation Errors -->
+            @if ($errors->any())
+            <div class="mb-4 text-red-600">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
-                <form method="POST" action="{{ route('admin.login.submit') }}">
+                <p class="login-box-msg">Reset Your Password</p>
+                <form method="POST" action="{{ route('admin.password.update') }}">
                     @csrf
+                    @if(session('status'))
+                    <div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
+                        {{ session('status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
+                    <input type="hidden" name="token" value="{{ $token }}">
+                    <input type="hidden" name="email" value="{{ request()->email }}">
                     <div class="input-group mb-1">
                         <div class="form-floating">
-                            <input id="loginEmail" type="email" name="email" class="form-control" value="" placeholder="" />
-                            <label for="loginEmail">Email</label>
+                            <input id="password" type="password" name="password" class="form-control" value="" placeholder="" />
+                            <label for="password">Password</label>
                         </div>
-                        <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+                        <div class="input-group-text"><span class="bi bi-lock"></span></div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="form-floating">
-                            <input id="loginPassword" type="password" name="password"  class="form-control" placeholder="" />
-                            <label for="loginPassword">Password</label>
+                            <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" value="" placeholder="" />
+                            <label for="password_confirmation">Confirm Password</label>
                         </div>
-                        <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+                        <div class="input-group-text"><span class="bi bi-lock"></span></div>
                     </div>
                     <div class="row">
                         <!-- /.col -->
                         <div class="col-12 mt-2">
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Sign In</button>
+                                <button type="submit" class="btn btn-primary">Reset Password</button>
                             </div>
                         </div>
                         <!-- /.col -->
                     </div>
                 </form>
-                <!-- /.social-auth-links -->
-                <p class="mb-2 mt-2 text-center"><a href="{{route('admin.forgot-password')}}">I forgot my password</a></p>
+                <p class="mb-2 mt-2 text-center"><a href="{{route('admin.login')}}">Back to login</a></p>
+
             </div>
 
             <!-- /.login-card-body -->

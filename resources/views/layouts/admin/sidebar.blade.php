@@ -55,16 +55,22 @@
                                 <p>Alacarte</p>
                             </a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a href="{{ route('admin.partymenu') }}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Party</p>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.diningmenu') }}" class="nav-link">
+                                <i class="nav-icon bi bi-table"></i>
+                                <p>Dining</p>
                             </a>
-                        </li> -->
+                        </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.additionalmenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-plus-square-fill"></i>
                                 <p>Sides</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.category') }}" class="nav-link">
+                                <i class="nav-icon bi bi-card-list"></i>
+                                <p>Category</p>
                             </a>
                         </li>
                     </ul>

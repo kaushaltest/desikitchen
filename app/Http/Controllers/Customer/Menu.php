@@ -7,6 +7,7 @@ use App\Models\Admin\Additionalmenu_model;
 use App\Models\Admin\Alacartemenu_model;
 use App\Models\Admin\Category_model;
 use App\Models\Admin\Daywisemenu_model;
+use App\Models\Admin\Diningmenu_model;
 use App\Models\Admin\Order_model;
 use App\Models\Admin\Orderitem_model;
 use App\Models\Admin\Partyemenu_model;
@@ -38,6 +39,10 @@ class Menu extends Controller
             // ->orderBy('menu_date', 'asc')
             ->get();
         $data['party'] = $partymenu;
+        $diningmenu = Category_model::with(['diningmenus' => function ($query) {
+            $query->where('is_active', true);
+        }])->get();
+        $data['dining'] = $diningmenu;
         $additionalmenu = Additionalmenu_model::where('is_active', '=', true)
             // ->orderBy('menu_date', 'asc')
             ->get();

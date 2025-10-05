@@ -46,25 +46,7 @@ class Subscription extends Controller
                 $userId = session('user_id');
 
                 $planId   = $request->input('plan_id');
-                $meals    = $request->input('meal');
-                $days = (int) $request->input('days');   // cast to int
-
-                // Ensure Asia/Kolkata timezone
-                $startDate = Carbon::now('Asia/Kolkata');
-                if ($days) {
-                    $endDate   = Carbon::now('Asia/Kolkata')->addDays($days);
-                }
-
                 $existing = Usersubscription_model::where('user_id', $userId)->first();
-
-                $data = [
-                    'user_id'        => $userId,
-                    'plan_id'         => $planId,
-                    'meals_remaining' => $meals,
-                    'start_date'     => $startDate,
-                    'end_date'       => ($days) ? $endDate : null,
-                    'status' => 'active'
-                ];
 
                 if ($existing) {
                     $endDate = Carbon::parse($existing->end_date);
@@ -76,19 +58,17 @@ class Subscription extends Controller
                             'loggedin' => true,
                             'message' => 'You already have an active plan. You cannot purchase another one right now.'
                         ], 200);
+                    }else{
+                        return response()->json([
+                            'success' => false,
+                            'loggedin' => false
+                        ]);
                     }
-                    $existing->update($data);
-                    $msg = "Subscription details updated successfully.!";
-                } else {
-                    Usersubscription_model::create($data);
-                    $msg = "Subscription created successfully!";
-                }
-
+                    
+                } 
                 return response()->json([
-                    'success' => true,
-                    'loggedin' => true,
-                    'message' => $msg,
-                    'data'    => $data,
+                    'success' => false,
+                    'loggedin' => false
                 ]);
             } else {
                 return response()->json([
@@ -99,7 +79,7 @@ class Subscription extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
-                'loggedin' => true,
+                'loggedin' => false,
                 'error' => $e->getMessage()
             ], 200);
         }
@@ -110,9 +90,7 @@ class Subscription extends Controller
         try {
             if ($request->session()->has('user_id')) {
                 $userId = session('user_id');
-
                 $existing = Usersubscription_model::where('user_id', $userId)->first();
-
 
                 if ($existing) {
                     $endDate = Carbon::parse($existing->end_date);
@@ -121,6 +99,7 @@ class Subscription extends Controller
                     if ($endDate->gte($today)  && $existing->meals_remaining > 0) {
                         return response()->json([
                             'success' => true,
+                            'is_subscription'=>true,
                             'meal_remaining' => $existing->meals_remaining
                         ], 200);
                     }
@@ -131,6 +110,7 @@ class Subscription extends Controller
 
                 return response()->json([
                     'success' => false,
+                    'is_subscription'=>false,
                 ]);
             } else {
                 return response()->json([
