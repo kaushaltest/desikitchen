@@ -358,40 +358,44 @@
 
     $(document).ready(function() {
         $(document).on('click', '.btn-cancel-order', function() {
-            let orderId = $(this).attr('data-id');
-            const formData = new FormData();
-            formData.append('order_id', orderId)
+            let confirmOrder = confirm("Are you sure you want to delete this order?");
+            if (confirmOrder) {
+                let orderId = $(this).attr('data-id');
+                const formData = new FormData();
+                formData.append('order_id', orderId)
 
-            $.ajax({
-                url: "{{ route('customer.cancel-order') }}", // Change this to your server endpoint
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                data: formData,
-                processData: false,
-                contentType: false,
-                beforeSend: function() {
-                    $(".loader-wrapper").css("display", "flex")
+                $.ajax({
+                    url: "{{ route('customer.cancel-order') }}", // Change this to your server endpoint
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".loader-wrapper").css("display", "flex")
 
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastSuccess((response.message) ? response.message : "Something went wrong. Please try again later.");
-                        loadOrders()
-                    } else {
-                        toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
-                    }
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    var errors = xhr.responseJSON.errors;
-                    toastFail(errors)
-                },
-                complete: function() {
-                    $(".loader-wrapper").css("display", "none")
-                },
-            });
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastSuccess((response.message) ? response.message : "Something went wrong. Please try again later.");
+                            loadOrders()
+                        } else {
+                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        var errors = xhr.responseJSON.errors;
+                        toastFail(errors)
+                    },
+                    complete: function() {
+                        $(".loader-wrapper").css("display", "none")
+                    },
+                });
+            }
+
         })
     });
 </script>

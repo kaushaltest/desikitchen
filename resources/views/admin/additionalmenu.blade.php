@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('title', 'Menu - Additional')
+@section('title', 'Menu - Sides')
 
 @section('content')
 <main class="app-main">
@@ -11,12 +11,12 @@
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Additional Menu</h3>
+                    <h3 class="mb-0">Sides Menu</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Additional menu</li>
+                        <li class="breadcrumb-item active" aria-current="page">Sides menu</li>
                     </ol>
                 </div>
             </div>
@@ -119,7 +119,8 @@
 <script src="{{asset('admin-assets/validation/alacartemenu.js')}}"></script>
 <script>
     $(document).ready(function() {
-
+        const assetBase = "{{ asset('storage') }}";
+        const defaultImage = "{{ asset('default.png') }}";
         var table = $("#dt_additionalmenu").DataTable({
             ajax: {
                 url: '{{route("admin.get-additional-menu")}}', // Replace with your server endpoint
@@ -137,9 +138,9 @@
                     data: 'id',
                 },
                 {
-                    data: 'image_url',
+                    data: 'image_path',
                     render: function(data) {
-                        return '<img src="' + data + '" width="80">';
+                        return `<img src="${data ? `${assetBase}/${data}` : defaultImage}" width="80" >`;
                     }
                 },
                 {
@@ -162,13 +163,21 @@
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_active) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -185,7 +194,7 @@
             $('#model_add_edit_menu').modal('toggle');
             $(".model_add_edit_menu_title").text('Add')
             $(".btn_submit_add_edit_menu").text('Add')
-            $(".btn_submit_add_edit_user").text('Add')
+            $(".btn_submit_add_edit_user").text('Save')
 
         })
 
@@ -194,7 +203,7 @@
             $('#form_add_edit_menu').validate().resetForm();
             $('#form_add_edit_menu')[0].reset();
             $(".model_add_edit_menu_title").text('Edit')
-            $(".btn_submit_add_edit_user").text('Edit')
+            $(".btn_submit_add_edit_user").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();

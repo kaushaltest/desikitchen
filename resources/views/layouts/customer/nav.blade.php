@@ -17,7 +17,6 @@
             <span class="fa fa-bars"></span>
             <span id="cartCountMobile"
                 class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                
             </span>
         </button>
         <div class="collapse navbar-collapse {{session('user_id')?'':''}}" id="navbarCollapse">
@@ -41,7 +40,7 @@
                 <div class="nav-item dropdown ">
                     <a href="#" class="nav-link dropdown-toggle {{ request()->routeIs(['customer.profile','customer.order']) ? 'active' : '' }}" data-bs-toggle="dropdown"><i class="fa fa-user"></i></a>
                     <div class="dropdown-menu m-0">
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
                         <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
                         <!-- <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a> -->
                         <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>
@@ -52,7 +51,7 @@
                 <div class="nav-item dropdown nav-auth" style="display: none;">
                     <a href="#" class="nav-link dropdown-toggle {{ request()->routeIs(['customer.profile','customer.order']) ? 'active' : '' }}" data-bs-toggle="dropdown"><i class="fa fa-user"></i></a>
                     <div class="dropdown-menu m-0">
-                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Plan</a>
+                        <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a>
                         <a href="{{route('customer.order')}}" class="dropdown-item">My Order</a>
                         <!-- <a href="{{route('customer.profile')}}" class="dropdown-item">My Profile</a> -->
                         <a href="{{route('customer.logout')}}" class="dropdown-item">Logout</a>

@@ -348,6 +348,18 @@ class Auth extends Controller
                 "message" => "User not found."
             ], 404);
         }
+        $existingUser = Auth_model::where('email', $request->input('txt_edit_email'))
+            ->when(!empty($userId), function ($query) use ($userId) {
+                $query->where('id', '!=', $userId);
+            })
+            ->first();
+
+        if ($existingUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This email is already associated with an account.',
+            ]);
+        }
 
         // ✅ Update user info
         $user->name  = $request->input('txt_edit_name');
@@ -410,18 +422,18 @@ class Auth extends Controller
     }
     public function create($token)
     {
-        return view('customer.reset-password',['token' => $token]);
+        return view('customer.reset-password', ['token' => $token]);
     }
 
     public function requestPassword(Request $request)
     {
-      
+
         $request->validate(['txt_forgot_email' => 'required|email']);
 
         $status = Password::sendResetLink([
             'email' => $request->input('txt_forgot_email')
         ]);
-        
+
         if ($status === Password::RESET_LINK_SENT) {
             return response()->json([
                 'success' => true,
@@ -436,13 +448,13 @@ class Auth extends Controller
     }
     public function store(Request $request)
     {
-    
+
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
-       
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
@@ -453,7 +465,7 @@ class Auth extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-            ? redirect()->route('dashboard')->with('status', __($status))
+            ? redirect()->route('customer.dashboard')->with('status', __($status))
             : back()->withErrors(['email' => [__($status)]]);
     }
 }

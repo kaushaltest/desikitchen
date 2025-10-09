@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('title', 'Menu - Alacarte')
+@section('title', 'Menu - Platters')
 
 @section('content')
 <main class="app-main">
@@ -11,12 +11,12 @@
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Alacarte Menu</h3>
+                    <h3 class="mb-0">Platters Menu</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Alacarte menu</li>
+                        <li class="breadcrumb-item active" aria-current="page">Platters menu</li>
                     </ol>
                 </div>
             </div>
@@ -141,6 +141,19 @@
                             <label class="col-form-label" for="txt_category">Name</label>
                             <input class="form-control me-2" id="txt_category" type="text" name="txt_category">
                         </div>
+                        <div>
+                            <label class="col-form-label">Is Active</label>
+                            <div class="form-check-size rtl-input mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_active" type="radio" name="rbt_is_active" value="1" checked="">
+                                    <label class="form-check-label" for="rbt_status_active">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_inactive" type="radio" name="rbt_is_active" value="0">
+                                    <label class="form-check-label" for="rbt_status_inactive">No</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
@@ -195,7 +208,7 @@
                 // Handle success response
                 let html = '<option value="">Select Category</option>';
                 if (response?.data) {
-                    categoryArrGetId=response?.data;
+                    categoryArrGetId = response?.data;
                     response?.data.forEach(ele => {
                         html += `<option value="${ele.id}">${ele.category}</option>`;
                         categoryArr.push(ele.category); // 👈 collect categories
@@ -316,13 +329,21 @@
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_active) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -340,7 +361,7 @@
             $('#model_add_edit_menu').modal('toggle');
             $(".model_add_edit_menu_title").text('Add')
             $(".btn_submit_add_edit_menu").text('Add')
-            $(".btn_submit_add_edit_user").text('Add')
+            $(".btn_submit_add_edit_user").text('Save')
 
         })
 
@@ -350,7 +371,7 @@
             $('#form_add_edit_menu')[0].reset();
             $("#btn_add_category").hide();
             $(".model_add_edit_menu_title").text('Edit')
-            $(".btn_submit_add_edit_user").text('Edit')
+            $(".btn_submit_add_edit_user").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();

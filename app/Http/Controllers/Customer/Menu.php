@@ -23,7 +23,7 @@ class Menu extends Controller
         $data = [];
         $today = Carbon::today('Asia/Kolkata')->format('Y-m-d');
 
-        $daywisemenu = Daywisemenu_model::where('menu_date', '>', $today)
+        $daywisemenu = Daywisemenu_model::where('menu_date', '>', $today)->where('is_active',true)
             ->orderBy('menu_date', 'asc')
             ->get();
         $daywisemenu->transform(function ($item) {

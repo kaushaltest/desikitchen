@@ -44,6 +44,7 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Category Name</th>
+                                        <th>Is Active</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -73,6 +74,19 @@
                         <div class="form-group">
                             <label class="col-form-label" for="txt_category">Name</label>
                             <input class="form-control me-2" id="txt_category" type="text" name="txt_category">
+                        </div>
+                        <div>
+                            <label class="col-form-label">Is Active</label>
+                            <div class="form-check-size rtl-input mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_active" type="radio" name="rbt_is_active" value="1" checked="">
+                                    <label class="form-check-label" for="rbt_status_active">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_inactive" type="radio" name="rbt_is_active" value="0">
+                                    <label class="form-check-label" for="rbt_status_inactive">No</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -117,19 +131,32 @@
                 {
                     data: 'category',
                 },
-              
+                {
+                    data: 'is_delete',
+                    render: function(data, type, row) {
+                        return (data) ? "<span class='bg-success text-white p-1 rounded'>Yes</span>" : "<span class='bg-danger text-white p-1 rounded'>No</span>"
+                    },
+                },
                 {
                     data: null,
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_delete) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -146,7 +173,7 @@
             $('#model_add_category').modal('toggle');
             $(".model_add_category_title").text('Add')
             $(".btn_submit_add_edit_menu").text('Add')
-            $(".btn_submit_add_edit_category").text('Add')
+            $(".btn_submit_add_edit_category").text('Save')
 
         })
 
@@ -155,7 +182,7 @@
             $('#form_add_category').validate().resetForm();
             $('#form_add_category')[0].reset();
             $(".model_add_category_title").text('Edit')
-            $(".btn_submit_add_edit_category").text('Edit')
+            $(".btn_submit_add_edit_category").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
@@ -163,6 +190,8 @@
             // // Populate the modal with row data
             $("#hid_menuid").val(rowData.id);
             $("#txt_category").val(rowData?.category)
+            $('input[name="rbt_is_active"][value="' + rowData.is_delete + '"]').prop('checked', true);
+
             $('#model_add_category').modal('toggle');
         });
         $('#dt_category').on('click', '.btn-menu-delete', function(e) {
@@ -204,7 +233,7 @@
 
         });
 
-       
+
         $('#form_add_category').validate({
             rules: validationRules.categoryForm.rules,
             messages: validationRules.categoryForm.messages,
@@ -264,7 +293,7 @@
 
             }
         });
-    
+
     });
 </script>
 @endsection

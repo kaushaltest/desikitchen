@@ -16,6 +16,7 @@ class Daywisemenu_model extends Model
         'title',
         'items',
         'price',
-        'image_path'
+        'image_path',
+        'is_active'
     ];
 }

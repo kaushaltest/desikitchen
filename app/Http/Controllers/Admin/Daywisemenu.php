@@ -39,6 +39,7 @@ class Daywisemenu extends Controller
                     'title' => $request->input('txt_title'),
                     'items' => $request->input('txt_item'),
                     'price' => $request->input('txt_price'),
+                    'is_active' => $request->input('rbt_is_active'),
                 ];
                 if ($request->hasFile('file_menu_image')) {
                     $imagePath = $request->file('file_menu_image')->store('uploads/menu_images', 'public');
@@ -56,7 +57,8 @@ class Daywisemenu extends Controller
                     'menu_date' => $request->input('dt_date'),
                     'title' => $request->input('txt_title'),
                     'items' => $request->input('txt_item'),
-                    'price' => $request->input('txt_price')
+                    'price' => $request->input('txt_price'),
+                    'is_active' => $request->input('rbt_is_active'),
                 ];
                 if ($request->hasFile('file_menu_image')) {
                     $imagePath = $request->file('file_menu_image')->store('uploads/menu_images', 'public');
@@ -83,23 +85,40 @@ class Daywisemenu extends Controller
 
     public function deleteDayWiseMenu(Request $request)
     {
-        $menu = Daywisemenu_model::find($request->user_uid); // Adjust model name
+        // $menu = Daywisemenu_model::find($request->user_uid); // Adjust model name
 
-        if (!$menu) {
-            return response()->json(['success' => false, 'message' => 'Menu not found']);
+        // if (!$menu) {
+        //     return response()->json(['success' => false, 'message' => 'Menu not found']);
+        // }
+        // // Delete image if exists
+        // if ($request->has('image_path') && File::exists(public_path('storage/' . $request->image_path))) {
+        //     File::delete(public_path('storage/' . $request->image_path));
+        // }
+
+        // // Or delete from storage if saved via Storage::put
+        // Storage::delete('public/' . $request->image_path);
+
+        // // Delete the menu record
+        // $menu->delete();
+
+        // return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
+        $existingMenu = Daywisemenu_model::find($request->user_uid);
+
+        if ($existingMenu) {
+            // Update is_delete to true
+            $existingMenu->is_active = ($existingMenu->is_active)?false:true;
+            $existingMenu->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Menu item removed successfully.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Menu item not removed.'
+            ]);
         }
-        // Delete image if exists
-        if ($request->has('image_path') && File::exists(public_path('storage/' . $request->image_path))) {
-            File::delete(public_path('storage/' . $request->image_path));
-        }
-
-        // Or delete from storage if saved via Storage::put
-        Storage::delete('public/' . $request->image_path);
-
-        // Delete the menu record
-        $menu->delete();
-
-        return response()->json(['success' => true, 'message' => 'Menu item removed successfully.']);
     }
 
     public function import(Request $request)

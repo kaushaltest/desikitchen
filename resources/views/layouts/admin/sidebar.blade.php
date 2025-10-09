@@ -52,7 +52,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.alacartemenu') }}" class="nav-link">
                                 <i class="nav-icon bi bi-cart"></i>
-                                <p>Alacarte</p>
+                                <p>Platters</p>
                             </a>
                         </li>
                         <li class="nav-item">

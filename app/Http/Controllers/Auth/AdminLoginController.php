@@ -70,13 +70,15 @@ class AdminLoginController extends Controller
             }
 
             Auth::logout();
-            return redirect()->route('admin.login')->withErrors([
-                'email' => 'Access denied. Not an admin account.',
+            return redirect()->back()->with([
+                'status'=>'danger',
+                'message' => 'Access denied. Not an admin account.',
             ]);
         }
 
-        return back()->withErrors([
-            'email' => 'Incorrect username or password. Please try again..',
+        return back()->with([
+            'status'=>'danger',
+            'message' => 'Incorrect username or password. Please try again..',
         ]);
     }
     public function checkMobileExist(Request $request)

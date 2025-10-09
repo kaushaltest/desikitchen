@@ -35,7 +35,7 @@ class Order extends Controller
         $data = [];
         $today = Carbon::today(); // Get today's date
 
-        $daywisemenu = Daywisemenu_model::where('menu_date', '>=', $today)
+        $daywisemenu = Daywisemenu_model::where('menu_date', '>=', $today)->where('is_active', true)
             ->orderBy('menu_date', 'asc')
             ->get();
         $data['daywise'] = $daywisemenu;
@@ -523,7 +523,7 @@ class Order extends Controller
             }
             if (isset($items['alacarte']) && !empty($items['alacarte'])) {
                 $order_id = $this->generateOrderId();
-                $alacarteHtml = ``;
+                $alacarteHtml = '';
                 $added_data = [
                     'user_id' => $request->input('user_id'),
                     'address_id' => $request->input('address_id'),

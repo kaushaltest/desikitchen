@@ -69,6 +69,12 @@
                 <p class="login-box-msg">Sign in to start your session</p>
                 <form method="POST" action="{{ route('admin.login.submit') }}">
                     @csrf
+                    @if(session('status'))
+                    <div class="alert alert-{{session('status')}} alert-dismissible fade show mb-2" role="alert">
+                        {{ session('message') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @endif
                     <div class="input-group mb-1">
                         <div class="form-floating">
                             <input id="loginEmail" type="email" name="email" class="form-control" value="" placeholder="" />

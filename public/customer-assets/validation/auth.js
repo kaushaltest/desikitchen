@@ -124,18 +124,18 @@ const validationRules = {
             newAddress2: {
                 required: true,
             },
-            newCity: {
-                required: true,
-            },
-            newState: {
-                required: true,
-            },
-            newCountry: {
-                required: true,
-            },
-            newPincode: {
-                required: true,
-            },
+            // newCity: {
+            //     required: true,
+            // },
+            // newState: {
+            //     required: true,
+            // },
+            // newCountry: {
+            //     required: true,
+            // },
+            // newPincode: {
+            //     required: true,
+            // },
         },
         messages: {
             newAddressType: {
@@ -147,18 +147,18 @@ const validationRules = {
             newAddress2: {
                 required: "Address2 is required",
             },
-            newCity: {
-                required: "City is required",
-            },
-            newState: {
-                required: "State is required",
-            },
-            newCountry: {
-                required: "Country is required",
-            },
-            newPincode: {
-                required: "Pincode is required",
-            },
+            // newCity: {
+            //     required: "City is required",
+            // },
+            // newState: {
+            //     required: "State is required",
+            // },
+            // newCountry: {
+            //     required: "Country is required",
+            // },
+            // newPincode: {
+            //     required: "Pincode is required",
+            // },
         },
     },
 };

@@ -109,7 +109,7 @@
                     </div>
 
                     <!-- Subscription Info -->
-                    @foreach($profile['subscription'] as $sub)
+                    <!-- @foreach($profile['subscription'] as $sub)
                     <div class="col-12 col-md-12 col-lg-12">
                         <div class="plan-card h-100 d-flex flex-column border-2">
                             <div class="plan-header p-4">
@@ -154,7 +154,7 @@
                         </div>
 
                     </div>
-                    @endforeach
+                    @endforeach -->
 
                 </div>
 
@@ -195,6 +195,7 @@
 <script src="{{asset('customer-assets/validation/profile.js')}}"></script>
 <script>
     $(document).ready(function() {
+        let email = "{{ $profile['email'] ?? '' }}";
         $(".choose-plan-btn").on("click", function() {
             let planId = $(this).data("plan");
             let meal = $(this).data("meal");
@@ -225,6 +226,7 @@
         });
 
         $("#btn_edit_user").click(function() {
+            $("#txt_edit_email").val(email);
             $("#model_edit_user").modal('toggle');
         });
         $('#form_edit_user').validate({

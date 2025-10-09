@@ -303,11 +303,11 @@ class Customerorder extends Controller
                     $orderDate = Carbon::parse($item['order_date'], 'Asia/Kolkata');
                     $now = Carbon::now('Asia/Kolkata');
                     if ($orderDate->greaterThan($now)) {
-                        $alacarteHtml .= `
+                        $alacarteHtml .= '
                         <div style="background:#4caf50; padding:20px; text-align:center;">
                             <h2 style="margin:0;">🧾 Your Order Summary</h2>
                         </div>
-                        `;
+                        ';
                         $alacarteHtml .= '<div style="margin-bottom:5px border-bottom:1px solid #eee;">
                             <p style="margin:0; font-size:14px;">Date: <strong>' . $item['order_date'] . '</strong></p>
                             <p style="margin:0; font-size:14px;">Order ID: <strong>' . $orderId . '</strong></p>

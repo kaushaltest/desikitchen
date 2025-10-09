@@ -110,7 +110,7 @@ class Alacartemenu extends Controller
 
     public function getCategory()
     {
-        $data = Category_model::select('id', 'category')->get();
+        $data = Category_model::select('id', 'category', 'is_delete')->get();
         return response()->json([
             'data' => $data,
         ], 200);
@@ -131,6 +131,7 @@ class Alacartemenu extends Controller
             }
             $added_data = [
                 'category' => $categoryName,
+                'is_delete' => $request->input('rbt_is_active'),
             ];
 
             Category_model::create($added_data);
@@ -152,19 +153,21 @@ class Alacartemenu extends Controller
         try {
             $categoryName = $request->input('txt_category');
 
-            $exists = Category_model::whereRaw('LOWER(category) = ?', [strtolower($categoryName)])->exists();
-
-            if ($exists) {
-                return response()->json([
-                    "success" => false,
-                    'message' => "This category name is already in use & exists"
-                ], 200);
-            }
+          
             $added_data = [
                 'category' => $categoryName,
+                'is_delete' => $request->input('rbt_is_active'),
             ];
 
             if (!empty($request->input('hid_menuid'))) {
+                $exists = Category_model::whereRaw('LOWER(category) = ?', [strtolower($categoryName)])->where('id', '!=', $request->input('hid_menuid'))->exists();
+
+                if ($exists) {
+                    return response()->json([
+                        "success" => false,
+                        'message' => "This category name is already in use & exists"
+                    ], 200);
+                }
                 $category = Category_model::where('id', $request->input('hid_menuid'))->first();
                 if ($category) {
                     $category->update($added_data);
@@ -180,6 +183,14 @@ class Alacartemenu extends Controller
                     ], 200);
                 }
             } else {
+                $exists = Category_model::whereRaw('LOWER(category) = ?', [strtolower($categoryName)])->exists();
+
+                if ($exists) {
+                    return response()->json([
+                        "success" => false,
+                        'message' => "This category name is already in use & exists"
+                    ], 200);
+                }
                 Category_model::create($added_data);
 
                 return response()->json([

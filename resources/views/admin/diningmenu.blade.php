@@ -316,13 +316,21 @@
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_active) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -340,7 +348,7 @@
             $('#model_add_edit_menu').modal('toggle');
             $(".model_add_edit_menu_title").text('Add')
             $(".btn_submit_add_edit_menu").text('Add')
-            $(".btn_submit_add_edit_user").text('Add')
+            $(".btn_submit_add_edit_user").text('Save')
 
         })
 
@@ -350,7 +358,7 @@
             $('#form_add_edit_menu')[0].reset();
             $("#btn_add_category").hide();
             $(".model_add_edit_menu_title").text('Edit')
-            $(".btn_submit_add_edit_user").text('Edit')
+            $(".btn_submit_add_edit_user").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();

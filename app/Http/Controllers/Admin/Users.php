@@ -35,7 +35,15 @@ class Users extends Controller
                 if ($existingUser) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'This mobile number is already associated with an account.registered.',
+                        'message' => 'This mobile number is already associated with an existing account.',
+                    ]);
+                }
+                $existingEmail = KitUser::where('email', $request->input('txt_email'))->first();
+
+                if ($existingEmail) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This email is already associated with an account registered.',
                     ]);
                 }
                 $added_data = [
@@ -64,7 +72,19 @@ class Users extends Controller
                 if ($existingUser) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'This mobile number is already associated with an account.registered by another user.',
+                        'message' => 'This mobile number is already associated with an account',
+                    ]);
+                }
+                $existingUser = KitUser::where('email', $request->input('txt_email'))
+                    ->when(!empty($userId), function ($query) use ($userId) {
+                        $query->where('id', '!=', $userId);
+                    })
+                    ->first();
+
+                if ($existingUser) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This email is already associated with an account.',
                     ]);
                 }
                 $updated_data = [
@@ -95,9 +115,26 @@ class Users extends Controller
 
     public function deleteUser(Request $request)
     {
-        $menu = KitUser::find($request->sub_id); // Adjust model name
-        $menu->delete();
-        return response()->json(['success' => true, 'message' => 'User account has been successfully removed.successfully']);
+        // $menu = KitUser::find($request->sub_id); // Adjust model name
+        // $menu->delete();
+        // return response()->json(['success' => true, 'message' => 'User account has been successfully removed.successfully']);
+        $existingUser = KitUser::where('id', $request->sub_id)->first();
+
+        if ($existingUser) {
+            // Update is_delete to true
+            $existingUser->is_delete = true;
+            $existingUser->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User account has been successfully deleted.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.'
+            ]);
+        }
     }
 
     public function adminUser()
@@ -162,7 +199,7 @@ class Users extends Controller
     {
         $menu = KitUser::find($request->sub_id); // Adjust model name
         $menu->delete();
-        return response()->json(['success' => true, 'message' => 'User account has been successfully removed.successfully']);
+        return response()->json(['success' => true, 'message' => 'User has been deleted successfully']);
     }
 
     public function tables()
@@ -174,7 +211,7 @@ class Users extends Controller
     {
         $data = Table_model::get();
         return response()->json([
-            'success'=>true,
+            'success' => true,
             'data' => $data,
         ], 200);
     }

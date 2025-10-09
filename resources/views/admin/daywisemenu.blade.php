@@ -61,7 +61,8 @@
                                         <th>Date</th>
                                         <th>Title</th>
                                         <th>Items</th>
-                                        <th>price</th>
+                                        <th>Price</th>
+                                        <th>Is Active</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -108,6 +109,19 @@
                             <label class="col-form-label" for="txt_price">Price</label>
                             <input class="form-control me-2" id="txt_price" type="text" name="txt_price">
 
+                        </div>
+                        <div>
+                            <label class="col-form-label">Is Active</label>
+                            <div class="form-check-size rtl-input mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_active" type="radio" name="rbt_is_active" value="1" checked="">
+                                    <label class="form-check-label" for="rbt_status_active">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_inactive" type="radio" name="rbt_is_active" value="0">
+                                    <label class="form-check-label" for="rbt_status_inactive">No</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -259,17 +273,31 @@
                     data: 'price',
                 },
                 {
+                    data: 'is_active',
+                    render: function(data, type, row) {
+                        return (data) ? "<span class='bg-success text-white p-1 rounded'>Yes</span>" : "<span class='bg-danger text-white p-1 rounded'>No</span>"
+                    },
+                },
+                {
                     data: null,
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_active) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -289,7 +317,7 @@
             $('#model_add_edit_menu').modal('toggle');
             $(".model_add_edit_menu_title").text('Add')
             $(".btn_submit_add_edit_menu").text('Add')
-            $(".btn_submit_add_edit_user").text('Add')
+            $(".btn_submit_add_edit_user").text('Save')
 
         })
 
@@ -298,7 +326,7 @@
             $('#form_add_edit_menu').validate().resetForm();
             $('#form_add_edit_menu')[0].reset();
             $(".model_add_edit_menu_title").text('Edit')
-            $(".btn_submit_add_edit_user").text('Edit')
+            $(".btn_submit_add_edit_user").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
@@ -308,13 +336,16 @@
             $('#txt_title').val(rowData.title);
             $('#txt_item').val(rowData.items);
             $('#txt_price').val(rowData.price);
+            $('input[name="rbt_is_active"][value="' + rowData.is_active + '"]').prop('checked', true);
             // Show the modal
             $('#model_add_edit_menu').modal('toggle');
         });
         $('#dt_daywisemenu').on('click', '.btn-menu-delete', function(e) {
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
-            let confirmation = confirm("Are you sure want to delete this menu ?");
+            let confirmation = confirm(
+                "Are you sure you want to " + (!rowData.is_active ? "restore" : "delete") + " this menu?"
+            );
             if (confirmation) {
                 $.ajax({
                     url: "{{ route('admin.delete-daywisemenu') }}", // Change this to your server endpoint

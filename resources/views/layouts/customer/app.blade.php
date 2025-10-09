@@ -233,10 +233,10 @@
                             <button type="submit" class="btn btn-primary w-100" id="send-otp-btn">Sign In</button>
 
                             <div class="text-center mt-3">
-                                <a href="javascript:void(0)" class="register_new_user">Register a new user ?</a>
+                                <a href="javascript:void(0)" class="register_new_user">Register as New user</a>
                             </div>
                             <div class="text-center mt-3">
-                                <button type="button" class="btn btn-light border w-100" id="guest_login">Continue as Guest ?</button>
+                                <button type="button" class="btn btn-light border w-100" id="guest_login">Continue as Guest</button>
                             </div>
                         </form>
                     </div>
@@ -968,7 +968,13 @@
     function updateCartDisplay() {
         const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
         const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-        $('#cartCountMobile').text(`${itemCount>0?itemCount+'':''}`)
+
+        if (itemCount == 0) {
+            $('#cartCountMobile').hide();
+        } else {
+            $('#cartCountMobile').show();
+        }
+        $('#cartCountMobile').text(`${itemCount>0?itemCount+'':''}`);
         $('#cartCount').text(`${itemCount>0?itemCount+' items':'Cart'}`);
         $('#cartTotal').text(`${(total!=0)?'$'+total.toFixed(2):''}`);
     }
@@ -1164,7 +1170,7 @@
                     bgColor: 'bg-primary-subtle'
                 },
                 'alacarte': {
-                    name: 'Alacarte',
+                    name: 'Catering Platters',
                     icon: 'fas fa-utensils',
                     color: 'success',
                     bgColor: 'bg-success-subtle'
@@ -1221,11 +1227,11 @@
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     const minDate = tomorrow.toISOString().split('T')[0];
-
+                    const alacarteOrderDate= localStorage.getItem('alacarte_orderdate') || "";
                     html += `
                             <div class=" p-2 mt-3">
                                 <label class="form-label fw-medium">Order Date</label>
-                                <input type="date" class="form-control w-auto" name="order_date_${type}" id="order_date_${type}" min="${minDate}">
+                                <input type="date" class="form-control w-auto" name="order_date_${type}" id="order_date_${type}" data-id="${type}" data-type="${type}" min="${minDate}" value="${alacarteOrderDate}">
                             </div>
                         `;
                 }
@@ -1427,6 +1433,16 @@
         }
     }
 
+    $(document).on('change', `#order_date_alacarte`, function() {
+        if ($(this).val()) {
+            localStorage.setItem('alacarte_orderdate', $(this).val());
+
+        }else{
+            localStorage.remove('alacarte_orderdate');
+
+        }
+    });
+
     function addToCartFromModal(cartId) {
         const existing = cart.find(item => item.id === cartId);
         if (existing) {
@@ -1468,7 +1484,7 @@
 
             // Optional: update main quantity if needed (depends on logic)
             // existing.quantity += 1;
-
+            localStorage.setItem('cart_items', JSON.stringify(cart));
             updateCartDisplay();
             showCart();
         }
@@ -1489,7 +1505,7 @@
                     // Remove item if quantity is 1 and being decreased
                     existing.additional_items.splice(index, 1);
                 }
-
+                localStorage.setItem('cart_items', JSON.stringify(cart));
                 updateCartDisplay();
                 showCart();
             }
@@ -2614,6 +2630,7 @@
                     toastSuccess(response.message);
                     cart = [];
                     localStorage.removeItem('cart_items')
+                    localStorage.removeItem('alacarte_orderdate')
                     currentUser = null;
                     selectedAddress = null;
                     updateCartDisplay();

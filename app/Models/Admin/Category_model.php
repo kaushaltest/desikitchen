@@ -22,6 +22,7 @@ class Category_model extends Model
     }
     
     protected $fillable = [
-        'category'
+        'category',
+        'is_delete'
     ];
 }

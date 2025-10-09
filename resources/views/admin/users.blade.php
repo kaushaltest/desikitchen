@@ -66,7 +66,7 @@
         <div class="modal-dialog modal-dialog-centered model_add_edit_user" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title "><span class="model_add_edit_user_title"></span> Menu</h5>
+                    <h5 class="modal-title "><span class="model_add_edit_user_title"></span> User</h5>
                     <button class="btn-close py-0" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="form_add_edit_user" method="post" class="theme-form needs-validation">
@@ -146,13 +146,21 @@
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+                     
                         `;
                     },
+                    // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                     orderable: false,
                     searchable: false
                 }
             ],
+            createdRow: function(row, data) {
+                if (!data.is_active) {
+                    // $(row).css('background-color', '#f8d7da'); // light red
+                    // OR add a class:
+                    $(row).addClass('table-danger');
+                }
+            }
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,
@@ -178,7 +186,7 @@
             $('#form_add_edit_user').validate().resetForm();
             $('#form_add_edit_user')[0].reset();
             $(".model_add_edit_user_title").text('Edit')
-            $(".btn_submit_add_edit_user").text('Edit')
+            $(".btn_submit_add_edit_user").text('Save')
             // Get the row data
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
@@ -195,7 +203,9 @@
         $('#dt_users').on('click', '.btn-menu-delete', function(e) {
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
-            let confirmation = confirm("Are you sure want to delete this user ?");
+            let confirmation = confirm(
+                "Are you sure you want to " + (rowData.is_delete ? "restore" : "delete") + " this user?"
+            );
             if (confirmation) {
                 $.ajax({
                     url: "{{ route('admin.delete-users') }}", // Change this to your server endpoint
