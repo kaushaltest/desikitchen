@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ Your Desi Kitchen Tiffin has been delivered!</title>
+    <title>❌ Your Desi Kitchen Order Has Been Cancelled</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .header {
-            background-color: #FEA116;
+            background-color: #FEA116; /* same header color as "on the way" */
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -64,20 +64,23 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>✅ Your Desi Kitchen Tiffin has been delivered!</h1>
+            <h1>❌ You Cancelled Your Desi Kitchen Order</h1>
         </div>
 
         <!-- Content -->
         <div class="content">
             <p>Hello <strong>{{ $customerName }}</strong> 🙏,</p>
 
-            <p>We are happy to inform you that your Desi Kitchen tiffin <strong>Order #{{ $orderId }}</strong> for <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> has been successfully delivered.</p>
+            <p>This is to confirm that your order <strong>#{{ $orderId }}</strong> Placed for <strong>{{ $orderDate }}</strong> has been successfully <strong>cancelled</strong> by you.</p>
 
             <div class="highlight">
-                <p>We hope you enjoyed your fresh vegetarian meal 🌱💚</p>
+                <p>If you had already made a payment, it will be refunded.</p>
+                <p>For any questions, feel free to contact our support team at <strong>info@desikitchen-ky.com</strong>.</p>
             </div>
 
-            <p>Thanks for choosing us!<br><strong>Team Desi Kitchen</strong></p>
+            <p>We hope to serve you again soon 🍱</p>
+
+            <p>Thanks,<br><strong>Team Desi Kitchen</strong></p>
         </div>
 
         <!-- Footer -->

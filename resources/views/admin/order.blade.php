@@ -115,11 +115,8 @@
                         <input type="hidden" name="hid_orderid" id="hid_orderid">
                         <select name="drp_status" id="drp_status" class="form-select">
                             <option value="">Select status</option>
-                            <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="preparing">Preparing</option>
-                            <option value="ready">Ready</option>
+                            <option value="cancelled">Cancelled</option>
                             <option value="dispatched">Dispatched</option>
                             <option value="delivered">Delivered</option>
                         </select>
@@ -178,7 +175,7 @@
 
                         // Loop through each row to sum the total price (7th column = "G")
                         let total = 0;
-                      
+
                         $('row', sheet).each(function(index) {
                             if (index === 0) return; // skip header
                             let cell = $('c[r^="G"] v', this).text(); // 👈 Column G (adjust if needed)

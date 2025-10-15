@@ -65,7 +65,7 @@
 </style>
 
 <body>
-    <div class="toast-container position-fixed top-0 end-0 toast-index toast-rtl" style="z-index: 10000;">
+    <div class="toast-container position-fixed top-0 end-0 toast-index toast-rtl" style="z-index: 999999999999999999999;">
         <div id="toast-success" class="toast fade m-3" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex justify-content-between bg-success text-white">
                 <div class="toast-body"></div>
@@ -74,7 +74,7 @@
     </div>
 
     <!-- FAIL TOAST -->
-    <div class="toast-container position-fixed top-0 end-0 toast-index toast-rtl" style="z-index: 10000;">
+    <div class="toast-container position-fixed top-0 end-0 toast-index toast-rtl" style="z-index: 999999999999999999999;">
         <div id="toast-fail" class="toast fade m-3" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex justify-content-between bg-danger text-white">
                 <div class="toast-body"></div>
@@ -488,7 +488,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success" id="placeOrderBtn">Place Order</button>
+                    <button class="btn btn-success" id="placeOrderBtn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                        Place Order</button>
                 </div>
             </div>
         </div>
@@ -499,13 +501,16 @@
                 <div class="modal-header">
                     <h5 class="modal-title d-flex align-items-center gap-2">
                         <i data-lucide="map-pin"></i>
-                        Add New Address
+                        <span class="addAddressModal_model"></span> New Address
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="form_addnewaddress" method="post">
                     <div class="modal-body">
                         <div class="row">
+                            <input type="hidden" name="newAddressId" id="newAddressId" class="form-control">
+                            <input type="hidden" name="newLat" id="newLat" class="form-control">
+                            <input type="hidden" name="newLng" id="newLng" class="form-control">
                             <div class="col-md-6">
                                 <div class="position-relative">
                                     <div class="map-search-box">
@@ -517,10 +522,10 @@
                                     <div class="alert alert-info">
                                         <small><i data-lucide="info"></i> Click on the map to select your delivery location</small>
                                     </div>
-                                    <div id="selectedLocationInfo" style="display: none;">
+                                    <!-- <div id="selectedLocationInfo" style="display: none;">
                                         <h6>Selected Location:</h6>
                                         <p id="selectedLocationText" class="text-muted"></p>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -576,7 +581,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button class="btn btn-primary" id="saveAddressBtn">Add Address</button>
+                        <button class="btn btn-primary" id="saveAddressBtn">Save Address</button>
                     </div>
                 </form>
             </div>
@@ -619,12 +624,13 @@
     </div> -->
 
     @include('layouts.customer.footer2')
-    <script src="{{ asset('customer-assets/customtoast.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="{{asset('customer-assets/validation/auth.js')}}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places"></script>
 
 </body>
+<script src="{{ asset('customer-assets/customtoast.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="{{asset('customer-assets/validation/auth.js')}}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places"></script>
+
 <script>
     let map, marker, geocoder, autocomplete;
 
@@ -670,6 +676,7 @@
                     map.setCenter(place.geometry.location);
                     map.setZoom(15);
                     marker.setPosition(place.geometry.location);
+                    console.log("dsds")
                     fillAddressFields(place);
                     reverseGeocode(pos)
                 } else {
@@ -763,40 +770,67 @@
             location: latLng
         }, (results, status) => {
             if (status === "OK" && results[0]) {
-                document.getElementById("selectedLocationInfo").style.display = "block";
-                document.getElementById("selectedLocationText").textContent = results[0].formatted_address;
-                fillAddressFields(results[0]);
+                // document.getElementById("selectedLocationInfo").style.display = "block";
+                // document.getElementById("selectedLocationText").textContent = results[0].formatted_address;
+                (results[0]);
+                fillAddressFromPlace(results[0])
             }
         });
     }
 
     function fillAddressFromPlace(place) {
-        document.getElementById("selectedLocationInfo").style.display = "block";
-        document.getElementById("selectedLocationText").textContent = place.formatted_address || "";
+        // document.getElementById("selectedLocationInfo").style.display = "block";
+        // document.getElementById("selectedLocationText").textContent = place.formatted_address || "";
         fillAddressFields(place);
     }
 
     function fillAddressFields(place) {
         const c = {};
-        (place.address_components || []).forEach(comp => {
-            comp.types.forEach(t => c[t] = comp.long_name);
-        });
+        console.log(place);
+        if (place.address_components) {
+            (place.address_components || []).forEach(comp => {
+                comp.types.forEach(t => {
+                    c[t] = comp.long_name;
+                });
+            });
+        }
+        // Case 2: simplified object (direct keys)
+        else {
+            c = place;
+        }
 
-        // Line 1: street number + street name (route) + premise/subpremise if present
+        // --- Line 1: detailed local address ---
         const line1Parts = [];
-        if (c.street_number) line1Parts.push(c.street_number);
-        if (c.route) line1Parts.push(c.route);
         if (c.premise) line1Parts.push(c.premise);
-        if (c.subpremise) line1Parts.push(c.subpremise);
+        if (c.route) line1Parts.push(c.route);
+        if (c.sublocality_level_2) line1Parts.push(c.sublocality_level_2);
+        if (c.sublocality_level_1 && !line1Parts.includes(c.sublocality_level_1))
+            line1Parts.push(c.sublocality_level_1);
+        else if (c.sublocality) line1Parts.push(c.sublocality);
 
-        // Line 2: neighborhood / area / locality details
+        // --- Line 2: broader region info ---
         const line2Parts = [];
-        if (c.sublocality) line2Parts.push(c.sublocality);
-        if (c.administrative_area_level_2) line2Parts.push(c.administrative_area_level_2);
-        if (c.locality && !line2Parts.includes(c.locality)) line2Parts.push(c.locality);
+        if (c.locality) line2Parts.push(c.locality);
+        if (c.administrative_area_level_1) line2Parts.push(c.administrative_area_level_1);
+        if (c.country) line2Parts.push(c.country);
 
-        document.getElementById("newAddress1").value = line1Parts.join(" ");
-        document.getElementById("newAddress2").value = line2Parts.join(" ");
+        // --- Fill input fields ---
+        let lat = null,
+            lng = null;
+        if (place.geometry && place.geometry.location) {
+            lat = place.geometry.location.lat();
+            lng = place.geometry.location.lng();
+        } else if (place.lat && place.lng) {
+            lat = place.lat;
+            lng = place.lng;
+        }
+
+        if (lat && lng) {
+            document.getElementById("newLat").value = lat;
+            document.getElementById("newLng").value = lng;
+        }
+        document.getElementById("newAddress1").value = line1Parts.join(", ");
+        document.getElementById("newAddress2").value = line2Parts.join(", ");
         document.getElementById("newPincode").value = c.postal_code || "";
     }
 
@@ -845,8 +879,6 @@
             }
         });
     });
-</script>
-<script>
     let cart = (localStorage.getItem('cart_items')) ? JSON.parse(localStorage.getItem('cart_items')) : [];
     let activeTab = 'menu_daywise';
     let allMenuList = [];
@@ -966,17 +998,39 @@
 
 
     function updateCartDisplay() {
-        const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-        const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        let itemCount = 0;
+        let total = 0;
 
+        cart.forEach(item => {
+            const itemQty = parseFloat(item.quantity) || 0;
+            const itemPrice = parseFloat(item.price) || 0;
+
+            // Add main item
+            itemCount += itemQty;
+            total += itemPrice * itemQty;
+
+            // Add additional items if present
+            if (item.additional_items && Array.isArray(item.additional_items)) {
+                item.additional_items.forEach(add => {
+                    const addQty = parseFloat(add.quantity) || 0;
+                    const addPrice = parseFloat(add.price) || 0;
+
+                    itemCount += addQty;
+                    total += addPrice * addQty;
+                });
+            }
+        });
+
+        // Update display
         if (itemCount == 0) {
             $('#cartCountMobile').hide();
         } else {
             $('#cartCountMobile').show();
         }
-        $('#cartCountMobile').text(`${itemCount>0?itemCount+'':''}`);
-        $('#cartCount').text(`${itemCount>0?itemCount+' items':'Cart'}`);
-        $('#cartTotal').text(`${(total!=0)?'$'+total.toFixed(2):''}`);
+
+        $('#cartCountMobile').text(`${itemCount > 0 ? itemCount + '' : ''}`);
+        $('#cartCount').text(`${itemCount > 0 ? itemCount + ' items' : 'Cart'}`);
+        $('#cartTotal').text(`${total != 0 ? '$' + total.toFixed(2) : ''}`);
     }
 
     function removeFromCart(cartId) {
@@ -1227,7 +1281,7 @@
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     const minDate = tomorrow.toISOString().split('T')[0];
-                    const alacarteOrderDate= localStorage.getItem('alacarte_orderdate') || "";
+                    const alacarteOrderDate = localStorage.getItem('alacarte_orderdate') || "";
                     html += `
                             <div class=" p-2 mt-3">
                                 <label class="form-label fw-medium">Order Date</label>
@@ -1437,7 +1491,7 @@
         if ($(this).val()) {
             localStorage.setItem('alacarte_orderdate', $(this).val());
 
-        }else{
+        } else {
             localStorage.remove('alacarte_orderdate');
 
         }
@@ -2075,8 +2129,75 @@
 
         $(document).on('click', '.addAddressBtn', function() {
             $("#form_addnewaddress")[0].reset();
+            $(".addAddressModal_model").text("Add");
             // $("#checkoutModal").modal('toggle');
             $('#addAddressModal').modal('toggle');
+            setTimeout(() => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const latLng = {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude
+                        };
+                        map.setCenter(latLng);
+                        map.setZoom(15);
+                        marker.setPosition(latLng);
+                        reverseGeocode(latLng);
+                    });
+                }
+            }, 2000);
+        });
+        $(document).on('click', '.editAddressBtn', function() {
+            const addrData = JSON.parse($(this).attr('data-addr'));
+            $('#addAddressModal').modal('toggle');
+
+            $(".addAddressModal_model").text("Edit");
+
+            setTimeout(() => {
+                const fullAddress = [
+                    addrData?.address_line1,
+                    addrData?.address_line2,
+                    addrData?.pincode
+                ].filter(Boolean).join(', ');
+                if (addrData?.lat && addrData?.long) {
+                    // If coordinates exist, set directly
+                    const pos = {
+                        lat: parseFloat(addrData.lat),
+                        lng: parseFloat(addrData.long)
+                    };
+                    map.setCenter(pos);
+                    map.setZoom(15);
+                    marker.setPosition(pos);
+                } else {
+                    geocoder.geocode({
+                        address: fullAddress
+                    }, (results, status) => {
+                        if (status === 'OK' && results[0] && results[0].geometry) {
+                            const pos = results[0].geometry.location;
+                            map.setCenter(pos);
+                            map.setZoom(15);
+                            marker.setPosition(pos);
+                            fillAddressFields(results[0]); // optional: fill form again from geocode
+                        } else {
+                            console.warn('Could not find coordinates for this address');
+                        }
+                    });
+                }
+
+
+                $("#newAddressId").val(addrData?.id || "");
+                $("#newAddressType").val(addrData?.address_type || "");
+                $("#newAddress1").val(addrData?.address_line1 || "");
+                $("#newAddress2").val(addrData?.address_line2 || "");
+                $("#newPincode").val(addrData?.pincode || "");
+
+            }, 2000); // 1000ms = 1 second
+
+            // $("#form_addnewaddress")[0].reset();
+        });
+        $(document).on('click', '.deleteAddressBtn', function() {
+            $("#confirm_delete_address_message").modal('toggle');
+            $("#hid_delete_addressid").val($(this).attr('data-id'));
         });
 
         $('#form_addnewaddress').validate({
@@ -2288,20 +2409,32 @@
                                 selectedAddress = addr
                             }
                             addressHtml += `
-                    <div class="address-card card mb-2" onclick="selectAddress(${addr.id})">
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-start gap-3">
-                                <input type="radio" name="address" ${addr.is_default ? 'checked' : ''}  value="${addr.id}" class="form-check-input mt-1">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <strong class="text-primary">${addr.address_type || "Default"}</strong>
-                                        ${addr.is_default ? '<span class="badge bg-success">Default</span>' : ''}
-                                    </div>
-                                    <p class="text-muted mb-0 small">${fullAddress}</p>
+                        <div class="address-card card mb-2" onclick="selectAddress(${addr.id})">
+                        <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                            <!-- Left: Radio + Address -->
+                            
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                            <input type="radio" name="address" ${addr.is_default ? 'checked' : ''} value="${addr.id}" class="form-check-input" style="padding:7px;">
+                          
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                <strong class="text-primary">${addr.address_type || "Default"}</strong>
+                                ${addr.is_default ? '<span class="badge bg-success">Default</span>' : ''}
+                                </div>
+                                <p class="text-muted mb-0 small">${fullAddress}</p>
+                            </div>
+                              <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary editAddressBtn"   data-addr='${JSON.stringify(addr)}'>
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger deleteAddressBtn" data-id='${addr.id}'>
+                                    <i class="bi bi-trash"></i>
+                                </button>
                                 </div>
                             </div>
+
                         </div>
-                    </div>
+                        </div>
                 `;
                         });
                     }
@@ -2347,7 +2480,7 @@
                 bgColor: 'bg-primary-subtle'
             },
             'alacarte': {
-                name: 'Alacarte',
+                name: 'Catering Platters',
                 icon: 'fas fa-plate-wheat',
                 color: 'success',
                 bgColor: 'bg-success-subtle'
@@ -2532,8 +2665,8 @@
         }
         summaryHtml += `<hr>`;
         console.log("is_subscription_exist " + is_subscription_exist)
-        summaryHtml += `
-                <p>Remaining meal : ${mealRemaining}</p>`;
+        // summaryHtml += `
+        //         <p>Remaining meal : ${mealRemaining}</p>`;
         summaryHtml += `
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Total:</strong>
@@ -2544,7 +2677,7 @@
         summaryHtml += `
                 <div class="d-flex justify-content-between align-items-center mt-2">
                     <strong>USD 0.8</strong>
-                    <strong class="text-success">$${total.toFixed(2)*1.25}</strong>
+                    <strong class="text-success">$${(total * 1.25).toFixed(2)}</strong>
 
                 </div>
             `;
@@ -2593,7 +2726,8 @@
     }
 
     function completeOrder() {
-
+        const $btn = $('#placeOrderBtn');
+        const $spinner = $btn.find('.spinner-border');
         if (!selectedAddress?.id) {
             toastFail("Please select a delivery address");
             return;
@@ -2621,8 +2755,8 @@
                 alacarteorder_date: alacarteorder_date,
             },
             beforeSend: function() {
-                $(".loader-wrapper").css("display", "flex")
-
+                $spinner.removeClass('d-none');
+                $btn.prop('disabled', true);
             },
             success: function(response) {
                 // Handle success response
@@ -2649,7 +2783,8 @@
                 toastFail(errors)
             },
             complete: function() {
-                $(".loader-wrapper").css("display", "none")
+                $spinner.addClass('d-none');
+                $btn.prop('disabled', false);
             },
         });
 

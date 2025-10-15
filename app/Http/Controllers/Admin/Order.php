@@ -426,6 +426,30 @@ class Order extends Controller
                         });
                     }
                 }
+                if ($request->input('drp_status') == 'cancelled') {
+                    $data = [
+                        'customerName' => $existCustomer->name,
+                        'orderId' => $existOrder->order_id,
+                        'orderDate' => $existOrder->order_date,
+                        'email' => $existCustomer->email,
+                        'reason' => $existOrder->note ? '<p>Reason: ' . htmlspecialchars($existOrder->note) . '</p>' : '',
+                    ];
+                    if ($existCustomer->email) {
+                        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                            ->asForm()
+                            ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                                'To' => '+91' . $existCustomer->phone,
+                                'From' => env('TWILIO_PHONE'),
+                                'Body' => 'We’re sorry to inform you that your Order #' . $existOrder->order_id . ' Placed for ' . $existOrder->order_date . ' has been cancelled.'
+                            ]);
+                        Mail::send('email.admin_cancel_order', $data, function ($message) use ($data) {
+                            $message->to($data['email'])
+                                ->from('info@desikitchen-ky.com', 'Desi Kitchen')
+                                ->subject('Desi Kitchen - Order Cancelled');
+                        });
+                    }
+                    $existOrder->delete();
+                }
 
                 return response()->json([
                     "success" => true,

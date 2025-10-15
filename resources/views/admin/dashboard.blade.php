@@ -211,11 +211,8 @@
                         <input type="hidden" name="hid_orderid" id="hid_orderid">
                         <select name="drp_status" id="drp_status" class="form-select">
                             <option value="">Select status</option>
-                            <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="preparing">Preparing</option>
-                            <option value="ready">Ready</option>
+                            <option value="cancelled">Cancelled</option>
                             <option value="dispatched">Dispatched</option>
                             <option value="delivered">Delivered</option>
                         </select>

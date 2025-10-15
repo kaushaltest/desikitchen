@@ -32,4 +32,88 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="confirm_delete_address_message" tabindex="-1" style="z-index:1000000000000000;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                    Message
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="form_delete_address" method="post">
+                <input type="hidden" id="hid_delete_addressid" name="hid_delete_addressid">
+                <div class="modal-body">
+                    <p>Are you sure want to delete this address ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#form_delete_address').validate({
+            rules: {},
+            messages: {},
+            errorElement: "div",
+            errorClass: "invalid-feedback",
+            highlight: function(element) {
+                $(element).addClass("is-invalid");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("is-invalid");
+            },
+            errorPlacement: function(error, element) {
+                const $group = element.closest(".input-group");
+                if ($group.length) {
+                    error.insertAfter($group);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            submitHandler: function(form, event) {
+                const formData = new FormData(form);
+                // event.preventDefault();
+                $.ajax({
+                    url: "{{ route('customer.delete-address') }}", // Change this to your server endpoint
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".loader-wrapper").css("display", "flex")
+
+                    },
+                    success: function(response) {
+                        // Handle success response
+                        if (response.success) {
+                            toastSuccess(response.message);
+                            $('#confirm_delete_address_message').modal('toggle');
+                            selectedAddress=null;
+                            showCheckout();
+                        } else {
+                            toastFail((response.message) ? response.message : "Something went wrong. Please contact our team or try after some time.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        var errors = xhr.responseJSON.errors;
+                        toastFail(errors)
+                    },
+                    complete: function() {
+                        $(".loader-wrapper").css("display", "none")
+                    },
+                });
+
+            }
+        });
+    })
+</script>
 @endsection

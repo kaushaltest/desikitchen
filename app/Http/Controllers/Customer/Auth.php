@@ -322,7 +322,9 @@ class Auth extends Controller
     {
         $mobile = session('user_phone');
         $data = Auth_model::where('phone', $mobile)
-            ->with('address') // just load address normally, no need to filter it
+            ->with(['address' => function ($query) {
+                $query->where('is_active', 1);
+            }])
             ->first(); // since mobile should be unique
         return response()->json([
             "success" => true,

@@ -96,7 +96,7 @@
         /* white background for readability */
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         border-radius: 4px;
-        padding: 6px 12px;
+        /* padding: 6px 12px; */
     }
 
     .address-form-section {
@@ -256,7 +256,8 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="modal-body" id="mapSelectForm" style="display: none;">
-
+                                                <input type="hidden" name="lat" id="lat">
+                                                <input type="hidden" name="long" id="long">
                                                 <div class="position-relative">
                                                     <div class="map-search-box">
                                                         <input type="text" class="form-control" id="searchBox2" placeholder="Search for a location...">
@@ -422,6 +423,8 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="modal-body">
+                                                    <input type="hidden" name="newLat" id="newLat">
+                                                    <input type="hidden" name="newLong" id="newLong">
                                                     <div class="position-relative">
                                                         <div class="">
                                                             <input type="text" class="form-control" id="searchBox1" placeholder="Search for a location...">
@@ -505,6 +508,8 @@
     <!--end::App Content-->
 </main>
 <script src="{{asset('admin-assets/validation/neworder.js')}}"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places&callback=initMap" async defer></script>
+
 <script>
     // Sample data with detailed addresses
 
@@ -626,15 +631,52 @@
                 location: location
             }, (results, status) => {
                 if (status === "OK" && results[0]) {
-                    const c = {};
-                    (results[0].address_components || []).forEach(comp => {
-                        comp.types.forEach(t => {
-                            c[t] = comp.long_name;
+                    let c = {};
+                    let placeAdd = results[0];
+                    if (placeAdd.address_components) {
+                        (placeAdd.address_components || []).forEach(comp => {
+                            comp.types.forEach(t => {
+                                c[t] = comp.long_name;
+                            });
                         });
-                    });
+                    }
+                    // Case 2: simplified object (direct keys)
+                    else {
+                        c = placeAdd;
+                    }
 
-                    document.getElementById(opts.addrLine1Id).value = [c.premise, c.street_number, c.route, c.subpremise].filter(Boolean).join(" ");
-                    document.getElementById(opts.addrLine2Id).value = [c.sublocality, c.administrative_area_level_2, c.locality].filter(Boolean).join(" ");
+                    // --- Line 1: detailed local address ---
+                    let line1Parts = [];
+                    if (c.premise) line1Parts.push(c.premise);
+                    if (c.route) line1Parts.push(c.route);
+                    if (c.sublocality_level_2) line1Parts.push(c.sublocality_level_2);
+                    if (c.sublocality_level_1 && !line1Parts.includes(c.sublocality_level_1))
+                        line1Parts.push(c.sublocality_level_1);
+                    else if (c.sublocality) line1Parts.push(c.sublocality);
+
+                    // --- Line 2: broader region info ---
+                    let line2Parts = [];
+                    if (c.locality) line2Parts.push(c.locality);
+                    if (c.administrative_area_level_1) line2Parts.push(c.administrative_area_level_1);
+                    if (c.country) line2Parts.push(c.country);
+
+                    let lat = null,
+                        lng = null;
+                    if (placeAdd.geometry && placeAdd.geometry.location) {
+                        lat = placeAdd.geometry.location.lat();
+                        lng = placeAdd.geometry.location.lng();
+                    } else if (placeAdd.lat && placeAdd.lng) {
+                        lat = placeAdd.lat;
+                        lng = placeAdd.lng;
+                    }
+
+                    if (lat && lng) {
+                        document.getElementById(opts.lat).value = lat;
+                        document.getElementById(opts.long).value = lng;
+                    }
+
+                    document.getElementById(opts.addrLine1Id).value = line1Parts.join(", ");
+                    document.getElementById(opts.addrLine2Id).value = line2Parts.join(", ");
                     document.getElementById(opts.pinId).value = c.postal_code || "";
                     document.getElementById(opts.infoBoxId).style.display = "block";
                     document.getElementById(opts.textId).textContent = results[0].formatted_address;
@@ -657,7 +699,9 @@
             textId: "selectedLocationText1",
             addrLine1Id: "newAddress1",
             addrLine2Id: "newAddress2",
-            pinId: "newPincode"
+            pinId: "newPincode",
+            lat: "newLat",
+            long: "newLong"
         });
 
         maps.map2 = initLocationPicker({
@@ -667,7 +711,9 @@
             textId: "selectedLocationText",
             addrLine1Id: "address1Input",
             addrLine2Id: "address2Input",
-            pinId: "pincodeInput"
+            pinId: "pincodeInput",
+            lat: "lat",
+            long: "long"
         });
 
         // Re-center maps when modals show
@@ -722,11 +768,14 @@
                     return;
                 }
             }
-
+            $("#newUserForm").hide();
+            $('#mapSelectForm').hide();
+            $("#continueCheckoutBtn").hide();
+            $('#saveUserBtn').hide();
             if (!currentUser) {
                 $('#userModal .modal-dialog').removeClass('model-lg');
                 $('#userModal .modal-dialog').addClass('model-xl');
-
+                $("#form_addnewuser")[0].reset();
                 $('#cartModal').modal('hide');
                 $('#userModal').modal('show');
             } else {
@@ -746,6 +795,7 @@
         // Continue to checkout
         $('#continueCheckoutBtn').click(function() {
             $('#userModal').modal('hide');
+
             showCheckout();
         });
 
@@ -1178,8 +1228,27 @@
     }
 
     function updateCartDisplay() {
-        const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-        const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        let itemCount = 0;
+        let total = 0;
+        cart.forEach(item => {
+            const itemQty = parseFloat(item.quantity) || 0;
+            const itemPrice = parseFloat(item.price) || 0;
+
+            // Add main item
+            itemCount += itemQty;
+            total += itemPrice * itemQty;
+
+            // Add additional items if present
+            if (item.additional_items && Array.isArray(item.additional_items)) {
+                item.additional_items.forEach(add => {
+                    const addQty = parseFloat(add.quantity) || 0;
+                    const addPrice = parseFloat(add.price) || 0;
+
+                    itemCount += addQty;
+                    total += addPrice * addQty;
+                });
+            }
+        });
         $('#cartCount').text(`${itemCount} items`);
         $('#cartTotal').text(`$${total.toFixed(2)}`);
     }
@@ -1797,7 +1866,7 @@
                 </div>
                  <div class="d-flex justify-content-between align-items-center mt-2">
                     <strong>USD 0.8</strong>
-                    <strong class="text-success">$${total.toFixed(2)*1.25}</strong>
+                    <strong class="text-success">$${(total * 1.25).toFixed(2)}</strong>
 
                 </div>
             `;
@@ -1949,6 +2018,5 @@
         }
     });
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWYgnYkmhhENengt8Gv1qPHnyc5KxMuFk&libraries=places&callback=initMap" async defer></script>
 
 @endsection

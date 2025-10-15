@@ -35,8 +35,8 @@ class Useraddress extends Controller
                 'address_line1' => $request->input('address1Input'),
                 'address_line2' => $request->input('address2Input'),
                 // 'city' => $request->input('cityInput'),
-                // 'state' => $request->input('stateInput'),
-                // 'country' => $request->input('countryInput'),
+                'lat' => $request->input('lat'),
+                'long' => $request->input('long'),
                 'pincode' => $request->input('pincodeInput'),
                 'is_default' => 1
             ];
@@ -66,6 +66,8 @@ class Useraddress extends Controller
                 'address_type' => $request->input('newAddressType'),
                 'address_line1' => $request->input('newAddress1'),
                 'address_line2' => $request->input('newAddress2'),
+                'lat' => $request->input('newLat'),
+                'long' => $request->input('newLong'),
                 // 'city' => $request->input('newCity'),
                 // 'state' => $request->input('newState'),
                 // 'country' => $request->input('newCountry'),

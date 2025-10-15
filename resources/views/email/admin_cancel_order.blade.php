@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ Your Desi Kitchen Tiffin has been delivered!</title>
+    <title>❌ Your Desi Kitchen Order Has Been Cancelled</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .header {
-            background-color: #FEA116;
+            background-color: #FEA116; /* red for cancellation */
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -39,7 +39,7 @@
             margin: 10px 0;
         }
         .highlight {
-            background-color: #f2f2f2;
+            background-color: #f2f2f2; /* light red background */
             padding: 15px;
             border-radius: 5px;
             margin: 15px 0;
@@ -64,20 +64,22 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>✅ Your Desi Kitchen Tiffin has been delivered!</h1>
+            <h1>❌ Your Desi Kitchen Order Has Been Cancelled</h1>
         </div>
 
         <!-- Content -->
         <div class="content">
             <p>Hello <strong>{{ $customerName }}</strong> 🙏,</p>
 
-            <p>We are happy to inform you that your Desi Kitchen tiffin <strong>Order #{{ $orderId }}</strong> for <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> has been successfully delivered.</p>
-
+            <p>We’re sorry to inform you that your order <strong>#{{ $orderId }}</strong> Placed for <strong>{{ $orderDate }}</strong> has been <strong>cancelled</strong>.</p>
+            {!! $reason !!}
             <div class="highlight">
-                <p>We hope you enjoyed your fresh vegetarian meal 🌱💚</p>
+                <p>If the payment was completed, it will be refunded.</p>
+                <p>For any concerns or clarification, please contact our support team at <strong>info@desikitchen-ky.com</strong>.</p>
             </div>
 
-            <p>Thanks for choosing us!<br><strong>Team Desi Kitchen</strong></p>
+            <p>We hope to serve you again soon 🍱</p>
+            <p>Thanks,<br><strong>Team Desi Kitchen</strong></p>
         </div>
 
         <!-- Footer -->

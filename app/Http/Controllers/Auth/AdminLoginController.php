@@ -85,7 +85,9 @@ class AdminLoginController extends Controller
     {
         $mobile = $request->input('mobile');
         $data = KitUser::where('phone', $mobile)
-            ->with('address') // just load address normally, no need to filter it
+        ->with(['address' => function ($query) {
+            $query->where('is_active', 1);
+        }])
             ->first(); // since mobile should be unique
         return response()->json([
             "success" => true,

@@ -141,6 +141,28 @@
 
 </div>
 </div>
+<div class="modal fade" id="confirm_delete_order_message" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                    Message
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <input type="hidden" id="hid_cancel_orderid" name="hid_cancel_orderid">
+            <div class="modal-body">
+                <p>Are you sure want to cancel this Order ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="btn_cancel_order">
+                    <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                    Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 <script>
     const orderUrl = "{{ route('customer.get-order') }}";
@@ -249,7 +271,9 @@
                 </div>
                 <div class="text-end">
                     ${statusBadge}
-                    <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}">Cancel Order</button>
+                    <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}">
+                                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                    Cancel Order</button>
                 </div>
             </div>
         </div>
@@ -357,45 +381,52 @@
     }
 
     $(document).ready(function() {
+
+        $(document).on("click", "#btn_cancel_order", function() {
+            const $btn = $('#btn_cancel_order');
+            const $spinner = $btn.find('.spinner-border');
+
+            let orderId = $("#hid_cancel_orderid").val();
+            const formData = new FormData();
+            formData.append('order_id', orderId)
+
+            $.ajax({
+                url: "{{ route('customer.cancel-order') }}", // Change this to your server endpoint
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $spinner.removeClass('d-none');
+                    $btn.prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastSuccess((response.message) ? response.message : "Something went wrong. Please try again later.");
+                        $("#confirm_delete_order_message").modal('toggle');
+                        loadOrders()
+                    } else {
+                        toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    var errors = xhr.responseJSON.errors;
+                    toastFail(errors)
+                },
+                complete: function() {
+                    $spinner.addClass('d-none');
+                    $btn.prop('disabled', false);
+                },
+            });
+        })
+
         $(document).on('click', '.btn-cancel-order', function() {
-            let confirmOrder = confirm("Are you sure you want to delete this order?");
-            if (confirmOrder) {
-                let orderId = $(this).attr('data-id');
-                const formData = new FormData();
-                formData.append('order_id', orderId)
-
-                $.ajax({
-                    url: "{{ route('customer.cancel-order') }}", // Change this to your server endpoint
-                    type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function() {
-                        $(".loader-wrapper").css("display", "flex")
-
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            toastSuccess((response.message) ? response.message : "Something went wrong. Please try again later.");
-                            loadOrders()
-                        } else {
-                            toastFail((response.message) ? response.message : "Something went wrong. Please try again later.");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle error response
-                        var errors = xhr.responseJSON.errors;
-                        toastFail(errors)
-                    },
-                    complete: function() {
-                        $(".loader-wrapper").css("display", "none")
-                    },
-                });
-            }
-
+            $("#hid_cancel_orderid").val($(this).attr('data-id'));
+            $("#confirm_delete_order_message").modal('toggle');
         })
     });
 </script>
