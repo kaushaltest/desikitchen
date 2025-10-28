@@ -210,8 +210,10 @@
                 if (response?.data) {
                     categoryArrGetId = response?.data;
                     response?.data.forEach(ele => {
-                        html += `<option value="${ele.id}">${ele.category}</option>`;
-                        categoryArr.push(ele.category); // 👈 collect categories
+                        if (ele?.is_delete) {
+                            html += `<option value="${ele.id}">${ele.category}</option>`;
+                            categoryArr.push(ele.category); 
+                        }
                     });
 
                 }

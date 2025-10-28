@@ -48,6 +48,7 @@ class Auth extends Controller
             'user_phone' => $user->phone,
             'user_name' => $user->name,
             'user_email' => $user->email,
+            'user_code' => $user->country_code
             // any other needed payload
         ]);
 
@@ -93,11 +94,11 @@ class Auth extends Controller
     {
         $otp = $request->input('otp');
         $mobile = $request->input('mobile');
-
+        $code  = $request->input('code');
         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
             ->asForm()
             ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/VerificationCheck", [
-                'To' => '+91' . $mobile,
+                'To' => $code . $mobile,
                 'Code' => $otp
             ]);
 
@@ -117,6 +118,7 @@ class Auth extends Controller
                 $data = Auth_model::create([
                     'phone' => $mobile,
                     'name'  => 'Guest User', // you can make this dynamic if needed
+                    'country_code' => $code,
                     'role' => 'guest'
                 ]);
             }
@@ -126,6 +128,7 @@ class Auth extends Controller
                 'user_phone' => $data->phone,
                 'user_name' => $data->name,
                 'user_email' => $data->email,
+                'user_code' => $code
                 // any other needed payload
             ]);
 
@@ -146,10 +149,11 @@ class Auth extends Controller
     public function guestLoginOTP(Request $request)
     {
         $mobile = $request->input('mobile');
+        $code = $request->input('code');
         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
             ->asForm()
             ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/Verifications", [
-                'To' => '+91' . $mobile,
+                'To' => $code . $mobile,
                 'Channel' => 'sms'
             ]);
         if ($response->failed()) {
@@ -182,6 +186,7 @@ class Auth extends Controller
     {
         $email = $request->input('txt_new_email');
         $mobile = $request->input('txt_new_mobile');
+        $code = $request->input('txt_new_countrycode');
         $data = Auth_model::where('email', $email)->where('is_created_by_admin', false)
             ->first();
         if ($data) {
@@ -194,7 +199,7 @@ class Auth extends Controller
         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
             ->asForm()
             ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/Verifications", [
-                'To' => '+91' . $mobile,      // e.g. +919876543210
+                'To' => $code . $mobile,      // e.g. +919876543210
                 'Channel' => 'sms'
             ]);
         if ($response->failed()) {
@@ -230,11 +235,11 @@ class Auth extends Controller
         $email = $request->input('email');
         $mobile = $request->input('mobile');
         $password = $request->input('password');
-
+        $country_code = $request->input('country_code');
         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
             ->asForm()
             ->post("https://verify.twilio.com/v2/Services/" . env('TWILIO_VERIFY_SID') . "/VerificationCheck", [
-                'To' => '+91' . $mobile,
+                'To' => $country_code . $mobile,
                 'Code' => $otp
             ]);
 
@@ -281,6 +286,7 @@ class Auth extends Controller
                     'name'     => $name,
                     'email'    => $email,
                     'phone'    => $mobile,
+                    'country_code'  => $country_code,
                     'password' => Hash::make($password),
                     'role'     => 'user', // default role
                 ]);
@@ -291,6 +297,7 @@ class Auth extends Controller
                 'user_phone' => $user->phone,
                 'user_name'  => $user->name,
                 'user_email' => $user->email,
+                'user_code' => $country_code
             ]);
             // OTP is valid, do your registration/login logic here
 
@@ -320,8 +327,8 @@ class Auth extends Controller
 
     public function getUserAddress(Request $request)
     {
-        $mobile = session('user_phone');
-        $data = Auth_model::where('phone', $mobile)
+        $userId = session('user_id');
+        $data = Auth_model::where('id', $userId)
             ->with(['address' => function ($query) {
                 $query->where('is_active', 1);
             }])

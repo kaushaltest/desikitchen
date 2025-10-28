@@ -51,6 +51,8 @@ class Users extends Controller
                     'email' => $request->input('txt_email'),
                     'phone' => $request->input('txt_phone'),
                     'is_active' => $request->input('rbt_is_active'),
+                    'country_code'=> $request->input('txt_countrycode'),
+                    'is_created_by_admin'=>1,
                     'role' => 'user'
 
                 ];
@@ -91,6 +93,7 @@ class Users extends Controller
                     'name' => $request->input('txt_name'),
                     'email' => $request->input('txt_email'),
                     'phone' => $request->input('txt_phone'),
+                    'country_code'=> $request->input('txt_countrycode'),
                     'is_active' => $request->input('rbt_is_active'),
 
                 ];
@@ -157,6 +160,7 @@ class Users extends Controller
                     'email' => $request->input('txt_email'),
                     'password' => Hash::make($request->input('txt_password')),
                     'phone' => $request->input('txt_phone'),
+                    'country_code' => $request->input('txt_countrycode'),
                     'is_active' => $request->input('rbt_is_active'),
                     'role' => 'admin'
 
@@ -174,6 +178,7 @@ class Users extends Controller
                     'email' => $request->input('txt_email'),
                     'password' =>  Hash::make($request->input('txt_password')),
                     'phone' => $request->input('txt_phone'),
+                    'country_code' => $request->input('txt_countrycode'),
                     'is_active' => $request->input('rbt_is_active'),
 
                 ];

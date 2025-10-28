@@ -174,7 +174,7 @@
                                                 <th>Delivery Date</th>
                                                 <th>Customer</th>
                                                 <!-- <th>Address</th> -->
-                                                <th>Order Type</th>
+                                                <th>Payment Type</th>
                                                 <!-- <th>Menu Type</th> -->
                                                 <th>Item Name</th>
                                                 <th>Total price</th>
@@ -211,9 +211,10 @@
                         <input type="hidden" name="hid_orderid" id="hid_orderid">
                         <select name="drp_status" id="drp_status" class="form-select">
                             <option value="">Select status</option>
+                            <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="cancelled">Cancelled</option>
-                            <option value="dispatched">Dispatched</option>
+                            <option value="outfordelivery">Out For Delivery</option>
                             <option value="delivered">Delivered</option>
                         </select>
                         <div class="form-group">
@@ -223,7 +224,9 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                        <button class="btn btn-primary btn_submit_add_edit_user" type="submit">Submit</button>
+                        <button class="btn btn-primary btn_update_status" type="submit">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            Save</button>
                     </div>
                 </form>
             </div>
@@ -276,17 +279,17 @@
                             let value = parseFloat(cell) || 0;
                             total += value;
                         });
-
                         // Append a new row with TOTAL
-                        let totalRow =
-                            `<row r="${lastRow + 1}">
-                            <c t="inlineStr" r="E${lastRow + 1}">
-                                <is><t style="font-weight:bold">TOTAL</t></is>
-                            </c>
-                            <c t="n" r="F${lastRow + 1}">
-                                <v>$${total.toFixed(2)}</v>
-                            </c>
-                        </row>`;
+                        let totalRow = `
+                            <row r="${lastRow + 1}">
+                                <c t="inlineStr" r="E${lastRow + 1}">
+                                    <is><t>TOTAL</t></is>
+                                </c>
+                                <c t="n" r="F${lastRow + 1}">
+                                    <v>${total.toFixed(2)}</v>
+                                </c>
+                            </row>
+                        `;
 
                         // Add TOTAL row before closing </sheetData>
                         sheet.childNodes[0].childNodes[1].innerHTML += totalRow;
@@ -345,7 +348,7 @@
                 }
             ],
             columns: [{
-                    data: 'id',
+                    data: 'order_id',
                 },
                 {
                     data: 'order_date',
@@ -390,11 +393,14 @@
                 {
                     data: null,
                     render: function(data, type, row) {
-                        return `
+                        let btn = `
                     ${data.next_btn_status}
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        if (data.status != 'Delivered') {
+                            // btn += `  <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>`;
+                        }
+                        return btn;
                     },
                     orderable: false,
                     searchable: false
@@ -474,7 +480,8 @@
 
         $('#dt_orderdata').on('click', '.btn-chanage-status', function(e) {
             e.preventDefault();
-
+            const $btn = $('.btn-chanage-status');
+            const $spinner = $btn.find('.spinner-border');
             const row = $(this).closest('tr');
             const rowData = table.row(row).data();
             const formData = new FormData();
@@ -491,8 +498,8 @@
                 processData: false,
                 contentType: false,
                 beforeSend: function() {
-                    $(".loader-wrapper").css("display", "flex")
-
+                    $spinner.removeClass('d-none');
+                    $btn.prop('disabled', true);
                 },
                 success: function(response) {
                     // Handle success response
@@ -511,7 +518,8 @@
                     toastFail(errors)
                 },
                 complete: function() {
-                    $(".loader-wrapper").css("display", "none")
+                    $spinner.addClass('d-none');
+                    $btn.prop('disabled', false);
                 },
             });
         });
@@ -536,14 +544,13 @@
             let confirmation = confirm("Are you sure want to delete this Order ?");
             if (confirmation) {
                 $.ajax({
-                    url: "{{ route('admin.delete-daywisemenu') }}", // Change this to your server endpoint
+                    url: "{{ route('admin.delete-order') }}", // Change this to your server endpoint
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': "{{ csrf_token() }}"
                     },
                     data: {
-                        user_uid: rowData.id,
-                        image_path: rowData.image_path
+                        order_id: rowData.id,
                     },
                     beforeSend: function() {
                         $(".loader-wrapper").css("display", "flex")
@@ -575,7 +582,8 @@
             messages: validationRules.validationForm.messages,
             submitHandler: function(form, event) {
                 const formData = new FormData(form);
-
+                const $btn = $('.btn_update_status');
+                const $spinner = $btn.find('.spinner-border');
                 // event.preventDefault();
                 $.ajax({
                     url: "{{ route('admin.add-update-order') }}", // Change this to your server endpoint
@@ -587,8 +595,8 @@
                     processData: false,
                     contentType: false,
                     beforeSend: function() {
-                        $(".loader-wrapper").css("display", "flex")
-
+                        $spinner.removeClass('d-none');
+                        $btn.prop('disabled', true);
                     },
                     success: function(response) {
                         // Handle success response
@@ -607,7 +615,8 @@
                         toastFail(errors)
                     },
                     complete: function() {
-                        $(".loader-wrapper").css("display", "none")
+                        $spinner.addClass('d-none');
+                        $btn.prop('disabled', false);
                     },
                 });
 

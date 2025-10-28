@@ -126,6 +126,7 @@ Route::prefix('admin')
         Route::post('/add-new-address', [Useraddress::class, 'addAddress'])->name('add-new-address');
         Route::post('/add-new-user', [Useraddress::class, 'addNewUser'])->name('add-new-user');
         Route::post('/add-order', [Order::class, 'addOrder'])->name('add-order');
+        Route::post('/delete-order', [Order::class, 'deleteOrder'])->name('delete-order');
         Route::post('/add-update-order', [Order::class, 'addUpdateOrder'])->name('add-update-order');
         //table
         Route::get('/tables', [Users::class, 'tables'])->name('tables');
@@ -134,7 +135,7 @@ Route::prefix('admin')
         Route::post('/add-update-table', [Users::class, 'addUpdateTables'])->name('add-update-table');
 
         Route::get('/selecttable', [Tables::class, 'index'])->name('selecttable');
-        Route::get('/tableorder', [Tables::class, 'tableOrder'])->name('tableorder');
+        Route::get('/tableorder/{id}', [Tables::class, 'tableOrder'])->name('tableorder');
         Route::post('/book-table', [Tables::class, 'bookTable'])->name('book-table');
         Route::post('/release-table', [Tables::class, 'releaseTable'])->name('release-table');
         Route::post('/add-table-order', [Order::class, 'addTableOrder'])->name('add-table-order');
@@ -163,30 +164,6 @@ Route::name('customer.')
         Route::post('/verify-otps', [Auth::class, 'verifySMPOtp']);
         Route::post('/send-sms', [Auth::class, 'sendCustomSms']);
 
-
-        Route::post('/get-user-address', [Auth::class, 'getUserAddress'])->name('get-user-address');
-        Route::post('/add-order', [Customerorder::class, 'addOrder'])->name('add-order');
-        Route::post('/add-new-address', [Customeruseraddress::class, 'addAddress'])->name('add-new-address');
-        Route::get('/order', [Customerorder::class, 'index'])->name('order');
-        Route::get('/get-order', [Customerorder::class, 'getOrder'])->name('get-order');
-
-        Route::post('/cancel-order', [Customerorder::class, 'cancelOrder'])->name('cancel-order');
-
-        Route::get('/logout', [Customerorder::class, 'logout'])->name('logout');
-
-        //register
-        Route::post('/register-user-mobile', [Auth::class, 'checkRegisterMobileExist'])->name('register-user-mobile');
-        Route::post('/verify-register-otp', [Auth::class, 'verifyRegisterOTP'])->name('verify-register-otp');
-        Route::post('/guest-login-otp', [Auth::class, 'guestLoginOTP'])->name('guest-login-otp');
-
-
-        //subscription
-        Route::get('/subscription', [CustomerSubscription::class, 'index'])->name('subscription');
-        Route::post('/buy-subscription', [CustomerSubscription::class, 'buySubscription'])->name('buy-subscription');
-
-        Route::get('/profile', [CustomerSubscription::class, 'profile'])->name('profile');
-        Route::get('/check-subscription', [CustomerSubscription::class, 'checkSubscription'])->name('check-subscription');
-
         // More customer routes here
         // Route::middleware('auth')->group(function () {
         //     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
@@ -203,7 +180,40 @@ Route::name('customer.')
         });
         Route::get('/forgot-password', [Auth::class, 'forgotPassword'])->name('forgot-password');
         Route::post('/forgot-password', [Auth::class, 'requestPassword'])->name('forgot-password');
+        //register
+        Route::post('/register-user-mobile', [Auth::class, 'checkRegisterMobileExist'])->name('register-user-mobile');
+        Route::post('/verify-register-otp', [Auth::class, 'verifyRegisterOTP'])->name('verify-register-otp');
+        Route::post('/guest-login-otp', [Auth::class, 'guestLoginOTP'])->name('guest-login-otp');
+
     });
+Route::name('customer.')
+    ->middleware(['web', \App\Http\Middleware\IsCustomerLoggedIn::class])
+    ->group(function () {
+
+
+        Route::post('/get-user-address', [Auth::class, 'getUserAddress'])->name('get-user-address');
+        Route::post('/add-order', [Customerorder::class, 'addOrder'])->name('add-order');
+        Route::post('/add-new-address', [Customeruseraddress::class, 'addAddress'])->name('add-new-address');
+        Route::post('/delete-address', [Customeruseraddress::class, 'deleteAddress'])->name('delete-address');
+
+        Route::get('/order', [Customerorder::class, 'index'])->name('order');
+
+        Route::get('/get-order', [Customerorder::class, 'getOrder'])->name('get-order');
+
+        Route::post('/cancel-order', [Customerorder::class, 'cancelOrder'])->name('cancel-order');
+
+        Route::get('/logout', [Customerorder::class, 'logout'])->name('logout');
+
+        
+
+        //subscription
+        Route::get('/subscription', [CustomerSubscription::class, 'index'])->name('subscription');
+        Route::post('/buy-subscription', [CustomerSubscription::class, 'buySubscription'])->name('buy-subscription');
+
+        Route::get('/profile', [CustomerSubscription::class, 'profile'])->name('profile');
+        Route::get('/check-subscription', [CustomerSubscription::class, 'checkSubscription'])->name('check-subscription');
+    });
+
 Route::get('/reset-password/{token}', [Auth::class, 'create'])
     ->middleware('guest')
     ->name('password.reset');

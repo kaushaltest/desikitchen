@@ -141,7 +141,21 @@
                             <label class="col-form-label" for="txt_category">Name</label>
                             <input class="form-control me-2" id="txt_category" type="text" name="txt_category">
                         </div>
+                        <div>
+                            <label class="col-form-label">Is Active</label>
+                            <div class="form-check-size rtl-input mt-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_active" type="radio" name="rbt_is_active" value="1" checked="">
+                                    <label class="form-check-label" for="rbt_status_active">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input me-2" id="rbt_status_inactive" type="radio" name="rbt_is_active" value="0">
+                                    <label class="form-check-label" for="rbt_status_inactive">No</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
                         <button class="btn btn-primary" type="submit">Submit</button>
@@ -195,10 +209,13 @@
                 // Handle success response
                 let html = '<option value="">Select Category</option>';
                 if (response?.data) {
-                    categoryArrGetId=response?.data;
+                    categoryArrGetId = response?.data;
                     response?.data.forEach(ele => {
-                        html += `<option value="${ele.id}">${ele.category}</option>`;
-                        categoryArr.push(ele.category); // 👈 collect categories
+                        if (ele?.is_delete) {
+                            html += `<option value="${ele.id}">${ele.category}</option>`;
+                            categoryArr.push(ele.category); 
+                        }
+                       // 👈 collect categories
                     });
 
                 }

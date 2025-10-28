@@ -81,8 +81,15 @@
                             <label class="col-form-label" for="txt_email">Email</label>
                             <input class="form-control" id="txt_email" type="text" name="txt_email" placeholder="Enter email">
                         </div>
-                        <div class="form-group">
-                            <label class="col-form-label" for="txt_phone">Phone</label>
+                        <label class="col-form-label" for="txt_phone">Phone</label>
+
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <select class="form-control" name="txt_countrycode" id="txt_countrycode">
+                                    <option value="+91">+91</option>
+                                    <option value="+1" selected="">+1</option>
+                                </select>
+                            </div>
                             <input class="form-control" id="txt_phone" type="number" name="txt_phone" placeholder="Enter phone">
                         </div>
                         <div>
@@ -195,6 +202,7 @@
             $('#txt_name').val(rowData.name);
             $('#txt_email').val(rowData.email);
             $('#txt_phone').val(rowData.phone);
+            $('#txt_countrycode').val(rowData.country_code);
             $('input[name="rbt_is_active"][value="' + rowData.is_active + '"]').prop('checked', true);
 
             // Show the modal

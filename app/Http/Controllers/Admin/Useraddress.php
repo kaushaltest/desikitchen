@@ -23,6 +23,7 @@ class Useraddress extends Controller
         try {
             $user = KitUser::create([
                 'phone' => $request->input('mobileInput'),
+                'country_code' => $request->input('countryCodeInput'),
                 'name' => $request->input('userNameInput'),
                 'email' => $request->input('userEmailInput'),
                 'is_created_by_admin'=>true

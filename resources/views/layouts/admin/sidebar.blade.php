@@ -90,13 +90,13 @@
                 <li class="nav-item ">
                     <a href="{{ route('admin.users') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
-                        <p>Manage User</p>
+                        <p>Manage Users</p>
                     </a>
                 </li>
                 <li class="nav-item ">
                     <a href="{{ route('admin.admin-user') }}" class="nav-link">
                         <i class="nav-icon bi bi-person"></i>
-                        <p>Admin User</p>
+                        <p>Add Employee</p>
                     </a>
                 </li>
                 <li class="nav-item ">

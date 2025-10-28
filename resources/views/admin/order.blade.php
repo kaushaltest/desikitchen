@@ -295,8 +295,9 @@
                     render: function(data, type, row) {
                         return `
                         <a  class="text-success m-2 btn-menu-edit"><i class="fa fa-edit"></i></a>
-                       <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
                         `;
+                        // <a  class="text-danger btn-menu-delete m-2"><i class="fa fa-trash"></i></a>
+
                     },
                     orderable: false,
                     searchable: false

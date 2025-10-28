@@ -521,4 +521,13 @@
     </div>
 </div> -->
 <!-- Testimonial End -->
+<script src="{{ asset('customer-assets/customtoast.js')}}"></script>
+
+<script>
+    var loggedoutmsg = '{{session("error")}}';
+    if(loggedoutmsg){
+        toastFail(loggedoutmsg);
+
+    }
+</script>
 @endsection

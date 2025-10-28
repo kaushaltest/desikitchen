@@ -179,13 +179,13 @@ class Order extends Controller
                 return $query->where('created_by', Auth::user()->id);
             });
         if ($request->filter === 'today') {
-            $query->whereDate('created_at', Carbon::today());
+            $query->whereDate('order_date', Carbon::today());
         } elseif ($request->filter == 'weekly') {
-            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $query->whereBetween('order_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
         } elseif ($request->filter == 'monthly') {
-            $query->whereMonth('created_at', Carbon::now()->month);
+            $query->whereMonth('order_date', Carbon::now()->month);
         } elseif ($request->filter == 'custom' && $request->fromDate && $request->toDate) {
-            $query->whereBetween('created_at', [$request->fromDate, $request->toDate]);
+            $query->whereBetween('order_date', [$request->fromDate, $request->toDate]);
         }
 
         $orders = $query->get();
@@ -288,6 +288,9 @@ class Order extends Controller
             if ($currentIndex !== false && $currentIndex < count($statuses) - 1) {
                 $nextStatus = $statuses[$currentIndex + 1];
             }
+            $rate = 0.25;
+            $base = ($order->total_amount / (1 + $rate));
+
             return [
                 'id'            => $order->id,
                 'customer'      => $order->user,
@@ -295,6 +298,7 @@ class Order extends Controller
                     ? "{$order->address->label}<br>{$order->address->address_line1}, {$order->address->address_line2}<br>{$order->address->city} - {$order->address->pincode}<br>"
                     : 'Table Order',
                 'items'         => $itemHtmlList,
+                'order_id' => $order->order_id,
                 'order_type'    => ucfirst($order->order_type),
                 'order_status'    => ucfirst($order->order_status),
                 'order_date'    =>  Carbon::parse($order->order_date)->format('d-m-Y'),
@@ -303,7 +307,8 @@ class Order extends Controller
                 'status_cap' => $this->getStatusName($order->status),
                 'next_btn_status' => ($nextStatus) ? $this->getStatusButton($nextStatus) : '',
                 'status_badge'  => $this->getStatusBadge($order->status),
-                'total_amount'  => number_format($order->total_amount, 2),
+                // 'total_amount'  => number_format($order->total_amount, 2),
+                'total_amount' => number_format($base, 2),
                 'created_at'    => Carbon::parse($order->created_at)->format('d-m-Y H:i'),
             ];
         });
@@ -315,21 +320,21 @@ class Order extends Controller
 
     private function getStatusBadge($status)
     {
-        $colors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
+        $colors = ['pending' => 'warning', 'confirmed' => 'success', 'cancelled' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
         $color = $colors[$status] ?? 'secondary';
         return "<span class='badge bg-{$color}'>" . ucfirst($status) . "</span>";
     }
     private function getStatusButton($status)
     {
-        $statusname = ['warning' => 'Warning', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
+        $statusname = ['warning' => 'Warning', 'confirmed' => 'Confirmed', 'cancelled' => 'Cancelled', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
         $colors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
         $color = $colors[$status] ?? 'secondary';
-        return "<button  class='btn btn-{$color} btn-chanage-status p-1'>" . ucfirst($statusname[$status]) . "</button>";
+        return "<button  class='btn btn-{$color} btn-chanage-status p-1'><span class='spinner-border spinner-border-sm me-2 d-none' role='status' aria-hidden='true'></span>" . ucfirst($statusname[$status]) . "</button>";
     }
     private function getStatusName($status)
     {
-        $statusname = ['warning' => 'Warning', 'confirmed' => 'Confirmed', 'rejected' => 'Rejected', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
-        $colors = ['pending' => 'warning', 'confirmed' => 'success', 'rejected' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
+        $statusname = ['pending' => 'Pending', 'confirmed' => 'Confirmed', 'cancelled' => 'Cancelled', 'rejected' => 'Rejected', 'outfordelivery'  => 'Out For Delivery', 'delivered'   => 'Delivered'];
+        $colors = ['pending' => 'warning', 'confirmed' => 'success', 'cancelled' => 'danger', 'outfordelivery'  => 'primary', 'delivered'   => 'success',];
         $color = $colors[$status] ?? 'secondary';
         return "<span class='badge bg-{$color}'>" . ucfirst($statusname[$status]) . "</span>";
     }
@@ -382,7 +387,138 @@ class Order extends Controller
                 );
                 $existOrder = Order_model::find($request->input('hid_orderid'));
                 $existCustomer = KitUser::find($existOrder->user_id);
+                if ($request->input('drp_status') == 'pending') {
+                    $orderHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff;border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
+                    $orderHtml .= '
+                            <div style="background:#FEA116; color:#FFFFFF; padding:10px; text-align:center;">
+                        <h2 style="margin:0;">🧾 Your Order Summary</h2>
+                    </div>
+                    ';
+                    $orderHtml .= '<div style="margin-bottom:5px border-bottom:1px solid #eee;">
+                        <p style="margin:0; font-size:14px;">Date: <strong>' . $existOrder->order_date . '</strong></p>
+                        <p style="margin:0; font-size:14px;">Order ID: <strong>' . $existOrder->order_id . '</strong></p>
+                    </div>';
+                    $existOrderItem = Orderitem_model::where("order_id", $existOrder->id)->get();
+                    $totalAmount = 0;
+                    foreach ($existOrderItem as $orditem) {
+                        $itemName = null;
+                        if ($orditem['item_type'] == 'alacarte') {
+                            $alacarteItem = Alacartemenu_model::find($orditem->item_id);
+                            $itemName = $alacarteItem ? $alacarteItem->name : null;
+                        }
+                        if ($orditem['item_type'] == 'daywise') {
+                            $daywiseItem = Daywisemenu_model::find($orditem->item_id);
+                            $itemName = $daywiseItem ? $daywiseItem->title : null;
+                        }
+                        if ($orditem['item_type'] == 'additional') {
+                            $additionalItem = Additionalmenu_model::find($orditem->item_id);
+                            $itemName = $additionalItem ? $additionalItem->name : null;
+                        }
+                        $totalAmount += $orditem['unit_price'] * $orditem['quantity'];
+                        $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
+                        $orderHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $itemName . '</strong> X ' . $orditem['quantity'] . '</div>';
+                        $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . number_format($orditem['unit_price'] * $orditem['quantity'], 2) . '</div>';
+                        $orderHtml .= '</div>';
+                    }
+                    
+                    $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px solid #ddd; padding-bottom:8px; overflow:hidden;">';
+                    $orderHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>Total</strong></div>';
+                    $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . number_format($totalAmount,2) . '</div>';
+                    $orderHtml .= '</div>';
+                    $finalUSDAmount = $totalAmount * ($totalAmount != 0 ? 1.25 : 1);
+                    $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; padding-bottom:8px; overflow:hidden;">';
+                    $orderHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
+                    $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . number_format($finalUSDAmount,2) . '</strong></div>';
+                    $orderHtml .= '</div></div>';
+                    $data = [
+                        'customerName' => $existCustomer->name,
+                        'orderId' => $existOrder->order_id,
+                        'orderDate' => $existOrder->order_date,
+                        'alacarteHtml' => $orderHtml
+                    ];
 
+                    if ($existCustomer->email) {
+                        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                            ->asForm()
+                            ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
+                                'From' => env('TWILIO_PHONE'),
+                                'Body' => 'Your order ' . $existOrder->order_id . ' for ' .  $existOrder->order_date . ' is currently pending confirmation'
+                            ]);
+
+                        Mail::send('email.pending_confirmation', $data, function ($message) use ($data) {
+                            $message->to(session('user_email'))
+                                ->from('info@desikitchen-ky.com', 'Desi Kitchen')
+                                ->subject('Desi Kitchen - Order Pending Confirmation');
+                        });
+                    }
+                }
+                if ($request->input('drp_status') == 'confirmed') {
+                    $orderHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff;border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
+                    $orderHtml .= '
+                            <div style="background:#FEA116; color:#FFFFFF; padding:10px; text-align:center;">
+                        <h2 style="margin:0;">🧾 Your Order Summary</h2>
+                    </div>
+                    ';
+                    $orderHtml .= '<div style="margin-bottom:5px border-bottom:1px solid #eee;">
+                        <p style="margin:0; font-size:14px;">Date: <strong>' . $existOrder->order_date . '</strong></p>
+                        <p style="margin:0; font-size:14px;">Order ID: <strong>' . $existOrder->order_id . '</strong></p>
+                    </div>';
+                    $existOrderItem = Orderitem_model::where("order_id", $existOrder->id)->get();
+                    $totalAmount = 0;
+                    foreach ($existOrderItem as $orditem) {
+                        $itemName = null;
+                        if ($orditem['item_type'] == 'alacarte') {
+                            $alacarteItem = Alacartemenu_model::find($orditem->item_id);
+                            $itemName = $alacarteItem ? $alacarteItem->name : null;
+                        }
+                        if ($orditem['item_type'] == 'daywise') {
+                            $daywiseItem = Daywisemenu_model::find($orditem->item_id);
+                            $itemName = $daywiseItem ? $daywiseItem->title : null;
+                        }
+                        if ($orditem['item_type'] == 'additional') {
+                            $additionalItem = Additionalmenu_model::find($orditem->item_id);
+                            $itemName = $additionalItem ? $additionalItem->name : null;
+                        }
+                        $totalAmount += $orditem['unit_price'] * $orditem['quantity'];
+                        $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
+                        $orderHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $itemName . '</strong> X ' . $orditem['quantity'] . '</div>';
+                        $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . number_format($orditem['unit_price'] * $orditem['quantity'], 2) . '</div>';
+                        $orderHtml .= '</div>';
+                    }
+                    
+                    $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px solid #ddd; padding-bottom:8px; overflow:hidden;">';
+                    $orderHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>Total</strong></div>';
+                    $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . number_format($totalAmount,2) . '</div>';
+                    $orderHtml .= '</div>';
+                    $finalUSDAmount = $totalAmount * ($totalAmount != 0 ? 1.25 : 1);
+                    $orderHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; padding-bottom:8px; overflow:hidden;">';
+                    $orderHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
+                    $orderHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . number_format($finalUSDAmount,2) . '</strong></div>';
+                    $orderHtml .= '</div></div>';
+                    $data = [
+                        'customerName' => $existCustomer->name,
+                        'orderId' => $existOrder->order_id,
+                        'orderDate' => $existOrder->order_date,
+                        'alacarteHtml' => $orderHtml
+                    ];
+
+                    if ($existCustomer->email) {
+                        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                            ->asForm()
+                            ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
+                                'From' => env('TWILIO_PHONE'),
+                                'Body' => 'Your order ' . $existOrder->order_id . ' for ' .  $existOrder->order_date . ' has been confirmed.'
+                            ]);
+
+                        Mail::send('email.confirmation', $data, function ($message) use ($data) {
+                            $message->to(session('user_email'))
+                                ->from('info@desikitchen-ky.com', 'Desi Kitchen')
+                                ->subject('Desi Kitchen - Order Confirmation');
+                        });
+                    }
+                }
                 if ($request->input('drp_status') == 'outfordelivery') {
                     $data = [
                         'customerName' => $existCustomer->name,
@@ -393,7 +529,7 @@ class Order extends Controller
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                             ->asForm()
                             ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                                'To' => '+91' . $existCustomer->phone,
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'Your order ' . $existOrder->order_id . ' is out for delivery'
                             ]);
@@ -415,7 +551,7 @@ class Order extends Controller
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                             ->asForm()
                             ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                                'To' => '+91' . $existCustomer->phone,
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'We are happy to inform you that your Desi Kitchen Order #' . $existOrder->order_id . ' for ' . $existOrder->order_date . ' has been successfully delivered.'
                             ]);
@@ -438,7 +574,7 @@ class Order extends Controller
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                             ->asForm()
                             ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                                'To' => '+91' . $existCustomer->phone,
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'We’re sorry to inform you that your Order #' . $existOrder->order_id . ' Placed for ' . $existOrder->order_date . ' has been cancelled.'
                             ]);
@@ -448,7 +584,7 @@ class Order extends Controller
                                 ->subject('Desi Kitchen - Order Cancelled');
                         });
                     }
-                    $existOrder->delete();
+                    // $existOrder->delete();
                 }
 
                 return response()->json([
@@ -471,9 +607,16 @@ class Order extends Controller
         try {
             $items = $request->input('cart');
             if (isset($items['daywise'])) {
-
+                $daywiseHtml = '';
                 foreach ($items['daywise'] as $item) {
+                    $daywiseItem = Daywisemenu_model::find($item['db_id']);
+
+                    $daywiseHtml .= '<p><b>Date : ' . $item['order_date'] . '</b></p>';
                     $order_id = $this->generateOrderId();
+                    $daywiseHtml .= '<div class="item-title">';
+                    $daywiseHtml .= '<div>' . $daywiseItem->name . '</div>';
+                    $daywiseHtml .= '<div>' . $item['price'] * $item['quantity'] . '</div>';
+                    $daywiseHtml .= '</div>';
                     $added_data = [
                         'user_id' => $request->input('user_id'),
                         'address_id' => $request->input('address_id'),
@@ -481,7 +624,8 @@ class Order extends Controller
                         'order_date' => $item['order_date'],
                         'order_id' => $order_id,
                         'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
-                        'order_status' => 'Online'
+                        'order_status' => 'Cash',
+                        'status'=> 'confirmed'
                     ];
 
                     $orderinsertedid = Order_model::create($added_data);
@@ -499,14 +643,20 @@ class Order extends Controller
                     if (isset($item['additional_items'])) {
 
                         foreach ($item['additional_items'] as $adt) {
+                            $additionalItem = Additionalmenu_model::find($adt['id']);
                             $additionalItemTotal = $additionalItemTotal + ($item['price'] * $item['quantity']);
+                            $daywiseHtml .= '<div class="item-title">';
+                            $daywiseHtml .= '<div>' . $additionalItem->name . '</div>';
+                            $daywiseHtml .= '<div>' . $adt['price'] * $adt['quantity'] . '</div>';
+                            $daywiseHtml .= '</div>';
+
                             $item_data = [
                                 'order_id' => $orderinsertedid->id,
-                                'item_type' => $item['type'],
-                                'item_id' => $item['db_id'],
-                                'quantity' => $item['quantity'],
-                                'unit_price' => $item['price'],
-                                'total_price' => $item['price'] * $item['quantity'],
+                                'item_type' => $adt['type'],
+                                'item_id' => $adt['id'],
+                                'quantity' => $adt['quantity'],
+                                'unit_price' => $adt['price'],
+                                'total_price' => $adt['price'] * $adt['quantity'],
                             ];
                             Orderitem_model::create($item_data);
                         }
@@ -514,23 +664,31 @@ class Order extends Controller
                     $updated_data = [
                         'total_amount' => $additionalItemTotal + ($item['price'] * $item['quantity']) * ($item['price'] != 0 ? 1.25 : 1),
                     ];
-
+                    $daywiseHtml .= '<div class="item-title">';
+                    $daywiseHtml .= '<div>Total</div>';
+                    $daywiseHtml .= '<div>' . $additionalItemTotal + ($item['price'] * $item['quantity']) . '</div>';
+                    $daywiseHtml .= '</div>';
                     $existCustomer = KitUser::find($request->input('user_id'));
                     if ($existCustomer) {
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                             ->asForm()
                             ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                                'To' => '+91' . $existCustomer->phone,
+                                'To' => $existCustomer->country_code . $existCustomer->phone,
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'Your tiffin order ' . $order_id . ' for ' . $item['order_date'] . ' has been confirmed.'
                             ]);
-                        $data = [
-                            'customerName' => $existCustomer->name,
-                            'orderId' => $order_id,
-                            'orderDate' => $item['order_date'],
-                            'email' => $existCustomer->email
-                        ];
                         if (!empty($existCustomer->email)) {
+                            $daywiseHtml .= '<div class="item-title">';
+                            $daywiseHtml .= '<div>USD 0.8</div>';
+                            $daywiseHtml .= '<div>' . $additionalItemTotal + ($item['price'] * $item['quantity']) * ($item['price'] != 0 ? 1.25 : 1) . '</div>';
+                            $daywiseHtml .= '</div>';
+                            $data = [
+                                'customerName' => $existCustomer->name,
+                                'orderId' => $order_id,
+                                'orderDate' => $item['order_date'],
+                                'email' => $existCustomer->email,
+                                'alacarteHtml' => $daywiseHtml
+                            ];
                             Mail::send('email.confirmation', $data, function ($message) use ($data) {
                                 $message->to($data['email'])
                                     ->from('info@desikitchen-ky.com', 'Desi Kitchen')
@@ -555,7 +713,8 @@ class Order extends Controller
                     'order_date' => $request->input('alacarteorder_date'),
                     'order_id' => $order_id,
                     'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
-                    'order_status' => 'Online'
+                    'order_status' => 'Cash',
+                    'status'=> 'confirmed'
                 ];
 
                 $orderalacarteinsertedid = Order_model::create($added_data);
@@ -581,7 +740,7 @@ class Order extends Controller
 
                         foreach ($item['additional_items'] as $adt) {
 
-                            $additionalItem = Additionalmenu_model::find($item['db_id']);
+                            $additionalItem = Additionalmenu_model::find($adt['id']);
                             $alacarteHtml .= '<div class="item-title">';
                             $alacarteHtml .= '<div>' . $additionalItem->name . '</div>';
                             $alacarteHtml .= '<div>' . $adt['price'] * $adt['quantity'] . '</div>';
@@ -614,7 +773,7 @@ class Order extends Controller
                     $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                         ->asForm()
                         ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                            'To' => '+91' . $existCustomer->phone,
+                            'To' => $existCustomer->country_code . $existCustomer->phone,
                             'From' => env('TWILIO_PHONE'),
                             'Body' => 'Your alacarte order ' . $order_id . ' for ' . $request->input('alacarteorder_date') . ' has been confirmed.'
                         ]);
@@ -732,12 +891,14 @@ class Order extends Controller
                         $existingEmailUser->update([
                             'name'  => $request->input('txt_name'),
                             'phone' => $request->input('txt_phone'),
+                            'country_code' => $request->input('txt_code')
                         ]);
                     } else {
                         $newUser = KitUser::create([
                             'name'      => $request->input('txt_name'),
                             'email'     => $request->input('txt_email'),
                             'phone'     => $request->input('txt_phone'),
+                            'country_code' => $request->input('txt_code'),
                             'role'      => 'user'
                         ]);
 
@@ -749,6 +910,7 @@ class Order extends Controller
                         'name'      => $request->input('txt_name'),
                         'email'     => $request->input('txt_email'),
                         'phone'     => $request->input('txt_phone'),
+                        'country_code' => $request->input('txt_code'),
                         'role'      => 'user'
                     ]);
 
@@ -819,7 +981,7 @@ class Order extends Controller
                     'created_by' => (Auth::user()->role == 'admin') ? Auth::user()->id : null,
                     'status' => 'delivered',
                     'payment_status' => 'Paid',
-                    'order_status' => 'Dining'
+                    'order_status' => $request->input('payment_type')
                 ];
 
                 $orderalacarteinsertedid = Order_model::create($added_data);
@@ -883,5 +1045,44 @@ class Order extends Controller
         }
         // Handle failed request (4xx or 5xx status codes)
         return [];
+    }
+
+    public function deleteOrder(Request $request)
+    {
+        try {
+            $orderId = $request->input('order_id');
+
+            // Check if order ID is provided
+            if (!$orderId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order ID is required.'
+                ], 400);
+            }
+
+            // Find the order
+            $existOrder = Order_model::find($orderId);
+
+            if (!$existOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found.'
+                ], 404);
+            }
+
+            // Delete the order
+            $existOrder->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order deleted successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while deleting the order.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

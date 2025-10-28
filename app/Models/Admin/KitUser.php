@@ -22,6 +22,7 @@ class KitUser extends Authenticatable
         'phone',
         'is_active',
         'is_created_by_admin',
+        'country_code'
     ];
     public function address()
     {

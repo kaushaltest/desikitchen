@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ Tiffin Order Confirmed – Desi Kitchen</title>
+    <title>⏳ Order Pending Confirmation – Desi Kitchen</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@
         }
 
         .header {
-            background-color: #FEA116;
+            background-color: #FFA500; /* Slightly lighter orange for pending */
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -83,23 +83,26 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>✅ Tiffin Order Confirmed – Desi Kitchen</h1>
+            <h1>⏳ Order Pending Confirmation – Desi Kitchen</h1>
         </div>
 
         <!-- Content -->
         <div class="content">
             <p>Hello <strong>{{ $customerName }}</strong> 🙏,</p>
 
-            <p>Your order {{ $orderId }} for <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> has been confirmed.</p>
+            <p>Your order <strong>{{ $orderId }}</strong> for 
+                <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> is currently 
+                <strong>pending confirmation</strong>.</p>
+
+            <p>Our team will review your order shortly and notify you once it’s confirmed ✅.</p>
 
             <div class="item-title">
                 {!! $alacarteHtml !!}
-
             </div>
 
-            <p>We look forward to serving you fresh, vegetarian meals 🌱</p>
+            <p>We appreciate your patience and look forward to serving you soon 🍱</p>
 
-            <p>Thanks,<br><strong>Team Desi Kitchen</strong></p>
+            <p>Warm regards,<br><strong>Team Desi Kitchen</strong></p>
         </div>
 
         <!-- Footer -->

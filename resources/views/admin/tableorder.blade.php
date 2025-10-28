@@ -216,7 +216,7 @@
                                     </li> -->
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link active d-flex align-items-center justify-content-center gap-2"
-                                            id="alacarte-tab" data-tab="alacarte">
+                                            id="dining-tab" data-tab="dining">
                                             <i data-lucide="utensils"></i>
                                             <span class="d-none d-sm-inline">Dining</span>
                                             <span class="d-sm-none">Menu</span>
@@ -295,11 +295,18 @@
                                         <!-- Order summary will be populated here -->
                                     </div>
                                 </div>
+                                <div class="d-flex"><label class="col-form-label"><b>Payment Type : </b></label>
+                                    <div class="form-check-size rtl-input mt-2 mx-2">
+                                        <div class="form-check form-check-inline"><input class="form-check-input me-2" id="rbt_online" type="radio" name="rbt_payment_type" value="Card" checked><label class="form-check-label" for="rbt_online">Card</label></div>
+                                        <div class="form-check form-check-inline"><input class="form-check-input me-2" id="rbt_cash" type="radio" name="rbt_payment_type" value="Cash"><label class="form-check-label" for="rbt_cash">Cash</label></div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-success">Place Order</button>
+                        <button class="btn btn-success">Payment Received</button>
                     </div>
                 </form>
             </div>
@@ -315,16 +322,13 @@
     // Sample user database with detailed addresses
 
     // Global variables
-    let order_name = 'tbl_order_' + (
-        localStorage.getItem('table_id') ?
-        localStorage.getItem('table_id') :
-        ''
-    );
+    let table_id = '{{$id}}';
+    let order_name = 'tbl_order_' + table_id;
     let cart = (localStorage.getItem(order_name)) ? JSON.parse(localStorage.getItem(order_name)) : [];
 
     let currentUser = null;
     let selectedAddress = null;
-    let activeTab = 'alacarte';
+    let activeTab = 'dining';
     let searchTerm = '';
     let map = null;
     let marker = null;
@@ -392,13 +396,14 @@
         $(`#${tab}-tab`).addClass('active');
         $('.tab-content').hide();
         $(`#${tab}-content`).show();
+
         renderMenu();
     }
 
     function renderMenu() {
         if (activeTab === 'daywise') {
             renderDayWiseMenu();
-        } else if (activeTab === 'alacarte') {
+        } else if (activeTab === 'dining') {
             renderAlaCarteMenu();
         } else if (activeTab === 'party') {
             renderPartyMenu();
@@ -1001,7 +1006,7 @@
 
 
     function showCheckout() {
-        let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${localStorage.getItem('table_id')}_user`));
+        let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${table_id}_user`));
         console.log(userDetails?.name)
         // Address list
         let customerHtml = `
@@ -1153,10 +1158,10 @@
                 acc[item.type].push(item);
                 return acc;
             }, {});
-            let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${localStorage.getItem('table_id')}_user`));
+            let userDetails = JSON.parse(localStorage.getItem(`tbl_order_${table_id}_user`));
 
             formData.append('cart', grouped);
-            formData.append('table_id', localStorage.getItem('table_id'))
+            formData.append('table_id', table_id)
             event.preventDefault();
             $.ajax({
                 url: "{{ route('admin.add-table-order') }}", // Change this to your server endpoint
@@ -1166,10 +1171,12 @@
                 },
                 data: {
                     cart: grouped,
-                    table_id: localStorage.getItem('table_id'),
+                    table_id: table_id,
                     txt_name: userDetails?.name,
                     txt_email: userDetails?.email,
-                    txt_phone: userDetails?.phone
+                    txt_phone: userDetails?.phone,
+                    txt_code: userDetails?.code,
+                    payment_type: $('input[name="rbt_payment_type"]:checked').val()
                 },
                 beforeSend: function() {
                     $(".loader-wrapper").css("display", "flex")
@@ -1181,13 +1188,13 @@
                         toastSuccess(response.message);
                         localStorage.removeItem(order_name);
                         localStorage.removeItem('table_id')
-                        localStorage.removeItem(`tbl_order_${localStorage.getItem('table_id')}_user`)
+                        localStorage.removeItem(`tbl_order_${table_id}_user`)
                         cart = [];
                         updateCartDisplay();
                         $('#checkoutModal').modal('hide');
                         showCheckout();
                         setTimeout(function() {
-                            window.location.href = "dashboard";
+                            window.location.href = "../dashboard";
                         }, 1000);
 
                     } else {

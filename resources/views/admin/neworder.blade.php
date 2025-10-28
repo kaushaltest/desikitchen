@@ -280,6 +280,12 @@
                                             <div class="mb-3">
                                                 <label class="form-label">Mobile Number</label>
                                                 <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <select class="form-control" name="countryCodeInput" id="countryCodeInput">
+                                                            <option value="+91">+91</option>
+                                                            <option value="+1" selected="">+1</option>
+                                                        </select>
+                                                    </div>
                                                     <input type="tel" class="form-control" name="mobileInput" id="mobileInput" placeholder="Enter mobile number">
                                                     <button class="btn btn-outline-primary" id="checkMobileBtn">Check</button>
                                                 </div>
@@ -843,6 +849,7 @@
                                 const newUser = {
                                     id: response.user_id,
                                     phone: $('#mobileInput').val(),
+                                    code:$("#countryCodeInput").val(),
                                     name: $('#userNameInput').val(),
                                     email: $('#userEmailInput').val(),
                                     address: [{
@@ -1465,7 +1472,7 @@
                             html += `</div>`;
                         }
                     }
-                    if ((index === items.length - 1) && (type === 'alacarte' || type === 'party')) {
+                    if ((index === items.length - 1) && (type === 'party')) {
                         if (allMenuList?.additional_menu.length > 0) {
                             html += `
                                 <div style="margin-left:22px;">

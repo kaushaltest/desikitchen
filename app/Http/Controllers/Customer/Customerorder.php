@@ -30,7 +30,7 @@ class Customerorder extends Controller
     }
     public function getOrder()
     {
-        $orders = Customerorder_model::with(['items', 'address'])->orderBy('order_date', 'asc')->where('user_id', session('user_id'))->get();
+        $orders = Customerorder_model::with(['items', 'address'])->orderBy('order_date', 'asc')->where('user_id', session('user_id'))->where('status', '!=', 'cancelled')->get();
         $data = $orders->map(function ($order) {
             $itemHtmlList = '';
             $menuTitle = '';
@@ -406,13 +406,13 @@ class Customerorder extends Controller
                             $updated_data
                         );
 
-                        // $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
-                        //     ->asForm()
-                        //     ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                        //         'To' => '+91' . session('user_phone'),
-                        //         'From' => env('TWILIO_PHONE'),
-                        //         'Body' => 'Your tiffin order ' . $orderId . ' for ' . $item['order_date'] . ' has been confirmed.'
-                        //     ]);
+                        $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                            ->asForm()
+                            ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                                'To' => session('user_code') . session('user_phone'),
+                                'From' => env('TWILIO_PHONE'),
+                                'Body' => 'Your tiffin order ' . $orderId . ' for ' . $item['order_date'] . ' has been confirmed.'
+                            ]);
                         if (session('user_email')) {
                             $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; margin-bottom:5px; padding-bottom:8px; overflow:hidden;">';
                             $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
@@ -424,10 +424,10 @@ class Customerorder extends Controller
                                 'orderDate' => $item['order_date'],
                                 'alacarteHtml' => $alacarteHtml
                             ];
-                            Mail::send('email.confirmation', $data, function ($message) use ($data) {
+                            Mail::send('email.pending_confirmation', $data, function ($message) use ($data) {
                                 $message->to(session('user_email'))
                                     ->from('info@desikitchen-ky.com', 'Desi Kitchen')
-                                    ->subject('Desi Kitchen - Order Confirmation');
+                                    ->subject('Desi Kitchen - Order Pending Confirmation');
                             });
                         }
 
@@ -534,13 +534,13 @@ class Customerorder extends Controller
                     $updated_data
                 );
 
-                // $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
-                //     ->asForm()
-                //     ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                //         'To' => '+91' . session('user_phone'),
-                //         'From' => env('TWILIO_PHONE'),
-                //         'Body' => 'Your alacarte order ' . $orderId . ' for ' .  $request->input('alacarteorder_date') . ' has been confirmed.'
-                //     ]);
+                $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                    ->asForm()
+                    ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                        'To' => session('user_code') . session('user_phone'),
+                        'From' => env('TWILIO_PHONE'),
+                        'Body' => 'Your alacarte order ' . $orderId . ' for ' .  $request->input('alacarteorder_date') . ' has been confirmed.'
+                    ]);
                 if (session('user_email')) {
                     $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; padding-bottom:8px; overflow:hidden;">';
                     $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
@@ -553,10 +553,10 @@ class Customerorder extends Controller
                         'orderDate' =>  $request->input('alacarteorder_date'),
                         'alacarteHtml' => $alacarteHtml
                     ];
-                    Mail::send('email.confirmation', $data, function ($message) use ($data) {
+                    Mail::send('email.pending_confirmation', $data, function ($message) use ($data) {
                         $message->to(session('user_email'))
                             ->from('info@desikitchen-ky.com', 'Desi Kitchen')
-                            ->subject('Desi Kitchen - Order Confirmation');
+                            ->subject('Desi Kitchen - Order Pending Confirmation');
                     });
                 }
             }
@@ -608,7 +608,7 @@ class Customerorder extends Controller
                 $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
                     ->asForm()
                     ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                        'To' => '+91' . session('user_phone'),
+                        'To' => session('user_code') . session('user_phone'),
                         'From' => env('TWILIO_PHONE'),
                         'Body' => 'This is to confirm that your order ' . $existing->order_id . ' Placed for ' .  $existing->order_date . ' has been successfully cancelled by you.'
                     ]);

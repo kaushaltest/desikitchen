@@ -322,7 +322,12 @@
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Mobile Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">+1</span>
+                                    <div class="input-group-prepend">
+                                        <select class="form-control" name="txt_guest_countrycode" id="txt_guest_countrycode">
+                                            <option value="+91">+91</option>
+                                            <option value="+1" selected="">+1</option>
+                                        </select>
+                                    </div>
                                     <input type="tel" class="form-control" id="txt_guest_mobile" name="txt_guest_mobile" placeholder="Enter 10-digit mobile">
                                 </div>
                                 <div class="form-text">We'll send a one-time password (OTP) to this number.</div>
@@ -406,7 +411,13 @@
                             <div class="mb-3">
                                 <label for="mobile" class="form-label">Mobile Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">+1</span>
+                                    <!-- <span class="input-group-text">+1</span> -->
+                                    <div class="input-group-prepend">
+                                        <select class="form-control" name="txt_new_countrycode" id="txt_new_countrycode">
+                                            <option value="+91">+91</option>
+                                            <option value="+1" selected>+1</option>
+                                        </select>
+                                    </div>
                                     <input type="tel" class="form-control" id="txt_new_mobile" name="txt_new_mobile" placeholder="Enter 10-digit mobile">
                                 </div>
                                 <div class="form-text">We'll send a one-time password (OTP) to this number.</div>
@@ -1422,7 +1433,7 @@
                             html += `</div>`;
                         }
                     }
-                    if ((index === items.length - 1) && (type === 'alacarte' || type === 'party')) {
+                    if ((index === items.length - 1) && (type === 'party')) {
                         if (allMenuList?.additional_menu.length > 0) {
                             html += `
                                         <div style="margin-left:22px;">
@@ -1848,6 +1859,7 @@
                 const data = Object.fromEntries(formData.entries());
 
                 formData.append('mobile', $("#txt_guest_mobile").val())
+                formData.append('code', $("#txt_guest_countrycode").val())
                 $.ajax({
                     url: "{{ route('customer.guest-login-otp') }}", // Change this to your server endpoint
                     type: 'POST',
@@ -1904,6 +1916,7 @@
                 const formData = new FormData();
                 formData.append('otp', otp);
                 formData.append('mobile', $("#txt_guest_mobile").val())
+                formData.append('code', $("#txt_guest_countrycode").val())
                 $.ajax({
                     url: "{{ route('customer.guest-verify-otp') }}", // Change this to your server endpoint
                     type: 'POST',
@@ -2056,6 +2069,7 @@
                 formData.append('email', $("#txt_new_email").val())
                 formData.append('mobile', $("#txt_new_mobile").val())
                 formData.append('password', $("#txt_new_password").val())
+                formData.append('country_code', $("#txt_new_countrycode").val())
 
                 $.ajax({
                     url: "{{ route('customer.verify-register-otp') }}", // Change this to your server endpoint

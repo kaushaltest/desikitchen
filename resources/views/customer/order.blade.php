@@ -130,6 +130,27 @@
     .order-item:last-child {
         border-bottom: none;
     }
+    .btn-cancel-order {
+        font-weight: 700;
+    }
+    @media (max-width: 900px) {
+        .cancel_btn_box {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+        }
+
+        .btn-cancel-order {
+            font-size: 13px;
+            padding: 5px 15px;
+            font-weight: 700;
+        }
+        .prev_status_box{
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
 </style>
 <div class="container-xxl py-5">
     <div class="container">
@@ -198,6 +219,10 @@
         }
 
         const statusFlow = {
+            pending: {
+                title: 'Pending Confirmed',
+                icon: 'bi bi-arrow-clockwise'
+            },
             confirmed: {
                 title: 'Order Confirmed',
                 icon: 'bi-check-circle'
@@ -220,7 +245,7 @@
             const idx = Math.max(keys.indexOf(current), 0);
 
             // ==== Current Orders ====
-            if (current === 'confirmed' || current === 'outfordelivery') {
+            if (current === 'pending' || current === 'confirmed' || current === 'outfordelivery') {
                 currentContainer.innerHTML += buildCurrentOrder(order, statusFlow, keys, idx);
                 hasCurrent = true;
             }
@@ -260,16 +285,14 @@
         return `
     <div class="card current-order-card mb-3">
         <div class="card-header bg-white">
-            <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
                 <div>
-                    <h5 class="card-title mb-1">
-                        <i class="bi bi-fire text-primary me-2"></i>
-                        Order #${order.order_id}
+                    <h5 class="card-title mb-1">Order #${order.order_id}
                         ${order.current_date === order.order_date ? '<span class="badge bg-primary ms-2">Current Order</span>' : ''}
                     </h5>
                     <p class="card-text text-muted">Ordered at ${order.order_date}</p>
                 </div>
-                <div class="text-end">
+                <div class="cancel_btn_box">
                     ${statusBadge}
                     <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}">
                                             <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
@@ -312,12 +335,12 @@
         return `
     <div class="card mb-3 order-summary-card">
         <div class="card-header collapse-toggle" data-bs-toggle="collapse" data-bs-target="#order${order.order_id}">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
                 <div>
                     <h6 class="card-title mb-1">Order #${order.order_id}</h6>
                     <small class="text-muted">Ordered at ${order.order_date} • Delivered at ${order.delivered_at ?? ''}</small>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center prev_status_box">
                     <div class="text-end me-3">${statusBadge}</div>
                     <span class="fw-semibold me-3">$${order.total_amount}</span>
                     <i class="bi bi-chevron-down"></i>
@@ -373,10 +396,11 @@
 
     function badgeForStatus(status) {
         const s = (status || '').toLowerCase();
-        if (s === 'rejected') return `<span class="badge bg-danger rounded text-light status-badge">Rejected</span>`;
-        if (s === 'outfordelivery') return `<span class="badge bg-warning rounded text-dark status-badge">Out for Delivery</span>`;
-        if (s === 'confirmed') return `<span class="badge bg-info rounded text-dark status-badge">Confirmed</span>`;
-        if (s === 'delivered') return `<span class="badge bg-success rounded text-light status-badge">Delivered</span>`;
+        if (s === 'pending') return `<span class="badge bg-warning rounded text-dark status-badge" style="height:20px">Pending Confirmed</span>`;
+        if (s === 'rejected') return `<span class="badge bg-danger rounded text-light status-badge" style="height:20px">Rejected</span>`;
+        if (s === 'outfordelivery') return `<span class="badge bg-warning rounded text-dark status-badge" style="height:20px">Out for Delivery</span>`;
+        if (s === 'confirmed') return `<span class="badge bg-info rounded text-dark status-badge" style="height:20px">Confirmed</span>`;
+        if (s === 'delivered') return `<span class="badge bg-success rounded text-light status-badge" style="height:20px">Delivered</span>`;
         return '';
     }
 

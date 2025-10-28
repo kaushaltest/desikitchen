@@ -121,7 +121,12 @@
                     <label for="mobile" class="form-label mt-3">Mobile Number</label>
 
                     <div class="input-group ">
-                        <span class="input-group-text">+1</span>
+                        <div class="input-group-prepend">
+                            <select class="form-control" name="txt_countrycode" id="txt_countrycode">
+                                <option value="+91">+91</option>
+                                <option value="+1" selected="">+1</option>
+                            </select>
+                        </div>
                         <input type="tel" class="form-control" id="txt_phone" name="txt_phone" placeholder="Enter 10-digit mobile">
                     </div>
 
@@ -269,7 +274,7 @@
         });
 
         $(document).on("click", '.btn-edit-a-table', function() {
-            window.location = './tableorder';
+            window.location = `./tableorder/${$(this).attr('data-tableid')}`;
         });
 
         $(document).on("click", '.btn-book-a-table', function() {
@@ -321,9 +326,11 @@
                                 name: $("#txt_name").val(),
                                 phone: $("#txt_phone").val(),
                                 email: $("#txt_email").val(),
+                                code: $("#txt_countrycode").val()
                             }
+                            $("#modal_add_table_user").modal('toggle');
                             localStorage.setItem(`tbl_order_${$("#txt_tableid").val()}_user`, JSON.stringify(userData));
-                            window.location = './tableorder';
+                            // window.location = `./tableorder/${$("#txt_tableid").val()}`;
                         } else {
                             toastFail(response.message || "Something went wrong. Please try again later.");
                         }

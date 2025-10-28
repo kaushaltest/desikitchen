@@ -86,9 +86,9 @@ class Tables extends Controller
         return response()->json(['success' => true, 'message' => 'Table removed successfully.']);
     }
 
-    public function tableOrder()
+    public function tableOrder($id)
     {
-        return view('admin.tableorder');
+        return view('admin.tableorder',compact('id'));
     }
 
     public function bookTable(Request $res)
@@ -117,8 +117,8 @@ class Tables extends Controller
         // Case 2: Table already booked by this user → allow edit
         if ($table->user_id == Auth::user()->id) {
             return response()->json([
-                'success' => true,
-                'message' => 'This table is already reserved. this table.',
+                'success' => false,
+                'message' => 'This table has already been reserved by you.',
                 'table_id' => $table->id,
             ]);
         }

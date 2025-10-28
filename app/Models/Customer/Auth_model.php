@@ -19,7 +19,8 @@ class Auth_model extends Authenticatable
         'role',
         'phone',
         'is_active',
-        'is_created_by_admin'
+        'is_created_by_admin',
+        'country_code'
     ];
     public function address()
     {
