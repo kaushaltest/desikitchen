@@ -96,6 +96,7 @@
                 {!! $alacarteHtml !!}
 
             </div>
+            {!! $reason !!}
 
             <p>We look forward to serving you fresh, vegetarian meals 🌱</p>
 

@@ -387,6 +387,8 @@ class Order extends Controller
                 );
                 $existOrder = Order_model::find($request->input('hid_orderid'));
                 $existCustomer = KitUser::find($existOrder->user_id);
+
+            
                 if ($request->input('drp_status') == 'pending') {
                     $orderHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff;border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
                     $orderHtml .= '
@@ -498,9 +500,11 @@ class Order extends Controller
                     $orderHtml .= '</div></div>';
                     $data = [
                         'customerName' => $existCustomer->name,
+                        'email' => $existCustomer->email,
                         'orderId' => $existOrder->order_id,
                         'orderDate' => $existOrder->order_date,
-                        'alacarteHtml' => $orderHtml
+                        'alacarteHtml' => $orderHtml,
+                        'reason' => ($request->input('txt_note'))?'<p>Desikitchen Notes:  '.$request->input('txt_note').'</p>':"",
                     ];
 
                     if ($existCustomer->email) {
@@ -511,9 +515,9 @@ class Order extends Controller
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'Your order ' . $existOrder->order_id . ' for ' .  $existOrder->order_date . ' has been confirmed.'
                             ]);
-
+                        print_r($response->json('message'));
                         Mail::send('email.confirmation', $data, function ($message) use ($data) {
-                            $message->to(session('user_email'))
+                            $message->to($data['email'])
                                 ->from('info@desikitchen-ky.com', 'Desi Kitchen')
                                 ->subject('Desi Kitchen - Order Confirmation');
                         });
@@ -523,7 +527,8 @@ class Order extends Controller
                     $data = [
                         'customerName' => $existCustomer->name,
                         'orderId' => $existOrder->order_id,
-                        'email' => $existCustomer->email
+                        'email' => $existCustomer->email,
+                        'reason' => ($request->input('txt_note'))?'<p>Desikitchen Notes:  '.$request->input('txt_note').'</p>':"",
                     ];
                     if ($existCustomer->email) {
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
@@ -545,7 +550,8 @@ class Order extends Controller
                         'customerName' => $existCustomer->name,
                         'orderId' => $existOrder->order_id,
                         'orderDate' => $existOrder->order_date,
-                        'email' => $existCustomer->email
+                        'email' => $existCustomer->email,
+                        'reason' => ($request->input('txt_note'))?'<p>Desikitchen Notes:  '.$request->input('txt_note').'</p>':"",
                     ];
                     if ($existCustomer->email) {
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
@@ -568,7 +574,7 @@ class Order extends Controller
                         'orderId' => $existOrder->order_id,
                         'orderDate' => $existOrder->order_date,
                         'email' => $existCustomer->email,
-                        'reason' => $existOrder->note ? '<p>Reason: ' . htmlspecialchars($existOrder->note) . '</p>' : '',
+                        'reason' => ($request->input('txt_note'))?'<p>Desikitchen Notes:  '.$request->input('txt_note').'</p>':"",
                     ];
                     if ($existCustomer->email) {
                         $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))

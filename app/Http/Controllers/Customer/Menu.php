@@ -27,7 +27,8 @@ class Menu extends Controller
             ->orderBy('menu_date', 'asc')
             ->get();
         $daywisemenu->transform(function ($item) {
-            $item->day_name = Carbon::parse($item->menu_date)->locale('en')->dayName; // or ->format('l')
+            $timezone = config('app.timezone');
+            $item->day_name = Carbon::parse($item->menu_date, $timezone)->locale('en')->dayName; // or ->format('l')
             return $item;
         });
         $data['daywise'] = $daywisemenu;

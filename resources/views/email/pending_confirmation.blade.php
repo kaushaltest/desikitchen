@@ -91,16 +91,14 @@
             <p>Hello <strong>{{ $customerName }}</strong> 🙏,</p>
 
             <p>Your order <strong>{{ $orderId }}</strong> for 
-                <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> is currently 
-                <strong>pending confirmation</strong>.</p>
+                <strong>{{ \Carbon\Carbon::parse($orderDate)->format('d M Y') }}</strong> is placed and 
+                <strong>pending for confirmation</strong>.</p>
 
-            <p>Our team will review your order shortly and notify you once it’s confirmed ✅.</p>
+            <p>Our team will review your order and confirm it. You will be notified once it is confirmed ✅</p>
 
             <div class="item-title">
                 {!! $alacarteHtml !!}
             </div>
-
-            <p>We appreciate your patience and look forward to serving you soon 🍱</p>
 
             <p>Warm regards,<br><strong>Team Desi Kitchen</strong></p>
         </div>

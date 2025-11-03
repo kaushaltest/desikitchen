@@ -1,6 +1,6 @@
 @extends('layouts.customer.auth')
 
-@section('title', 'Profile')
+@section('title', 'Reset Password')
 
 @section('content')
 <style>

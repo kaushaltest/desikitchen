@@ -1,6 +1,6 @@
 @extends('layouts.customer.app')
 
-@section('title', 'About Us')
+@section('title', 'My Order')
 
 @section('content')
 <div class="container-xxl py-5 bg-dark hero-header mb-5">
@@ -130,9 +130,11 @@
     .order-item:last-child {
         border-bottom: none;
     }
+
     .btn-cancel-order {
         font-weight: 700;
     }
+
     @media (max-width: 900px) {
         .cancel_btn_box {
             display: flex;
@@ -146,7 +148,8 @@
             padding: 5px 15px;
             font-weight: 700;
         }
-        .prev_status_box{
+
+        .prev_status_box {
             justify-content: space-between;
             width: 100%;
         }
@@ -220,7 +223,7 @@
 
         const statusFlow = {
             pending: {
-                title: 'Pending Confirmed',
+                title: 'Pending Confirmation',
                 icon: 'bi bi-arrow-clockwise'
             },
             confirmed: {
@@ -294,7 +297,7 @@
                 </div>
                 <div class="cancel_btn_box">
                     ${statusBadge}
-                    <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}">
+                    <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}" data-orderdate="${order.without_format_order_date}">
                                             <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
                     Cancel Order</button>
                 </div>
@@ -396,7 +399,7 @@
 
     function badgeForStatus(status) {
         const s = (status || '').toLowerCase();
-        if (s === 'pending') return `<span class="badge bg-warning rounded text-dark status-badge" style="height:20px">Pending Confirmed</span>`;
+        if (s === 'pending') return `<span class="badge bg-warning rounded text-dark status-badge" style="height:20px">Pending Confirmation</span>`;
         if (s === 'rejected') return `<span class="badge bg-danger rounded text-light status-badge" style="height:20px">Rejected</span>`;
         if (s === 'outfordelivery') return `<span class="badge bg-warning rounded text-dark status-badge" style="height:20px">Out for Delivery</span>`;
         if (s === 'confirmed') return `<span class="badge bg-info rounded text-dark status-badge" style="height:20px">Confirmed</span>`;
@@ -449,6 +452,31 @@
         })
 
         $(document).on('click', '.btn-cancel-order', function() {
+
+            const menuDateStr = $(this).attr('data-orderdate'); // e.g. "2025-09-23"
+
+            // 1. Create a Date object for the menu date (ignore time, use local midnight)
+            const menuDate = new Date(menuDateStr + "T00:00:00");
+            // 2. Get today's date and tomorrow's date (also at midnight for comparison)
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            // 3. Check if menuDate is tomorrow
+            const isTomorrow = menuDate.getTime() === tomorrow.getTime();
+            // 4. If it’s tomorrow, check if current time is after 9 PM
+            if (isTomorrow) {
+                const currentHour = now.getHours(); // 0–23
+
+                const currentMinute = now.getMinutes(); // optional if you need minute precision
+                if (currentHour >= 21) {
+                    // After 9 PM
+                    toastFail("You cannot buy meal after 9 PM for tomorrow.");
+                    return;
+                }
+            }
+           
             $("#hid_cancel_orderid").val($(this).attr('data-id'));
             $("#confirm_delete_order_message").modal('toggle');
         })

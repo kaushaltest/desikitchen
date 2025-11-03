@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             padding: 0;
             color: #333333;
         }
+
         .container {
             width: 100%;
             max-width: 600px;
@@ -19,47 +21,56 @@
             background-color: #ffffff;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         .header {
             background-color: #FEA116;
             color: #ffffff;
             padding: 20px;
             text-align: center;
         }
+
         .header h1 {
             margin: 0;
             font-size: 24px;
         }
+
         .content {
             padding: 20px;
             line-height: 1.6;
         }
+
         .content p {
             margin: 10px 0;
         }
+
         .highlight {
             background-color: #f2f2f2;
             padding: 15px;
             border-radius: 5px;
             margin: 15px 0;
         }
+
         .footer {
             padding: 15px;
             text-align: center;
             font-size: 14px;
             color: #777777;
         }
+
         @media screen and (max-width: 600px) {
             .container {
                 width: 95%;
             }
+
             .header h1 {
                 font-size: 20px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -73,10 +84,11 @@
 
             <p>Your tiffin order {{ $orderId }} is <strong>out for delivery</strong>.</p>
 
+            {!! $reason !!}
+
             <div class="highlight">
                 <p>Please keep your phone nearby and answer calls from Desi Kitchen 📞 so our driver can reach you.</p>
             </div>
-
             <p>Enjoy your meal 🌱💚</p>
 
             <p>Thanks,<br><strong>Team Desi Kitchen</strong></p>
@@ -88,4 +100,5 @@
         </div>
     </div>
 </body>
+
 </html>

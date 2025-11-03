@@ -952,12 +952,10 @@
 
                 // 3. Check if menuDate is tomorrow
                 const isTomorrow = menuDate.getTime() === tomorrow.getTime();
-
                 // 4. If it’s tomorrow, check if current time is after 9 PM
                 if (isTomorrow) {
                     const currentHour = now.getHours(); // 0–23
                     const currentMinute = now.getMinutes(); // optional if you need minute precision
-
                     if (currentHour >= 21) {
                         // After 9 PM
                         toastFail("You cannot buy meal after 9 PM for tomorrow.");

@@ -53,6 +53,36 @@
                                     <button class="btn btn-primary btn-add-menu text-right">Add Menu</button>
                                 </div>
                             </div>
+                            <div class="row my-3">
+                                        <!-- Filter Type -->
+                                        <div class="row align-items-end justify-content-end ">
+                                            <div class="col-md-3">
+                                                <select id="filterType" class="form-select">
+                                                    <option value="month" selected>This Month</option>
+                                                    <option value="custom">Custom Range</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- From Date -->
+                                            <div class="col-md-3 custom-range d-none">
+                                                <label class="form-label fw-bold">From Date</label>
+                                                <input type="date" id="fromDate" class="form-control">
+                                            </div>
+
+                                            <!-- To Date -->
+                                            <div class="col-md-3 custom-range d-none">
+                                                <label class="form-label fw-bold">To Date</label>
+                                                <input type="date" id="toDate" class="form-control">
+                                            </div>
+
+                                            <!-- Apply Button -->
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button id="applyFilter" class="btn btn-primary w-100">
+                                                    Apply
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                             <table id="dt_daywisemenu" class="table table-striped text-nowrap">
                                 <thead>
                                     <tr>
@@ -242,6 +272,21 @@
             ajax: {
                 url: '{{route("admin.get-daywise-menu")}}', // Replace with your server endpoint
                 type: 'GET', // or 'POST', depending on your server setup
+                data: function(d) {
+                    let filterType = $('#filterType').val();
+
+                    if (filterType === 'today') {
+                        d.filter = 'today';
+                    } else if (filterType === 'week') {
+                        d.filter = 'week';
+                    } else if (filterType === 'month') {
+                        d.filter = 'month';
+                    } else if (filterType === 'custom') {
+                        d.filter = 'custom';
+                        d.fromDate = $('#fromDate').val();
+                        d.toDate = $('#toDate').val();
+                    }
+                },
                 dataSrc: function(json) {
                     // Ensure the data is returned in a way that DataTable understands
                     console.log('Full response:', json);
@@ -306,6 +351,20 @@
             //     }
             // }]
         });
+
+        $('#filterType').on('change', function() {
+            if ($(this).val() === 'custom') {
+                $('.custom-range').removeClass('d-none');
+            } else {
+                $('.custom-range').addClass('d-none');
+            }
+        });
+
+        // Apply filter
+        $('#applyFilter').on('click', function() {
+            table.ajax.reload();
+        });
+
         $("#btn_import").click(function() {
             $("#file_import_file").val("");
             $('#form_add_import_request').validate().resetForm();

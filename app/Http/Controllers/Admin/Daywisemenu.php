@@ -18,13 +18,21 @@ class Daywisemenu extends Controller
     {
         return view('admin.daywisemenu'); // View: resources/views/admin/dashboard.blade.php
     }
-    public function getDaywiseMenuData()
+    public function getDaywiseMenuData(Request $request)
     {
-        $data = Daywisemenu_model::all()->map(function ($item) {
-            // Append full URL to image
-            $item->image_url = asset('storage/' . $item->image_path);
-            return $item;
-        });
+        $query = Daywisemenu_model::query();
+        if ($request->filter == 'month') {
+            $query->whereMonth('menu_date', Carbon::now()->month);
+        } elseif ($request->filter == 'custom' && $request->fromDate && $request->toDate) {
+            $query->whereBetween('menu_date', [$request->fromDate, $request->toDate]);
+        }
+        $data = $query->orderBy('menu_date', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $item->image_url = asset('storage/' . $item->image_path);
+                return $item;
+            });
+
         return response()->json([
             'data' => $data,
         ], 200);
@@ -106,7 +114,7 @@ class Daywisemenu extends Controller
 
         if ($existingMenu) {
             // Update is_delete to true
-            $existingMenu->is_active = ($existingMenu->is_active)?false:true;
+            $existingMenu->is_active = ($existingMenu->is_active) ? false : true;
             $existingMenu->save();
 
             return response()->json([
@@ -140,8 +148,8 @@ class Daywisemenu extends Controller
                 $menuDate = $this->normalizeDate($row['date']);
                 if (!empty($row['date'])) {
                     $menu = Daywisemenu_model::whereDate('menu_date', $menuDate)   // compares only the date part
-                    ->first();
-                    
+                        ->first();
+
                     if ($menu) {
                         // Update existing record
                         $menu->update([
@@ -166,7 +174,7 @@ class Daywisemenu extends Controller
                     Daywisemenu_model::create([
                         'title' => $row['title'],
                         'price' => $row['price'],
-                        'menu_date'  =>$menuDate,
+                        'menu_date'  => $menuDate,
                         'items' => $row['items'],
                         'image' => $imagePath ?? null,
                     ]);
@@ -186,26 +194,26 @@ class Daywisemenu extends Controller
         if (empty($dateValue)) {
             return null;
         }
-    
+
         try {
             // Case 1: Already a Carbon/DateTime object
             if ($dateValue instanceof \DateTime) {
                 return Carbon::instance($dateValue)->format('Y-m-d');
             }
-    
+
             // Case 2: Numeric Excel date serial
             if (is_numeric($dateValue)) {
                 // Excel's base date is 1899-12-30
                 return Carbon::createFromDate(1899, 12, 30)->addDays($dateValue)->format('Y-m-d');
             }
-    
+
             // Case 3: ISO 8601 string or normal string
             return Carbon::parse($dateValue)->format('Y-m-d');
         } catch (\Exception $e) {
             return null; // fallback if parsing fails
         }
     }
-    
+
     public function export()
     {
         return Excel::download(new MenuExport, 'menus.xlsx');

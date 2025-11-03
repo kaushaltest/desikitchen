@@ -72,12 +72,12 @@
             <p>Hello <strong>{{ $customerName }}</strong> 🙏,</p>
 
             <p>We’re sorry to inform you that your order <strong>#{{ $orderId }}</strong> Placed for <strong>{{ $orderDate }}</strong> has been <strong>cancelled</strong>.</p>
-            {!! $reason !!}
+           
             <div class="highlight">
                 <p>If the payment was completed, it will be refunded.</p>
                 <p>For any concerns or clarification, please contact our support team at <strong>info@desikitchen-ky.com</strong>.</p>
             </div>
-
+            {!! $reason !!}
             <p>We hope to serve you again soon 🍱</p>
             <p>Thanks,<br><strong>Team Desi Kitchen</strong></p>
         </div>

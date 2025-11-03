@@ -1,6 +1,6 @@
 @extends('layouts.customer.app')
 
-@section('title', 'About Us')
+@section('title', 'Contact Us')
 
 @section('content')
 <div class="container-xxl py-5 bg-dark hero-header mb-5">

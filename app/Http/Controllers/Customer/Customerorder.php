@@ -105,12 +105,13 @@ class Customerorder extends Controller
                 'order_id' => $order->order_id,
                 'order_type'    => ucfirst($order->order_type),
                 'order_date'    =>  Carbon::parse($order->order_date)->format('d-m-Y'),
+                'without_format_order_date'    =>  $order->order_date,
                 'note' => $order->note,
                 'payment_status' => $order->payment_status,
                 'status'        => ucfirst($order->status),
                 'total_amount'  => $order->total_amount,
                 'created_at'    => Carbon::parse($order->created_at)->format('d-m-Y H:i'),
-                'current_date' => Carbon::today('Asia/Kolkata')->format('d-m-Y'),
+                'current_date' => Carbon::today()->format('d-m-Y'),
                 'delivered_at' => Carbon::parse($order->updated_at)->format('d-m-Y H:i'),
             ];
         });
@@ -300,9 +301,30 @@ class Customerorder extends Controller
                         }
                     }
                     $orderId = $this->generateOrderId();
-                    $orderDate = Carbon::parse($item['order_date'], 'Asia/Kolkata');
-                    $now = Carbon::now('Asia/Kolkata');
+                    $orderDate = Carbon::parse($item['order_date']);
+                    $now = Carbon::now();
                     if ($orderDate->greaterThan($now)) {
+
+                        $menuDateStr =  $item['order_date']; // e.g. "2025-09-23"
+
+                        // 1️⃣ Parse menu date as a Carbon date (local timezone)
+                        $menuDate = Carbon::createFromFormat('Y-m-d', $menuDateStr)->startOfDay();
+
+                        // 2️⃣ Get today's and tomorrow's dates
+                        $today = Carbon::today();
+                        $tomorrow = Carbon::tomorrow();
+
+                        // 3️⃣ Check if menuDate is tomorrow
+                        $isTomorrow = $menuDate->equalTo($tomorrow);
+
+                        // 4️⃣ If tomorrow, check if current time is after 9 PM
+                        if ($isTomorrow && Carbon::now()->hour >= 21) {
+                            // After 9 PM
+                            return response()->json([
+                                'status' => 'fail',
+                                'message' => 'You cannot buy meal after 9 PM for tomorrow.',
+                            ]);
+                        }
                         $alacarteHtml .= '
                         <div style="background:#FEA116; color:#FFFFFF; padding:10px; text-align:center;">
                             <h2 style="margin:0;">🧾 Your Order Summary</h2>
@@ -319,7 +341,7 @@ class Customerorder extends Controller
                             'order_date' => $item['order_date'],
                             'order_id' => $orderId,
                             'payment_status' => $paymentStatus,
-                            'order_status' => 'Online'
+                            'order_status' => 'Cash'
                         ];
 
                         $orderinsertedid = Customerorder_model::create($added_data);
@@ -461,7 +483,7 @@ class Customerorder extends Controller
                     'order_type' => 'alacarte',
                     'order_date' => $request->input('alacarteorder_date'),
                     'order_id' => $orderId,
-                    'order_status' => 'Online'
+                    'order_status' => 'Cash'
                 ];
                 $orderalacarteinsertedid = Customerorder_model::create($added_data);
                 $alacarteItemTotal = 0;

@@ -76,7 +76,15 @@
             <div class="highlight">
                 <p>We hope you enjoyed your fresh vegetarian meal 🌱💚</p>
             </div>
+            {!! $reason !!}
 
+            <p>We’d love to hear your thoughts!</p>
+
+            <p style="text-align: center;">
+                <a href="https://g.page/r/CTQDwr5S89-aEBM/review" target="_blank" class="btn-feedback">
+                    ⭐ Leave Feedback
+                </a>
+            </p>
             <p>Thanks for choosing us!<br><strong>Team Desi Kitchen</strong></p>
         </div>
 
