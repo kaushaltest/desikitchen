@@ -515,7 +515,6 @@ class Order extends Controller
                                 'From' => env('TWILIO_PHONE'),
                                 'Body' => 'Your order ' . $existOrder->order_id . ' for ' .  $existOrder->order_date . ' has been confirmed.'
                             ]);
-                        print_r($response->json('message'));
                         Mail::send('email.confirmation', $data, function ($message) use ($data) {
                             $message->to($data['email'])
                                 ->from('info@desikitchen-ky.com', 'Desi Kitchen')

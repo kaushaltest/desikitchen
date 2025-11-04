@@ -35,7 +35,7 @@ class Auth extends Controller
                 "message" => "User not found with this email."
             ], 200);
         }
-
+       
         // 3. Verify password
         if (!Hash::check($password, $user->password)) {
             return response()->json([

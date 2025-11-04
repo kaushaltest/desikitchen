@@ -284,7 +284,7 @@
         const rate = 0.25;
         const final = order.total_amount;
         const base = (final / (1 + rate)).toFixed(2);
-
+        console.log("order.status ",order.status)
         return `
     <div class="card current-order-card mb-3">
         <div class="card-header bg-white">
@@ -293,13 +293,16 @@
                     <h5 class="card-title mb-1">Order #${order.order_id}
                         ${order.current_date === order.order_date ? '<span class="badge bg-primary ms-2">Current Order</span>' : ''}
                     </h5>
-                    <p class="card-text text-muted">Ordered at ${order.order_date}</p>
+                    <p class="card-text text-muted">Ordered for ${order.order_date}</p>
                 </div>
                 <div class="cancel_btn_box">
                     ${statusBadge}
-                    <button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}" data-orderdate="${order.without_format_order_date}">
-                                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                    Cancel Order</button>
+                     ${!['Outfordelivery', 'Delivered'].includes(order.status)
+                    ? `<button class="btn btn-danger rounded btn-cancel-order" data-id="${order.id}" data-orderdate="${order.without_format_order_date}">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            Cancel Order
+                       </button>`
+                    : ''}
                 </div>
             </div>
         </div>

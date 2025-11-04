@@ -249,9 +249,10 @@ class Customerorder extends Controller
             }
             if (isset($items['daywise'])) {
                 $paymentStatus = 'Unpaid';
-                $alacarteHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff;border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
 
                 foreach ($items['daywise'] as $item) {
+                    $alacarteHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff;border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
+
                     $subscriptionPlanAmount = 0;
                     $subscription_plan = Usersubscription_model::where('user_id', session('user_id'))
                         ->first();
@@ -421,7 +422,7 @@ class Customerorder extends Controller
                         $totalAmountForEmail = ($total * ($quantityAfterPlan == 0 ? 1 : $quantityAfterPlan) + $additionalItemTotal);
                         $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px solid #ddd; padding-bottom:8px; overflow:hidden; border-top:1px solid #eee;">';
                         $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>Total</strong></div>';
-                        $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . ($totalAmountForEmail) . '</div>';
+                        $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . round($totalAmountForEmail, 2) . '</div>';
                         $alacarteHtml .= '</div>';
                         $addQuarantine_failed = Customerorder_model::updateOrCreate(
                             ['id' => $orderinsertedid->id],
@@ -438,7 +439,7 @@ class Customerorder extends Controller
                         if (session('user_email')) {
                             $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; margin-bottom:5px; padding-bottom:8px; overflow:hidden;">';
                             $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
-                            $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . $finalUSDAmount . '</strong></div>';
+                            $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . round($finalUSDAmount, 2) . '</strong></div>';
                             $alacarteHtml .= '</div></div>';
                             $data = [
                                 'customerName' => session('user_name'),
@@ -475,111 +476,140 @@ class Customerorder extends Controller
                 }
             }
             if (isset($items['alacarte']) && !empty($items['alacarte'])) {
-                $orderId = $this->generateOrderId();
-                $alacarteHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff; border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
-                $added_data = [
-                    'user_id' => session('user_id'),
-                    'address_id' => $request->input('address_id'),
-                    'order_type' => 'alacarte',
-                    'order_date' => $request->input('alacarteorder_date'),
-                    'order_id' => $orderId,
-                    'order_status' => 'Cash'
-                ];
-                $orderalacarteinsertedid = Customerorder_model::create($added_data);
-                $alacarteItemTotal = 0;
-                $additionalItemTotal = 0;
-                $alacarteHtml .= '
+                $orderDate = Carbon::parse($request->input('alacarteorder_date'));
+                $now = Carbon::now();
+                if ($orderDate->greaterThan($now)) {
+                    $menuDateStr =  $request->input('alacarteorder_date');
+
+                    // 1️⃣ Parse menu date as a Carbon date (local timezone)
+                    $menuDate = Carbon::createFromFormat('Y-m-d', $menuDateStr)->startOfDay();
+
+                    // 2️⃣ Get today's and tomorrow's dates
+                    $today = Carbon::today();
+                    $tomorrow = Carbon::tomorrow();
+
+                    // 3️⃣ Check if menuDate is tomorrow
+                    $isTomorrow = $menuDate->equalTo($tomorrow);
+
+                    // 4️⃣ If tomorrow, check if current time is after 9 PM
+                    if ($isTomorrow && Carbon::now()->hour >= 21) {
+                        // After 9 PM
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'You cannot buy meal after 9 PM for tomorrow.',
+                        ]);
+                    }
+                    $orderId = $this->generateOrderId();
+                    $alacarteHtml = '<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; background:#fff; border:1px solid #FFFFFF; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1);">';
+                    $added_data = [
+                        'user_id' => session('user_id'),
+                        'address_id' => $request->input('address_id'),
+                        'order_type' => 'alacarte',
+                        'order_date' => $request->input('alacarteorder_date'),
+                        'order_id' => $orderId,
+                        'order_status' => 'Cash'
+                    ];
+                    $orderalacarteinsertedid = Customerorder_model::create($added_data);
+                    $alacarteItemTotal = 0;
+                    $additionalItemTotal = 0;
+                    $alacarteHtml .= '
                         <div style="background:#FEA116; color:#FFFFFF; padding:10px; text-align:center;">
                     <h2 style="margin:0;">🧾 Your Order Summary</h2>
-                </div>
-                ';
-                $alacarteHtml .= '<div style="margin-bottom:5px border-bottom:1px solid #eee;">
-                    <p style="margin:0; font-size:14px;">Date: <strong>' . $request->input('alacarteorder_date') . '</strong></p>
-                    <p style="margin:0; font-size:14px;">Order ID: <strong>' . $orderId . '</strong></p>
-                </div>';
-                foreach ($items['alacarte'] as $item) {
-                    $alacarteItem = Alacartemenu_model::find($item['db_id']);
-                    $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
-                    $alacarteHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $alacarteItem->name . '</strong> X ' . $item['quantity'] . '</div>';
-                    $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . $item['price'] * $item['quantity'] . '</div>';
-                    $alacarteHtml .= '</div>';
+                    </div>
+                    ';
+                    $alacarteHtml .= '<div style="margin-bottom:5px border-bottom:1px solid #eee;">
+                        <p style="margin:0; font-size:14px;">Date: <strong>' . $request->input('alacarteorder_date') . '</strong></p>
+                        <p style="margin:0; font-size:14px;">Order ID: <strong>' . $orderId . '</strong></p>
+                    </div>';
+                    foreach ($items['alacarte'] as $item) {
+                        $alacarteItem = Alacartemenu_model::find($item['db_id']);
+                        $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
+                        $alacarteHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $alacarteItem->name . '</strong> X ' . $item['quantity'] . '</div>';
+                        $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . $item['price'] * $item['quantity'] . '</div>';
+                        $alacarteHtml .= '</div>';
 
-                    $item_data = [
-                        'order_id' => $orderalacarteinsertedid->id,
-                        'item_type' => $item['type'],
-                        'item_id' => $item['db_id'],
-                        'quantity' => $item['quantity'],
-                        'unit_price' => $item['price'],
-                        'total_price' => $item['price'] * $item['quantity'],
-                    ];
-                    Customerorderitem_model::create($item_data);
-                    if (isset($item['additional_items'])) {
+                        $item_data = [
+                            'order_id' => $orderalacarteinsertedid->id,
+                            'item_type' => $item['type'],
+                            'item_id' => $item['db_id'],
+                            'quantity' => $item['quantity'],
+                            'unit_price' => $item['price'],
+                            'total_price' => $item['price'] * $item['quantity'],
+                        ];
+                        Customerorderitem_model::create($item_data);
+                        if (isset($item['additional_items'])) {
 
-                        foreach ($item['additional_items'] as $adt) {
-                            $additionalItem = Additionalmenu_model::find($adt['id']);
+                            foreach ($item['additional_items'] as $adt) {
+                                $additionalItem = Additionalmenu_model::find($adt['id']);
 
-                            $alacarteHtml .= '<div style="margin:5px;  margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
-                            $alacarteHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $additionalItem->name . '</strong> X ' . $adt['quantity'] . '</div>';
-                            $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . $adt['price'] * $adt['quantity'] . '</div>';
-                            $alacarteHtml .= '</div>';
+                                $alacarteHtml .= '<div style="margin:5px;  margin-left:10px; margin-right:10px; border-bottom:1px dashed #ddd; padding-bottom:8px; overflow:hidden;">';
+                                $alacarteHtml .= '<div style="float:left; width:70%; font-size:14px;"><strong>' . $additionalItem->name . '</strong> X ' . $adt['quantity'] . '</div>';
+                                $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:14px;">$' . $adt['price'] * $adt['quantity'] . '</div>';
+                                $alacarteHtml .= '</div>';
 
-                            $additionalItemTotal = $additionalItemTotal + ($adt['price'] * $adt['quantity']);
-                            $item_data = [
-                                'order_id' => $orderalacarteinsertedid->id,
-                                'item_type' => $adt['type'],
-                                'item_id' => $adt['id'],
-                                'quantity' => $adt['quantity'],
-                                'unit_price' => $adt['price'],
-                                'total_price' => $adt['price'] * $adt['quantity'],
-                            ];
-                            Customerorderitem_model::create($item_data);
+                                $additionalItemTotal = $additionalItemTotal + ($adt['price'] * $adt['quantity']);
+                                $item_data = [
+                                    'order_id' => $orderalacarteinsertedid->id,
+                                    'item_type' => $adt['type'],
+                                    'item_id' => $adt['id'],
+                                    'quantity' => $adt['quantity'],
+                                    'unit_price' => $adt['price'],
+                                    'total_price' => $adt['price'] * $adt['quantity'],
+                                ];
+                                Customerorderitem_model::create($item_data);
+                            }
                         }
+                        $alacarteItemTotal += ($item['price'] * $item['quantity']);
                     }
-                    $alacarteItemTotal += ($item['price'] * $item['quantity']);
-                }
-                $updated_data = [
-                    'total_amount' => $additionalItemTotal + $alacarteItemTotal,
-                ];
-                $updated_data = [
-                    'total_amount' => ($alacarteItemTotal + $additionalItemTotal)
-                        * ($alacarteItemTotal + $additionalItemTotal != 0 ? 1.25 : 1),
-                ];
-                $finalUSDAmount = ($alacarteItemTotal + $additionalItemTotal)
-                    * ($alacarteItemTotal + $additionalItemTotal != 0 ? 1.25 : 1);
-                $totalAmountForEmail = ($alacarteItemTotal + $additionalItemTotal);
-                $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px solid #ddd; padding-bottom:8px; overflow:hidden;">';
-                $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>Total</strong></div>';
-                $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . ($totalAmountForEmail) . '</div>';
-                $alacarteHtml .= '</div>';
-                $addQuarantine_failed = Customerorder_model::updateOrCreate(
-                    ['id' => $orderalacarteinsertedid->id],
-                    $updated_data
-                );
-
-                $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
-                    ->asForm()
-                    ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
-                        'To' => session('user_code') . session('user_phone'),
-                        'From' => env('TWILIO_PHONE'),
-                        'Body' => 'Your alacarte order ' . $orderId . ' for ' .  $request->input('alacarteorder_date') . ' has been confirmed.'
-                    ]);
-                if (session('user_email')) {
-                    $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; padding-bottom:8px; overflow:hidden;">';
-                    $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
-                    $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . ($finalUSDAmount) . '</strong></div>';
-                    $alacarteHtml .= '</div></div>';
-
-                    $data = [
-                        'customerName' => session('user_name'),
-                        'orderId' => $orderId,
-                        'orderDate' =>  $request->input('alacarteorder_date'),
-                        'alacarteHtml' => $alacarteHtml
+                    $updated_data = [
+                        'total_amount' => $additionalItemTotal + $alacarteItemTotal,
                     ];
-                    Mail::send('email.pending_confirmation', $data, function ($message) use ($data) {
-                        $message->to(session('user_email'))
-                            ->from('info@desikitchen-ky.com', 'Desi Kitchen')
-                            ->subject('Desi Kitchen - Order Pending Confirmation');
-                    });
+                    $updated_data = [
+                        'total_amount' => ($alacarteItemTotal + $additionalItemTotal)
+                            * ($alacarteItemTotal + $additionalItemTotal != 0 ? 1.25 : 1),
+                    ];
+                    $finalUSDAmount = ($alacarteItemTotal + $additionalItemTotal)
+                        * ($alacarteItemTotal + $additionalItemTotal != 0 ? 1.25 : 1);
+                    $totalAmountForEmail = ($alacarteItemTotal + $additionalItemTotal);
+                    $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; border-bottom:1px solid #ddd; padding-bottom:8px; overflow:hidden;">';
+                    $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>Total</strong></div>';
+                    $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;">' . ($totalAmountForEmail) . '</div>';
+                    $alacarteHtml .= '</div>';
+                    $addQuarantine_failed = Customerorder_model::updateOrCreate(
+                        ['id' => $orderalacarteinsertedid->id],
+                        $updated_data
+                    );
+
+                    $response = Http::withBasicAuth(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'))
+                        ->asForm()
+                        ->post("https://api.twilio.com/2010-04-01/Accounts/" . env('TWILIO_SID') . "/Messages.json", [
+                            'To' => session('user_code') . session('user_phone'),
+                            'From' => env('TWILIO_PHONE'),
+                            'Body' => 'Your alacarte order ' . $orderId . ' for ' .  $request->input('alacarteorder_date') . ' has been confirmed.'
+                        ]);
+                    if (session('user_email')) {
+                        $alacarteHtml .= '<div style="margin:5px; margin-left:10px; margin-right:10px; padding-bottom:8px; overflow:hidden;">';
+                        $alacarteHtml .= '<div style="float:left; width:70%; font-size:15px;"><strong>USD 0.8</strong></div>';
+                        $alacarteHtml .= '<div style="float:right; width:28%; text-align:right; font-size:15px;"><strong>' . ($finalUSDAmount) . '</strong></div>';
+                        $alacarteHtml .= '</div></div>';
+
+                        $data = [
+                            'customerName' => session('user_name'),
+                            'orderId' => $orderId,
+                            'orderDate' =>  $request->input('alacarteorder_date'),
+                            'alacarteHtml' => $alacarteHtml
+                        ];
+                        Mail::send('email.pending_confirmation', $data, function ($message) use ($data) {
+                            $message->to(session('user_email'))
+                                ->from('info@desikitchen-ky.com', 'Desi Kitchen')
+                                ->subject('Desi Kitchen - Order Pending Confirmation');
+                        });
+                    }
+                } else {
+                    return response()->json([
+                        "success" => false,
+                        'message' => "Please select a future date for your platter order. than current date"
+                    ], 200);
                 }
             }
             return response()->json([
@@ -607,13 +637,23 @@ class Customerorder extends Controller
                     "message" => "Order not found"
                 ], 200);
             }
+            if ($existing->status == 'outfordelivery' || $existing->status == 'delivered') {
+                return response()->json([
+                    "success" => false,
+                    "message" => "The order is currently out for delivery and cannot be canceled at this time."
+                ], 200);
+            }
+
 
             $tz = config('app.timezone') ?: 'UTC';
             // Parse order_date as a date (startOfDay ensures date-only)
             $orderDate = Carbon::parse($existing->order_date, $tz)->startOfDay();
+
             $now = Carbon::now($tz);
+
             $cutoffToday = Carbon::today($tz)->setTime(21, 0, 0);
-            if ($orderDate->isTomorrow() && $now->greaterThan($cutoffToday)) {
+
+            if (($orderDate->isTomorrow() || $orderDate->isToday()) && $now->greaterThan($cutoffToday)) {
                 return response()->json([
                     "success" => false,
                     "message" => "You cannot cancel this order after 9 PM."

@@ -406,7 +406,7 @@
                     searchable: false
                 }
             ],
-            order: []
+            order: [[1, 'asc']]
             // columnDefs: [{
             //     targets: 7, // Index of the column you want to hide
             //     visible: false,

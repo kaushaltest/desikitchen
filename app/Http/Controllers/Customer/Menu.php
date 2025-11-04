@@ -23,12 +23,13 @@ class Menu extends Controller
         $data = [];
         $today = Carbon::today('Asia/Kolkata')->format('Y-m-d');
 
-        $daywisemenu = Daywisemenu_model::where('menu_date', '>', $today)->where('is_active',true)
+        $daywisemenu = Daywisemenu_model::where('menu_date', '>', $today)->where('is_active', true)
             ->orderBy('menu_date', 'asc')
             ->get();
         $daywisemenu->transform(function ($item) {
-            $timezone = config('app.timezone');
-            $item->day_name = Carbon::parse($item->menu_date, $timezone)->locale('en')->dayName; // or ->format('l')
+            $timezone = 'America/Cayman';
+            $item->day_name = Carbon::createFromFormat('Y-m-d', $item->menu_date)->locale('en')->dayName; // or ->format('l')
+            $item->formatted_date = Carbon::createFromFormat('Y-m-d', $item->menu_date)->format('d M');
             return $item;
         });
         $data['daywise'] = $daywisemenu;
